@@ -1,0 +1,81 @@
+{
+  "nodes": {
+    "binaries": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1661115863,
+        "narHash": "sha256-GPpbL423S81qYXNsT6fAWNLzs+V4DBzWkm6dgLVgeeo=",
+        "owner": "usertam",
+        "repo": "context-minimals",
+        "rev": "ea84ee6c59b2c8df71de1c58112c4c12170a5972",
+        "type": "github"
+      },
+      "original": {
+        "owner": "usertam",
+        "ref": "mirror/binaries",
+        "repo": "context-minimals",
+        "type": "github"
+      }
+    },
+    "context": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1659714279,
+        "narHash": "sha256-1I3lnay0+CRMAj8CFq0/xgAJQnEXllM344gzrkl9EO4=",
+        "owner": "contextgarden",
+        "repo": "context-mirror",
+        "rev": "178de9556e3cb519672f9b54db7b5b29eec43c69",
+        "type": "github"
+      },
+      "original": {
+        "owner": "contextgarden",
+        "ref": "beta",
+        "repo": "context-mirror",
+        "type": "github"
+      }
+    },
+    "modules": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1661115859,
+        "narHash": "sha256-Aefji7uAnHHxWI7gpiQ/UxjvNwKbFvQRTZiQQpF8UBY=",
+        "owner": "usertam",
+        "repo": "context-minimals",
+        "rev": "1402bb20ca22be0ca0761e5a2330a2e04b5f0866",
+        "type": "github"
+      },
+      "original": {
+        "owner": "usertam",
+        "ref": "mirror/modules",
+        "repo": "context-minimals",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1661067879,
+        "narHash": "sha256-REC3ipNl6oMnEPYeP1LI2B8XK3h9z48esjdEukLKpZM=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "796a2677849fd7329543d9da4e13b77aa48956a8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "binaries": "binaries",
+        "context": "context",
+        "modules": "modules",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
