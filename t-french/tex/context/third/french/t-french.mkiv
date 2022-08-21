@@ -1,0 +1,98 @@
+%D \module
+%D   [     file=t-french,
+%D      version=2011.11.09,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=For French documents,
+%D       author=Peter Münster,
+%D         date=\currentdate,
+%D    copyright=Peter Münster,
+%D        email=pmrb@free.fr,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011  Peter Münster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but without any warranty; without even the implied warranty of
+%C merchantability or fitness for a particular purpose.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+%D This module tries to do similar things as the frenchb.ldf in \LaTeX:
+%D \startitemize
+%D \item automatic space before » and after «, :, ?, ; and ! 
+%D \item changing symbol for itemize environment
+%D \stopitemize
+%D
+%D If I remember right, the \LaTeX\ babel package does a much better job at
+%D language switching, but I don't know, how this is possible in \ConTeXt...
+%D
+%D Many thanks to Hans Hagen and Wolfgang Schuster for their help!
+
+\writestatus{loading}{Typesetting French documents}
+
+\startsetups french
+  % Todo: This shoud be also active in footnotes, headers and footers,
+  % and not active in verbatim text:
+  \setcharacterspacing[frenchpunctuation]
+  % A question of style:
+  \setupitemize[symbol=2]
+\stopsetups
+\startsetups not-french
+  \setcharacterspacing[reset]
+  \setupitemize[symbol=\currentitemlevel]
+\stopsetups
+\setuplanguage [default] [setups=not-french]
+\setuplanguage [fr]      [setups=french]
+\mainlanguage  [fr]
+
+\ifx \ieme  \undefined \def\ieme  {\highordinalstr{e}}   \fi
+\ifx \iemes \undefined \def\iemes {\highordinalstr{es}}  \fi
+\ifx \ier   \undefined \def\ier   {\highordinalstr{er}}  \fi
+\ifx \iere  \undefined \def\iere  {\highordinalstr{re}}  \fi
+\ifx \iers  \undefined \def\iers  {\highordinalstr{ers}} \fi
+\ifx \ieres \undefined \def\ieres {\highordinalstr{res}} \fi
+
+\continueifinputfile{t-french.mkiv}
+
+%D Usage example:
+\startbuffer[items]
+  \startitemize
+  \item test
+  \item test
+    \startitemize
+    \item test
+    \item test
+      \startitemize
+      \item test
+      \item test
+      \stopitemize
+    \stopitemize
+  \stopitemize
+\stopbuffer
+
+\usemodule[french]
+
+\starttext
+\startbuffer
+  Voilà: Voilà? Voilà! Voilà;
+  \start
+    \language[en]
+    some English text: «English» or \quotation{French}, ok?
+  \stop
+  «voilà» \quote{voilà} \quotation{voilà}
+  \getbuffer[items]
+  \start
+    \language[en]
+    \getbuffer[items]
+  \stop
+\stopbuffer
+\typebuffer
+\getbuffer
+\stoptext

@@ -1,0 +1,22 @@
+Modulename : t-gantt
+Author     : Adam Reviczky
+License    : Public Domain
+
+Description
+-----------
+
+Drawing Gantt charts.
+
+Usage
+-----
+
+\usemodule[gantt]
+
+\starttext
+… \startgantt … \stopgantt …
+\stoptext
+
+Options
+-------
+
+- alternative

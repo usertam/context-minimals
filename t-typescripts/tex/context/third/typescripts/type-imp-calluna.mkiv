@@ -1,0 +1,66 @@
+%D \module
+%D   [     file=type-imp-calluna,
+%D      version=2011.01.01,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Calluna Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [calluna]
+
+\starttypescript [\s!serif] [calluna]
+    \definefontsynonym [Calluna-Regular]    [\s!file:callunaregular] [\s!features=\s!default]
+    \definefontsynonym [Calluna-Italic]     [\s!file:callunait]      [\s!features=\s!default]
+    \definefontsynonym [Calluna-Bold]       [\s!file:callunabold]    [\s!features=\s!default]
+    \definefontsynonym [Calluna-BoldItalic] [\s!file:callunaboldit]  [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [calluna]
+    \setups[\s!font:\s!fallback:\s!serif]
+    \definefontsynonym [\s!Serif]            [Calluna-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SerifItalic]      [Calluna-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold]        [Calluna-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBoldItalic]  [Calluna-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [calluna]
+    \definefontsynonym [CallunaSans-Regular]    [\s!file:callunasansregular]    [\s!features=\s!default]
+    \definefontsynonym [CallunaSans-Italic]     [\s!file:callunasansitalic]     [\s!features=\s!default]
+    \definefontsynonym [CallunaSans-Bold]       [\s!file:callunasansbold]       [\s!features=\s!default]
+    \definefontsynonym [CallunaSans-BoldItalic] [\s!file:callunasansbolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [calluna]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]            [CallunaSans-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]      [CallunaSans-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]        [CallunaSans-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic]  [CallunaSans-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [calluna]
+    \definetypeface [calluna] [rm] [\s!serif] [calluna]  [\s!default]
+    \definetypeface [calluna] [ss] [\s!sans]  [calluna]  [\s!default] [\s!rscale=\v!auto]
+    \definetypeface [calluna] [tt] [\s!mono]  [modern]   [\s!default] [\s!rscale=\v!auto]
+    \definetypeface [calluna] [mm] [\s!math]  [palatino] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection

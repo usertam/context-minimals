@@ -1,0 +1,63 @@
+%D \module
+%D   [     file=type-imp-pigiarniq,
+%D      version=2010.09.14,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Pigiarniq Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [pigiarniq]
+
+\starttypescript [\s!sans] [pigiarniq,pigiarniq-thin,pigiarniq-bold]
+    \definefontsynonym [Pigiarniq-Light]   [\s!file:pigiarniqlight]   [\s!features=\s!default]
+    \definefontsynonym [Pigiarniq-Regular] [\s!file:pigiarniqregular] [\s!features=\s!default]
+    \definefontsynonym [Pigiarniq-Italic]  [\s!file:pigiarniqitalic]  [\s!features=\s!default]
+    \definefontsynonym [Pigiarniq-Bold]    [\s!file:pigiarniqbold]    [\s!features=\s!default]
+    \definefontsynonym [Pigiarniq-Heavy]   [\s!file:pigiarniqheavy]   [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [pigiarniq]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]       [Pigiarniq-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic] [Pigiarniq-Italic]  [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]   [Pigiarniq-Bold]    [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [pigiarniq-thin]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [Pigiarniq-Light]   [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [Pigiarniq-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [Pigiarniq-Italic]  [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [pigiarniq-bold]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [Pigiarniq-Bold]  [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [Pigiarniq-Heavy] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [pigiarniq,pigiarniq-thin,pigiarniq-bold]
+    \definetypeface [\typescriptone] [ss] [\s!sans] [\typescriptone] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

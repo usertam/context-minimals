@@ -1,0 +1,24 @@
+Modulename : t-fullpage
+Author     : Wolfgang Schuster
+License    : GNU General Public License
+
+Description
+-----------
+
+Fullpage is a module for ConTeXt to set equal margins
+in a document without the need for \setuplayout.
+
+Usage
+-----
+
+\usemodule[fullpage][style={cm,empty}]
+
+\starttext
+\input knuth\par
+\stoptext
+
+Options
+-------
+
+- style  (cm,in,margin,headings,plain,empty)
+- margin (DIMENSION)

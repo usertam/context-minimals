@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2010.12.31">
+
+<cd:command name="defineannotation" file="t-annotation.mkvi">
+    <cd:sequence>
+        <cd:string value="defineannotation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="2" optional="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="3" list="yes" optional="yes">
+            <cd:inherit name="setupannotation" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="annotation" generated="yes" file="t-annotation.mkvi">
+    <cd:sequence>
+        <cd:variable value="annotation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes" optional="yes">
+            <cd:inherit name="setupannotation"/>
+        </cd:assignments>
+        <cd:content n="2" optional="yes"/>
+        <cd:content n="3"/>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="annotation" generated="yes" type="environment" file="t-annotation.mkvi">
+    <cd:sequence>
+        <cd:variable value="annotation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes" optional="yes">
+            <cd:inherit name="setupannotation"/>
+        </cd:assignments>
+        <cd:content n="2" optional="yes"/>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupannotation" file="t-annotation.mkvi">
+    <cd:sequence>
+        <cd:string value="setupannotation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes" optional="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="alternative">
+                <cd:constant type="text"/>
+                <cd:constant type="paragraph" default="yes"/>
+                <cd:constant type="comment"/>
+                <cd:constant type="tooltip"/>
+                <cd:constant type="inmargin"/>
+                <cd:constant type="inleft"/>
+                <cd:constant type="inright"/>
+                <cd:constant type="margin"/>
+                <cd:constant type="leftmargin"/>
+                <cd:constant type="rightmargin"/>
+                <cd:constant type="innermargin"/>
+                <cd:constant type="outermargin"/>
+                <cd:constant type="footnote"/>
+                <cd:constant type="endnote"/>
+                <cd:constant type="command"/>
+            </cd:parameter>
+            <cd:parameter name="before">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="after">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="inbetween">
+                <cd:constant type="cd:command" default="\blank"/>
+            </cd:parameter>
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="headstyle">
+                <cd:resolve name="style" default="bold"/>
+            </cd:parameter>
+            <cd:parameter name="textstyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="headcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="textcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="title">
+                <cd:constant type="yes" default="yes"/>
+                <cd:constant type="no"/>
+            </cd:parameter>
+            <cd:parameter name="number">
+                <cd:constant type="yes"/>
+                <cd:constant type="no" default="yes"/>
+            </cd:parameter>
+            <cd:parameter name="next">
+                <cd:constant type="cd:command" default="\autoinsertnextspace"/>
+            </cd:parameter>
+            <cd:parameter name="command">
+                <cd:constant type="cd:twoarguments"/>
+            </cd:parameter>
+            <cd:parameter name="counter">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="reference">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="export">
+                <cd:constant type="yes"/>
+                <cd:constant type="no" default="yes"/>
+            </cd:parameter>
+            <cd:parameter name="list">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="display">
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="auto" default="yes"/>
+            </cd:parameter>
+            <cd:parameter name="paragraph">
+                <cd:constant type="yes"/>
+                <cd:constant type="no" default="yes"/>
+            </cd:parameter>
+            <cd:parameter name="spacebefore">
+                <cd:inherit name="blank" n="1" default="line"/>
+            </cd:parameter>
+            <cd:parameter name="spaceafter">
+                <cd:inherit name="blank" n="1" default="line"/>
+            </cd:parameter>
+            <cd:parameter name="left">
+                <cd:constant type="cd:text" default="("/>
+            </cd:parameter>
+            <cd:parameter name="right">
+                <cd:constant type="cd:text" default=")"/>
+            </cd:parameter>
+            <cd:parameter name="indentnext">
+                <cd:constant type="yes" default="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="auto"/>
+            </cd:parameter>
+            <cd:parameter name="indenting">
+                <cd:inherit name="setupindenting" n="1" default="never"/>
+            </cd:parameter>
+            <cd:parameter name="align">
+                <cd:inherit name="setupalign" n="1"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+</cd:interface>

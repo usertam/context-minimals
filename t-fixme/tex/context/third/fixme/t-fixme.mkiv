@@ -1,0 +1,263 @@
+%D \module
+%D   [     file=t-fixme,
+%D      version=2013.03.03,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=FiXme,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@gmail.com,
+%D      license=Public Domain]
+
+\writestatus{loading}{Context User Module / FiXme}
+
+\unprotect
+
+%D Logo
+
+\def\fixmelogo{{\ss FiXme}} \logo[FIXME]{\fixmelogo}
+
+\startinterface all
+  \setinterfaceconstant {version} {version}
+\stopinterface
+
+\startinterface all
+  \setinterfacevariable {fixme}     {fixme}
+  \setinterfacevariable {fixmes}    {fixmes}
+  \setinterfacevariable {fatal}     {fatal}
+  \setinterfacevariable {note}      {note}
+  \setinterfacevariable {warning}   {warning}
+  \setinterfacevariable {error}     {error}
+  \setinterfacevariable {total}     {total}
+  \setinterfacevariable {draft}     {draft}
+  \setinterfacevariable {fxnote}    {fxnote}
+  \setinterfacevariable {fxwarning} {fxwarning}
+  \setinterfacevariable {fxerror}   {fxerror}
+\stopinterface
+
+%D Messages
+
+\definemessageconstant {fixme}
+
+\startinterface all
+  \setinterfacemessage{fixme}{title}{FiXme}
+  \setinterfacemessage{fixme}{1}    {Number of notes: --}
+  \setinterfacemessage{fixme}{2}    {Number of warnings: --}
+  \setinterfacemessage{fixme}{3}    {Number of errors: --}
+  \setinterfacemessage{fixme}{4}    {Number of fatal errors: --}
+  \setinterfacemessage{fixme}{5}    {Total: --}
+\stopinterface
+
+%D \macros
+%D   {setupfixme}
+%D
+%D Namespace and setup command
+
+\installnamespace {fixme}
+\installnamespace {fixmecounter}
+\installnamespace {fixmelocation}
+\installnamespace {fixmerenderings}
+
+\installcommandhandler \????fixme         {fixme}         \????fixme
+\installcommandhandler \????fixmelocation {fixmelocation} \????fixmelocation
+
+%D \starttyping
+%D \def\setupfixme
+%D   {\dosingleargument\dosetupfixme}
+%D
+%D \def\dosetupfixme[#1]%
+%D   {\doifassignmentelse{#1}
+%D      {\getparameters[\????fx][#1]}
+%D      {\setvalue{\????fx\c!version}{#1}}}
+%D \stoptyping
+
+%D Lists
+
+\definelist[\v!fixme][\c!width=\zeropoint]
+
+\setvalue{\e!place   \e!listof\v!fixmes}{\placelist   [\v!fixme]}
+\setvalue{\e!complete\e!listof\v!fixmes}{\completelist[\v!fixme][\v!fixmes]}
+
+%D \macros
+%D   {fixme,fxnote,fxwarning,fxerror,
+%D    definefixme,definefixmelocation}
+%D
+%D Commands
+
+\appendtoks
+  \setuevalue        {\currentfixme}{\fixme_direct{\currentfixme}}%
+  \setuevalue{\e!start\currentfixme}{\fixme_start {\currentfixme}}%
+  \setuevalue{\e!stop \currentfixme}{\fixme_stop                 }%
+\to \everydefinefixme
+
+\definecounter[\????fixmecounter\v!note   ]
+\definecounter[\????fixmecounter\v!warning]
+\definecounter[\????fixmecounter\v!error  ]
+\definecounter[\????fixmecounter\v!fatal  ]
+\definecounter[\????fixmecounter\v!total  ]
+
+\unexpanded\def\fixme_direct#1%
+  {\edef\currentfixme{#1}%
+   \dosingleempty\fixme_direct_indeed}
+
+\def\fixme_direct_indeed[#1]#2%
+  {\removeunwantedspaces
+   \begingroup
+   \setupcurrentfixme[\c!location={#1},\c!text={#2}]%
+   \edef\p_fixme_version {\fixmeparameter\c!version }%
+   \edef\p_fixme_type    {\fixmeparameter\c!type    }%
+   \edef\p_fixme_location{\fixmeparameter\c!location}%
+   \edef\p_fixme_text    {\fixmeparameter\c!text    }%
+   \ifx\p_fixme_location\empty
+     \let\p_fixme_location\v!margin
+   \fi
+   \ifx\p_fixme_version\v!draft
+     \normalexpanded{\writetolist[\v!fixme]{}{\fixmetext{\p_fixme_type}\p_fixme_text}}%
+     \incrementcounter[\????fixmecounter\v!total     ]%
+     \incrementcounter[\????fixmecounter\p_fixme_type]%
+     \processcommacommand[\p_fixme_location]\fixme_location
+   \fi
+   \endgroup}
+
+\def\fixme_location#1%
+  {\edef\currentfixmelocation{#1}%
+   \ifcsname\currentfixmelocationhash\s!parent\endcsname \else
+     \let\currentfixmelocation\v!margin
+   \fi
+   \edef\p_fixme_renderingsetup{\fixmelocationparameter\c!renderingsetup}%
+   \texsetup\p_fixme_renderingsetup}
+
+\unexpanded\def\fixme_start#1%
+  {\begingroup
+   \edef\currentfixme{#1}%
+   \dosingleempty\fixme_start_indeed}
+
+\def\fixme_start_indeed[#1]%
+  {\iffirstargument
+     \setupcurrentfixme[#1]%
+   \fi
+   \grabbufferdatadirect\v!fixme{\e!start\currentfixme}{\e!stop\currentfixme}}
+
+\unexpanded\def\fixme_stop
+  {\edef\p_fixme_version{\fixmeparameter\c!version}%
+   \edef\p_fixme_list   {\fixmeparameter\c!list   }%
+   \edef\p_fixme_type   {\fixmeparameter\c!type   }%
+   \ifx\p_fixme_version\v!draft
+     \ifx\p_fixme_list\empty \else
+       \normalexpanded{\writetolist[\v!fixme]{}{\fixmetext\p_fixme_type\p_fixme_list}}%
+     \fi
+     \incrementcounter[\????fixmecounter\v!total     ]%
+     \incrementcounter[\????fixmecounter\p_fixme_type]%
+     \fixmeparameter\c!before
+     \getbufferdata[\v!fixme]%
+     \fixmeparameter\c!after
+   \fi
+   \endgroup}
+
+\definefixmelocation [\v!text] [\c!renderingsetup=\????fixmerenderings:\v!text]
+
+\startsetups[\????fixmerenderings:\v!text]
+  \ifhmode\normalspace\fi
+  \fixmetext\p_fixme_type
+  \p_fixme_text
+\stopsetups
+
+\definefixmelocation [\v!command]               [\c!renderingsetup=\????fixmerenderings:\v!command]
+\definefixmelocation [\v!margin]   [\v!command] [\c!command=\inright]
+\definefixmelocation [\v!footnote] [\v!command] [\c!command=\footnote]
+\definefixmelocation [\v!left]     [\v!command] [\c!command=\inleft]
+\definefixmelocation [\v!right]    [\v!command] [\c!command=\inright]
+\definefixmelocation [\v!inner]    [\v!command] [\c!command=\ininner]
+\definefixmelocation [\v!outer]    [\v!command] [\c!command=\inouter]
+
+\startsetups[\????fixmerenderings:\v!command]
+  \edef\p_fixme_command{\fixmelocationparameter\c!command}%
+  \normalexpanded{\p_fixme_command{\fixmetext{\p_fixme_type}\p_fixme_text}}
+\stopsetups
+
+\definefixmelocation [\v!none] [\c!renderingsetup=\????fixmerenderings:\v!none]
+
+\startsetups[\????fixmerenderings:\v!none]
+  % EMPTY
+\stopsetups
+
+%D \starttyping
+%D \def\definefixme
+%D   {\dodoubleargument\dodefinefixme}
+%D
+%D \def\dodefinefixme[#1][#2]%
+%D   {\setvalue        {#1}{\dodoubleempty\dofixme     [#2]}%
+%D    \setvalue{\e!start#1}{\dodoubleempty\dostartfixme[#2]}%
+%D    \setvalue{\e!stop #1}{\dostopfixme}}
+%D \stoptyping
+
+\appendtoks
+    \showmessage\m!fixme{1}{\rawcountervalue[\????fixmecounter\v!note   ]}%
+    \showmessage\m!fixme{2}{\rawcountervalue[\????fixmecounter\v!warning]}%
+    \showmessage\m!fixme{3}{\rawcountervalue[\????fixmecounter\v!error  ]}%
+    \showmessage\m!fixme{4}{\rawcountervalue[\????fixmecounter\v!fatal  ]}%
+    \showmessage\m!fixme{5}{\rawcountervalue[\????fixmecounter\v!total  ]}%
+\to \everynotabene
+
+% Labels
+
+\definelabelclass[fixme]
+
+\setupheadtext [\s!en] [\v!fixme=List of Corrections]
+\setupheadtext [\s!de] [\v!fixme=Verzeichnis der Korrekturen]
+\setupheadtext [\s!fr] [\v!fixme=Liste des Corrections]
+\setupheadtext [\s!it] [\v!fixme=Corrigenda]
+\setupheadtext [\s!es] [\v!fixme=Lista de Correcciones]
+\setupheadtext [\s!da] [\v!fixme=Rettelser]
+\setupheadtext [\s!hr] [\v!fixme=Popis korekcija]
+
+\setupfixmetext [\s!en]    [\v!note=\fixmelogo~Note: ]
+\setupfixmetext [\s!en] [\v!warning=\fixmelogo~Warning: ]
+\setupfixmetext [\s!en]   [\v!error=\fixmelogo~Error: ]
+\setupfixmetext [\s!en]   [\v!fatal=\fixmelogo: ]
+
+\setupfixmetext [\s!de]    [\v!note=\fixmelogo~Anm.: ]
+\setupfixmetext [\s!de] [\v!warning=\fixmelogo~Warnung: ]
+\setupfixmetext [\s!de]   [\v!error=\fixmelogo~Fehler: ]
+\setupfixmetext [\s!de]   [\v!fatal=\fixmelogo]
+
+\setupfixmetext [\s!fr]   [\v!note=\fixmelogo~Note: ]
+\setupfixmetext [\s!fr] [\v!warning=\fixmelogo~Attention: ]
+\setupfixmetext [\s!fr]   [\v!error=\fixmelogo~Erreur: ]
+\setupfixmetext [\s!fr]   [\v!fatal=\fixmelogo: ]
+
+\setupfixmetext [\s!it]    [\v!note=\fixmelogo~Nota: ]
+\setupfixmetext [\s!it] [\v!warning=\fixmelogo~Avviso: ]
+\setupfixmetext [\s!it]   [\v!error=\fixmelogo~Errore: ]
+\setupfixmetext [\s!it]   [\v!fatal=\fixmelogo: ]
+
+\setupfixmetext [\s!es]    [\v!note=\fixmelogo~Nota: ]
+\setupfixmetext [\s!es] [\v!warning=\fixmelogo~Aviso: ]
+\setupfixmetext [\s!es]   [\v!error=\fixmelogo~Error: ]
+\setupfixmetext [\s!es]   [\v!fatal=\fixmelogo: ]
+
+\setupfixmetext [\s!da]    [\v!note=\fixmelogo~Note: ]
+\setupfixmetext [\s!da] [\v!warning=\fixmelogo~Advarsel: ]
+\setupfixmetext [\s!da]   [\v!error=\fixmelogo~Fejl: ]
+\setupfixmetext [\s!da]   [\v!fatal=\fixmelogo: ]
+
+\setupfixmetext [\s!hr]    [\v!note=\fixmelogo~Poruka: ]
+\setupfixmetext [\s!hr] [\v!warning=\fixmelogo~Upozorenje: ]
+\setupfixmetext [\s!hr]   [\v!error=\fixmelogo~Gre\scaron ska: ]
+\setupfixmetext [\s!hr]   [\v!fatal=\fixmelogo: ]
+
+% Default commands and settings
+
+\definefixme [\v!fixme    ] [\c!type=\v!fatal  ]
+\definefixme [\v!fxnote   ] [\c!type=\v!note   ]
+\definefixme [\v!fxwarning] [\c!type=\v!warning]
+\definefixme [\v!fxerror  ] [\c!type=\v!error  ]
+
+\setupfixme
+  [  \c!before=\startquotation,
+      \c!after=\stopquotation,
+   \c!location=\v!margin,
+    \c!version=\v!draft,
+       \c!type=\v!fatal]
+
+\protect \endinput

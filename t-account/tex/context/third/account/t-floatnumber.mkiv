@@ -1,0 +1,37 @@
+%D \module
+%D   [       file=floatnumber,
+%D        version=2008.02.11,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Float Numbers,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+\writestatus{loading}{Context User Module / Float Numbers}
+
+\unprotect
+
+\startluacode
+    thirddata                    = thirddata                    or { }
+    thirddata.floatnumbers       = thirddata.floatnumbers       or { }
+    thirddata.floatnumbers.data  = thirddata.floatnumbers.data  or { }
+    thirddata.floatnumbers.saved = thirddata.floatnumbers.saved or { }
+\stopluacode
+
+\def\makefloatcounter      #1{\ctxlua{thirddata.floatnumbers.data ["#1"] = 0 thirddata.floatnumbers.saved["#1"] = 0}}
+\def\setfloatcounter     #1#2{\ctxlua{thirddata.floatnumbers.data ["#1"] = #2}}
+
+\def\plusfloatcounter    #1#2{\ctxlua{thirddata.floatnumbers.data ["#1"] = thirddata.floatnumbers.data ["#1"] + #2}}
+\def\minusfloatcounter   #1#2{\ctxlua{thirddata.floatnumbers.data ["#1"] = thirddata.floatnumbers.data ["#1"] - #2}}
+\def\multiplyfloatcounter#1#2{\ctxlua{thirddata.floatnumbers.data ["#1"] = thirddata.floatnumbers.data ["#1"] * #2}}
+\def\dividefloatcounter  #1#2{\ctxlua{thirddata.floatnumbers.data ["#1"] = thirddata.floatnumbers.data ["#1"] / #2}}
+\def\savefloatcounter      #1{\ctxlua{thirddata.floatnumbers.saved["#1"] = thirddata.floatnumbers.data ["#1"]}}
+\def\restorefloatcounter   #1{\ctxlua{thirddata.floatnumbers.data ["#1"] = thirddata.floatnumbers.saved["#1"]}}
+
+\def\floatcountervalue     #1{\ctxlua{tex.print(thirddata.floatnumbers.data["#1"])}}
+
+\let\resetfloatcounter\makefloatcounter
+
+\protect \endinput

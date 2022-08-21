@@ -1,0 +1,110 @@
+%D \module
+%D   [       file=t-games,
+%D        version=2008.01.10,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Games,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+\writestatus{loading}{Context User Module / Games}
+
+\unprotect
+
+%D Constants
+
+\startinterface all
+  \setinterfaceconstant {labelstyle}      {labelstyle}
+  \setinterfaceconstant {labelcolor}      {labelcolor}
+  \setinterfaceconstant {labeldistance}   {labeldistance}
+  \setinterfaceconstant {stonesize}       {stonesize}
+  \setinterfaceconstant {backgroundimage} {backgroundimage}
+  \setinterfaceconstant {interactive}     {interactive}
+\stopinterface
+
+%D Variables
+
+\startinterface all
+  \setinterfacevariable {game}    {game}
+  \setinterfacevariable {black}   {black}
+  \setinterfacevariable {white}   {white}
+  \setinterfacevariable {go}      {go}
+  \setinterfacevariable {hex}     {hex}
+  \setinterfacevariable {goban}   {goban}
+  \setinterfacevariable {hexgame} {hexgame}
+  \setinterfacevariable {red}     {red}
+  \setinterfacevariable {blue}    {blue}
+  \setinterfacevariable {weiqi}   {weiqi}
+  \setinterfacevariable {baduk}   {baduk}
+  \setinterfacevariable {pure}    {pure}
+  \setinterfacevariable {shade}   {shade}
+  \setinterfacevariable {tex}     {tex}
+  \setinterfacevariable {sgf}     {sgf}
+  \setinterfacevariable {chess}   {chess}
+  \setinterfacevariable {pgn}     {pgn}
+\stopinterface
+
+%D Namespace
+
+\def\????ga{@@@@ga}
+\def\????gm{@@@@gm}
+
+\def\gameparameter#1%
+  {\csname\????gm\currentgame#1\endcsname}
+
+%D Game environment, not more than a simple wrapper to load the real
+%D environments in the from \type {\????gm\????gm...}.
+
+\def\dostartgame
+  {\!!gameenvironmenttrue
+   \dotripleempty\dodostartgame}
+
+\def\dodostartgame[#1][#2][#3]%
+  {\bgroup
+   \edef\currentname{#1}% needed for the parser
+   \edef\currentgame{#2}% I should look for better names
+   \gameparameter\c!before
+   \ifsecondargument
+     \setupgame[#2][#3]%
+   \fi
+   \executeifdefined{\e!begin\????gm\????gm\currentgame}{\@EA\gobbleuntil\csname\e!stop\currentname\endcsname}}
+
+\def\dostopgame
+  {\executeifdefined{\e!end\????gm\????gm\currentgame}\donothing
+   \gameparameter\c!after
+   \egroup}
+
+\def\dogame
+  {\dotripleempty\dodogame}
+
+\newif\if!!gameenvironment
+
+\def\dodogame[#1][#2][#3]#4%
+  {\!!gameenvironmentfalse\dodostartgame[#1][#2][#3]{#4}\dostopgame}
+   
+
+\def\definegame
+  {\dodoubleargument\dodefinegame}
+
+\def\dodefinegame[#1][#2]%
+  {\setvalue{\e!start#1}{\dostartgame[#1][#2]}%
+   \setvalue{\e!stop #1}{\dostopgame}%
+   \setvalue        {#1}{\dogame[#1][#2]}%
+   \setvalue{\e!setup#1\e!endsetup}{\setupgame[#2]}}
+
+%D Setup command.
+
+\def\setupgame
+  {\dodoubleargument\dosetupgame}
+
+\def\dosetupgame[#1][#2]%
+  {\getparameters[\????gm#1][#2]}
+
+%D Load the games with their own macros.
+
+\input games-go
+\input games-hex
+
+\protect \endinput

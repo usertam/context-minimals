@@ -1,0 +1,40 @@
+Modulename : t-simplefonts
+Author     : Wolfgang Schuster
+License    : GNU General Public License
+
+Description
+-----------
+
+The 'simplefonts' module provides a interface to use fonts in ConTeXt MkIV
+in similar way as you can do with the 'fontspec' package for XeLaTeX.
+
+Usage
+-----
+
+The module is loaded in the document with:
+
+    \usemodule[simplefonts]
+
+The global fonts can be set with the following three commands:
+
+    \setmainfont[...][..,..=..,..]
+    \setsansfont[...][..,..=..,..]
+    \setmonofont[...][..,..=..,..]
+
+A single typeface can bet set with the command:
+
+    \definesimplefonttypeface[...][...][..,..=..,..]
+
+For each a complete typeface switch like \switchtobodyfont but you can use
+
+  \simplefonttypeface[...][..,..=..,..]
+
+With the command
+
+    \definesimplefont[...][..,..=..,..]
+
+you can define a single font for the use in header or other style elements and the last commmand
+
+    \simplefont[...][..,..=..,..]
+
+is for inline use and acts like \definedfont.

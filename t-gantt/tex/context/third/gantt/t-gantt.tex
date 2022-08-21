@@ -1,0 +1,23 @@
+%D \module
+%D   [      file=t-gantt,
+%D        version=2012.08.19,
+%D          title=\CONTEXT\ Module,
+%D       subtitle=Gantt Module,
+%D         author={Adam Reviczky and Aditya Mahajan},
+%D           date=\currentdate,
+%D      copyright={Adam Reviczky and Aditya Mahajan},
+%D        license=Public Domain]
+
+\writestatus{loading}{module gantt}
+
+\startmodule[gantt]
+
+\unprotect
+\setupmodule[alternative=]
+
+\doifdefinedelse{\currentmoduleparameter{\c!alternative}}
+  {\usemodule[gantt-s-mp]}
+  {\usemodule[gantt-s-\currentmoduleparameter{\c!alternative}]}
+
+\protect
+\stopmodule

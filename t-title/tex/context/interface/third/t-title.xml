@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2011.10.04">
+
+<cd:command name="placetitle" file="t-tile.mkvi">
+    <cd:sequence>
+        <cd:string value="placetitle"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes" optional="yes">
+            <cd:inherit name="setuptitle" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setuptitle" variant="1" file="t-tile.mkvi">
+    <cd:sequence>
+        <cd:string value="setuptitle"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes">
+            <cd:parameter name="author">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="title">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="date">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="spacebefore">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceafter">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="align">
+                <cd:inherit name="setupalign" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="pagestate">
+                <cd:constant type="start"/>
+                <cd:constant type="stop" default="yes"/>
+            </cd:parameter>
+            <cd:parameter name="KEY">
+                <cd:constant type="VALUE"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setuptitle" variant="2" file="t-tile.mkvi">
+    <cd:sequence>
+        <cd:string value="setuptitle"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="titleelement" file="t-title.mkvi">
+    <cd:sequence>
+        <cd:string value="titleelement"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:content n="1"/>
+    </cd:arguments>
+</cd:command>
+
+</cd:interface>

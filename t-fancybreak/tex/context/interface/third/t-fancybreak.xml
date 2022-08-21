@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2010.06.21">
+
+<cd:command name="fancybreak" generated="yes" file="t-fancybreak.tex">
+    <cd:sequence>
+        <cd:variable value="fancybreak"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes" optional="yes">
+            <cd:inherit name="setupfancybreak"/>
+        </cd:assignments>
+        <cd:content n="2" optional="yes"/>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="fancybreak" generated="yes" type="environment" file="t-fancybreak.tex">
+    <cd:sequence>
+        <cd:variable value="fancybreak"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes" optional="yes">
+            <cd:inherit name="setupfancybreak"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupfancybreak" file="t-fancybreak.tex">
+    <cd:sequence>
+        <cd:string value="setupfancybreak"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" optional="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="spacebefore">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceafter">
+                <cd:inherit name="blank" n="1" default="nowhite"/>
+            </cd:parameter>
+            <cd:parameter name="spaceinbetween">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="align">
+                <cd:inherit name="setupalign" n="1" default="middle"/>
+            </cd:parameter>
+            <cd:parameter name="indentnext">
+                <cd:constant type="yes" default="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="auto"/>
+            </cd:parameter>
+            <cd:parameter name="symbol">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="definefancybreak" file="t-fancybreak.tex">
+    <cd:sequence>
+        <cd:string value="definefancybreak"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes" optional="yes">
+            <cd:inherit name="setupfanycbreak" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+</cd:interface>

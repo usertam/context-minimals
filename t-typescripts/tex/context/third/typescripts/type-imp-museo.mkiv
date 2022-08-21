@@ -1,0 +1,59 @@
+%D \module
+%D   [     file=type-imp-museo,
+%D      version=2010.10.27,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Museo Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [museo]
+
+\starttypescript [\s!serif] [museo]
+    \definefontsynonym [Museo-300] [\s!file:museo300regular] [\s!features=\s!default]
+    \definefontsynonym [Museo-500] [\s!file:museo500regular] [\s!features=\s!default]
+    \definefontsynonym [Museo-700] [\s!file:museo700regular] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [museo]
+    \setups[\s!font:\s!fallback:\s!serif]
+    \definefontsynonym [\s!Serif]     [Museo-500] [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold] [Museo-700] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [museo]
+    \definefontsynonym [MuseoSans-Regular] [\s!file:museosans500]       [\s!features=\s!default]
+    \definefontsynonym [MuseoSans-Italic]  [\s!file:museosans500italic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [museo]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]       [MuseoSans-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic] [MuseoSans-Italic]  [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [museo]
+    \definetypeface [museo] [rm] [\s!serif] [museo] [\s!default]
+    \definetypeface [museo] [ss] [\s!sans]  [museo] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

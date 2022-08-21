@@ -1,0 +1,195 @@
+%D \module
+%D    [       file=t-bnf,
+%D         version=2004.6.23,
+%D           title=\CONTEXT\ BNF Grammar Module,
+%D        subtitle=Grammars,
+%D          author={Nikolai Weibull},
+%D            date=\currentdate,
+%D       copyright={Nikolai Weibull}]
+%C
+%C This module is NOT part of the \CONTEXT\ macro||package.
+%C This module is free software; you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation; either version 2 of the License, or
+%C (at your option) any later version.
+%C 
+%C This module is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C 
+%C You should have received a copy of the GNU General Public License
+%C along with this program; if not, write to the Free Software
+%C Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+\writestatus{loading}{BNF Macros / Initialization}
+
+\unprotect
+
+%M \usemodule[bnf]
+%D We define a new system variable for our settings:
+
+\definesystemvariable{bnf}
+
+%D We need some constants for the multi||lingual interface,
+
+\startconstants     english             dutch
+     terminalstart: terminalstart       terminalstart
+      terminalstop: terminalstop        terminalstop
+  nonterminalstart: nonterminalstart    nonterminalstart
+   nonterminalstop: nonterminalstop     nonterminalstop
+                is: is                  worden
+\stopconstants
+
+%D and while we're at it, lets define some variables.
+
+\startvariables     english             dutch
+        bnfgrammar: bnfgrammar          bnfspraakleer
+       bnfgrammars: bnfgrammars         bnfspraakleer
+\stopvariables
+
+%D Finally, we want the commands to be multi||lingually accessible, so we set
+%D that up as well:
+
+\startcommands      english             dutch
+   setupbnfgrammar: setupbnfgrammar     stelbnfspraakleer
+   startbnfgrammar: startbnfgrammar     startbnfspraakleer
+    stopbnfgrammar: stopbnfgrammar      startbnfspraakleer
+\stopcommands
+
+%D \macros
+%D   {startbnfgrammar, stopbnfgrammar}
+%D
+%D Now to the interesting parts, those that are actually useful to the outside
+%D world.  First we have the \type{\startbnfgrammar} and \type{\stopbnfgrammar}
+%D pairs, which are of course used to delimit \BNF\ grammars.  We would like to
+%D define \type{\startbnfgrammar} as \type{\def\startbnfgrammar[#1]}, but a bug
+%D in \CONTEXT\ prevents us from doing this, as the first character in the
+%D grammar may be active, for example \type{<}, but while checking for the
+%D presence of \type{[}, it gets ruined.  A way around it is of course to
+%D require that the user pass an empty \type{[]} pair, and we will use this
+%D method at the moment.
+
+\def\complexstartbnfgrammar[#1]%
+  {\endgraf\nobreak\medskip
+   \begingroup
+   \setupbnfgrammar[#1]%
+   \chardef\bnfsinglequote=`'
+   \defineactivecharacter : {\@@bnfis}
+   \defineactivecharacter | {\@@bnfoption}
+   \defineactivecharacter " %
+     {\thinspace\bgroup\@@bnfterminalstart\setupinlineverbatim%
+      \defineactivecharacter " {\@@bnfterminalstop\egroup\thinspace}}
+   \defineactivecharacter ' %
+     {\thinspace\bgroup\@@bnfterminalstart\setupinlineverbatim%
+      \defineactivecharacter ' {\@@bnfterminalstop\egroup\thinspace}}
+   \catcode`<=13
+   \let\par=\bnfgrammarline
+   \obeylines}
+
+\def\stopbnfgrammar{\medbreak\checknextindentation[\@@bnfindentnext]}
+
+\definecomplexorsimpleempty\startbnfgrammar
+
+%D \macros
+%D   {<>,bnfgrammarrule}
+%D
+%D We need a couple more macros to deal with the interior of a \BNF\ grammar.
+%D \type{\<>} is used for non||terminals, and \type{\bnfgrammarrule} is used
+%D later on in \type{\bnfgrammarswitch} for continuing a line.
+
+\def\<#1>{\leavevmode\hbox{\@@bnfnonterminalstart#1\/\@@bnfnonterminalstop}}
+
+\bgroup
+  \catcode`<=13
+  \global\let<=\<
+  \gdef\bnfgrammarrule<#1>{\endgraf\indent\<#1>}
+\egroup
+
+%D \macros
+%D   {bnfgrammarline, bnfgrammarswitch, bnfgrammarcont}
+%D
+%D These macros deal with the ending of a line in a grammar.
+%D \type{\bnfgrammarline} is called whenever a new line begins, and invokes
+%D \type{\bnfgrammarswitch} to determine what to do next.  If the next token is
+%D \type{\<}, we will call upon \type{\bnfgrammarrule} to deal with the new
+%D rule.  If it is \type{\stopbnfgrammar}, we end the top||level group, and let
+%D it process \type{\stopbnfgrammar} afterwards.  Otherwise we invoke
+%D \type{\bnfgrammarcont}, which will end the line and add some indentation to
+%D the continuing line.
+
+\def\bnfgrammarline{\futurelet\next\bnfgrammarswitch}
+\def\bnfgrammarswitch%
+  {\ifx\next\<
+    \let\next=\bnfgrammarrule
+  \else\ifx\next\stopbnfgrammar
+    \let\next=\endgroup
+  \else
+    \let\next=\bnfgrammarcont
+  \fi\fi
+  \next}
+\def\bnfgrammarcont{\hfil\break\indent\qquad}
+
+%D \macros
+%D   {setupbnfgrammar}
+%D
+%D We want to allow our users to change the way the \BNF\ grammars are typeset,
+%D so we define a setup command for them to use.
+%D
+%D It allows you to define the start and stop sequence for terminals and
+%D non||terminals, as well as colons (lhs / rhs separator) and vertical bars
+%D (alternative), and commas.  This has been multi||lingualized above, so
+%D choose your language.
+
+\def\dosetupbnfgrammar[#1]%
+  {\getparameters[\??bnf][#1]}
+
+\def\setupbnfgrammar%
+  {\dosingleargument\dosetupbnfgrammar}
+
+\setupbnfgrammar
+  [\c!terminalstart=\tttf,
+   \c!terminalstop=,
+   \c!nonterminalstart=\mathematics{\langle},
+   \c!nonterminalstop=\mathematics{\rangle},
+   \c!is={ \mathematics{\longrightarrow}},
+   \c!option=\mathematics{\vert},
+   \c!indentnext=\v!no]
+
+%D \macros
+%D   {BNF}
+%D
+%D We also define a useful abbreviation to be used for header texts and labels.
+
+\logo[BNF]{bnf}
+
+%D And we use it here:
+
+\setupheadtext[\s!en][\v!bnfgrammar=\BNF\ Grammar]
+\setupheadtext[\s!en][\v!bnfgrammars=\BNF\ Grammars]
+\setuplabeltext[\s!en][\v!bnfgrammar=\BNF\ Grammar ]
+
+%D Finally we define a float to be use with \BNF\ grammars, so that we can 
+%D finish off with something like this:
+%D
+%D \startbuffer
+%D \placebnfgrammar
+%D   [][]
+%D   {An example of a placed grammar.}
+%D   {\startbnfgrammar[]
+%D      <exp>: <num> | <num> "+" <num>
+%D      <num>: "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+%D    \stopbnfgrammar}
+%D \stopbuffer
+%D
+%D \typebuffer
+%D
+%D \getbuffer
+%D
+%D which looks kind of nice.
+
+\definefloat
+  [\v!bnfgrammar]
+  [\v!bnfgrammars]
+
+\protect \endinput

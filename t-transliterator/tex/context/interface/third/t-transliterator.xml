@@ -1,0 +1,63 @@
+<?xml version="1.0" standalone="yes"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" 
+  name="context" language="en" 
+  version="2010.3.10">
+
+  <cd:command name="setuptransliterator" file="t-transliterator.mkiv">
+    <cd:sequence>
+      <cd:string value="setuptransliterator"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:assignments list="yes" optional="no">
+        <cd:parameter name="mode">
+          <cd:constant type="ru_old" default="yes"/>
+          <cd:constant type="ru"/>
+          <cd:constant type="ru_transcript_de"/>
+          <cd:constant type="ru_transcript_de_exp"/>
+          <cd:constant type="ru_transcript_en"/>
+          <cd:constant type="all"/>
+          <cd:constant type="sr_tolt"/>
+          <cd:constant type="sr_tocy"/>
+          <cd:constant type="bg_de"/>
+          <cd:constant type="iso9_ocs"/>
+          <cd:constant type="ocs"/>
+          <cd:constant type="ocs_gla"/>
+          <cd:constant type="ru_cz"/>
+          <cd:constant type="ocs_cz"/>
+          <cd:constant type="gr"/>
+          <cd:constant type="gr_n"/>
+        </cd:parameter>
+        <cd:parameter name="hyphenate">
+          <cd:constant type="cs" default="yes"/>
+          <cd:constant type="sk"/>
+          <cd:constant type="hr"/>
+        </cd:parameter>
+        <cd:parameter name="deficient_font">
+          <cd:constant type="yes"/>
+          <cd:constant type="no" default="yes"/>
+        </cd:parameter>
+        <cd:parameter name="hinting">
+          <cd:constant type="yes" default="yes"/>
+          <cd:constant type="no"/>
+        </cd:parameter>
+        <cd:parameter name="sr_exceptions">
+          <cd:constant type="yes" default="yes"/>
+          <cd:constant type="no"/>
+        </cd:parameter>
+      </cd:assignments>
+    </cd:arguments>
+  </cd:command>
+
+  <cd:command name="transliterate" file="t-transliterator.mkiv">
+    <cd:sequence>
+      <cd:string value="transliterate"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:assignments list="yes" optional="yes">
+        <cd:inherit name="setuptransliterator"/>
+      </cd:assignments>
+    </cd:arguments>
+  </cd:command>
+
+</cd:interface>

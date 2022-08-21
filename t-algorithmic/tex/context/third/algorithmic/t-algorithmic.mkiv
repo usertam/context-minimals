@@ -1,0 +1,317 @@
+%D \module
+%D   [     file=t-algorithmic,
+%D      version=2013.06.03,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Algorithms,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% begin info
+%
+% title   : algorithmic
+% comment : context port of the algorithmic package for latex
+% status  : final
+%
+% end info
+
+\writestatus{loading}{Context User Module / Algorithms}
+
+\unprotect
+
+\startinterface all
+  \setinterfaceconstant {labelstyle} {labelstyle}
+  \setinterfaceconstant {labelcolor} {labelcolor}
+\stopinterface
+
+\startinterface all
+  \setinterfacevariable {algorithmic} {algorithmic}
+\stopinterface
+
+\installnamespace {algorithmic}
+\installnamespace {algorithmiccommand}
+
+%D The algorithmic environment
+
+\installcommandhandler \????algorithmic {algorithmic} \????algorithmic
+
+\appendtoks
+  \setuevalue{\e!start\currentalgorithmic}{\algorithmic_start[\currentalgorithmic]}%
+  \setuevalue{\e!stop \currentalgorithmic}{\algorithmic_stop                      }%
+\to \everydefinealgorithmic
+
+\appendtoks
+  \definelinenumbering[\currentalgorithmic]%
+\to \everydefinealgorithmic
+
+\appendtoks
+  \setuplinenumbering
+    [\currentalgorithmic]
+    [\c!conversion=\algorithmicparameter\c!conversion,
+          \c!start=\algorithmicparameter\c!start,
+           \c!step=\algorithmicparameter\c!step,
+         \c!method=\algorithmicparameter\c!method,
+       \c!continue=\algorithmicparameter\c!continue,
+       \c!location=\algorithmicparameter\c!location,
+          \c!style=\algorithmicparameter\c!numberstyle,
+          \c!color=\algorithmicparameter\c!numbercolor,
+          \c!width=\algorithmicparameter\c!numberwidth,
+          \c!align=\algorithmicparameter\c!align]%
+\to \everysetupalgorithmic
+
+\unexpanded\def\algorithmic_start[#1]%
+  {\begingroup
+   \edef\currentalgorithmic{#1}%
+   \dosingleempty\algorithmic_start_indeed}
+
+\def\algorithmic_start_indeed[#1]%
+  {\iffirstargument
+     \setupcurrentalgorithmic[#1]%
+   \fi
+   \the\t_algorithmic_commands
+   \usealgorithmicstyleandcolor\c!style\c!color
+   \doifsomething{\algorithmicparameter\c!spacebefore}{\blank[\algorithmicparameter\c!spacebefore]}%
+   \algorithmicparameter\c!before
+   \setupwhitespace[\v!none ]%
+   \setupindenting [\v!never]%
+   \doadaptleftskip{\algorithmicparameter\c!margin}%
+   \doif{\algorithmicparameter\c!numbering}\v!yes\startlinenumbering}
+
+\unexpanded\def\algorithmic_stop
+  {\par
+   \doif{\algorithmicparameter\c!numbering}\v!yes\stoplinenumbering
+   \algorithmicparameter\c!after
+   \doifsomething{\algorithmicparameter\c!spaceafter}{\blank[\algorithmicparameter\c!spaceafter]}%
+   \endgroup}
+
+% Commands
+
+\def\algorithmic_begsub
+  {\par\doadaptleftskip{\algorithmicparameter\c!width}}
+
+\def\algorithmic_endsub
+  {\par\doadaptleftskip{-\algorithmicparameter\c!width}}
+
+\def\algorithmic_label#1%
+  {\begingroup
+   \usealgorithmicstyleandcolor\c!labelstyle\c!labelcolor
+   \algorithmictext{#1}%
+   \endgroup}
+
+\starttexdefinition algorithmic_state
+  \par
+\stoptexdefinition
+
+\starttexdefinition algorithmic_if #1
+  \par
+  \algorithmic_label{if} #1 \algorithmic_label{then}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_else
+  \algorithmic_endsub
+  \algorithmic_label{else}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_elsif #1
+  \algorithmic_endsub
+  \algorithmic_label{elsif} #1 \algorithmic_label{then}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_endif
+  \algorithmic_endsub
+  \algorithmic_label{endif}
+\stoptexdefinition
+
+\starttexdefinition algorithmic_for #1
+  \par
+  \algorithmic_label{for} #1 \algorithmic_label{do}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_forall #1
+  \par
+  \algorithmic_label{forall} #1 \algorithmic_label{do}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_endfor
+  \algorithmic_endsub
+  \algorithmic_label{endfor}
+\stoptexdefinition
+
+\starttexdefinition algorithmic_while #1
+  \par
+  \algorithmic_label{while} #1 \algorithmic_label{do}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_endwhile
+  \algorithmic_endsub
+  \algorithmic_label{endwhile}
+\stoptexdefinition
+
+\starttexdefinition algorithmic_repeat
+  \par
+  \algorithmic_label{repeat}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_until #1
+  \algorithmic_endsub
+  \algorithmic_label{until} #1
+\stoptexdefinition
+
+\starttexdefinition algorithmic_loop
+  \par
+  \algorithmic_label{loop}
+  \algorithmic_begsub
+\stoptexdefinition
+
+\starttexdefinition algorithmic_endloop
+  \algorithmic_endsub
+  \algorithmic_label{endloop}
+\stoptexdefinition
+
+\starttexdefinition algorithmic_require
+  \par
+  \algorithmic_label{require}
+  \space
+\stoptexdefinition
+
+\starttexdefinition algorithmic_ensure
+  \par
+  \algorithmic_label{ensure}
+  \space
+\stoptexdefinition
+
+\starttexdefinition algorithmic_return
+  \par
+  \algorithmic_label{return}
+  \space
+\stoptexdefinition
+
+\starttexdefinition algorithmic_true
+  \algorithmic_label{true}
+\stoptexdefinition
+
+\starttexdefinition algorithmic_false
+  \algorithmic_label{false}
+\stoptexdefinition
+
+\starttexdefinition algorithmic_print
+  \par
+  \algorithmic_label{print}
+  \space
+\stoptexdefinition
+
+\starttexdefinition algorithmic_comment #1
+  \textbraceleft
+    #1
+  \textbraceright
+\stoptexdefinition
+
+% The commands in the environment are all uppercase, the connection
+% between them and their defintion happens here.
+
+\newtoks\t_algorithmic_commands
+
+\def\algorithmic_define
+  {\dodoubleargument\algorithmic_define_indeed}
+
+\def\algorithmic_define_indeed[#1][#2]%
+  {\appendtoks\letvalue{#1}#2\to\t_algorithmic_commands}
+
+\algorithmic_define [STATE]    [\algorithmic_state   ]
+\algorithmic_define [IF]       [\algorithmic_if      ]
+\algorithmic_define [ELSE]     [\algorithmic_else    ]
+\algorithmic_define [ELSIF]    [\algorithmic_elsif   ]
+\algorithmic_define [ENDIF]    [\algorithmic_endif   ]
+\algorithmic_define [FOR]      [\algorithmic_for     ]
+\algorithmic_define [FORALL]   [\algorithmic_forall  ]
+\algorithmic_define [ENDFOR]   [\algorithmic_endfor  ]
+\algorithmic_define [WHILE]    [\algorithmic_while   ]
+\algorithmic_define [ENDWHILE] [\algorithmic_endwhile]
+\algorithmic_define [REPEAT]   [\algorithmic_repeat  ]
+\algorithmic_define [UNTIL]    [\algorithmic_until   ]
+\algorithmic_define [LOOP]     [\algorithmic_loop    ]
+\algorithmic_define [ENDLOOP]  [\algorithmic_endloop ]
+\algorithmic_define [REQUIRE]  [\algorithmic_require ]
+\algorithmic_define [ENSURE]   [\algorithmic_ensure  ]
+\algorithmic_define [RETURN]   [\algorithmic_return  ]
+\algorithmic_define [TRUE]     [\algorithmic_true    ]
+\algorithmic_define [FALSE]    [\algorithmic_false   ]
+\algorithmic_define [PRINT]    [\algorithmic_print   ]
+\algorithmic_define [COMMENT]  [\algorithmic_comment ]
+
+% Labels
+
+\definelabelclass[algorithmic]
+
+\setupalgorithmictext[\s!en][require=Require:]
+\setupalgorithmictext[\s!en][ensure=Ensure:]
+\setupalgorithmictext[\s!en][end=end]
+\setupalgorithmictext[\s!en][if=if]
+\setupalgorithmictext[\s!en][then=then]
+\setupalgorithmictext[\s!en][else=else]
+\setupalgorithmictext[\s!en][elsif=else if]
+\setupalgorithmictext[\s!en][endif=end if]
+\setupalgorithmictext[\s!en][for=for]
+\setupalgorithmictext[\s!en][forall=for all]
+\setupalgorithmictext[\s!en][do=do]
+\setupalgorithmictext[\s!en][endfor=end for]
+\setupalgorithmictext[\s!en][while=while]
+\setupalgorithmictext[\s!en][endwhile=end while]
+\setupalgorithmictext[\s!en][loop=loop]
+\setupalgorithmictext[\s!en][endloop=end loop]
+\setupalgorithmictext[\s!en][repeat=repeat]
+\setupalgorithmictext[\s!en][until=until]
+\setupalgorithmictext[\s!en][print=print]
+\setupalgorithmictext[\s!en][return=return]
+\setupalgorithmictext[\s!en][true=true]
+\setupalgorithmictext[\s!en][false=false]
+
+% Default values
+
+\definealgorithmic[\v!algorithmic]
+
+\setupalgorithmic
+  [  \c!numbering=\v!no,      % linenumbering
+    \c!conversion=\v!numbers, % linenumbering
+         \c!start=1,          % linenumbering
+          \c!step=1,          % linenumbering
+        \c!method=\v!first,   % linenumbering
+      \c!continue=\v!no,      % linenumbering
+      \c!location=\v!left,    % linenumbering
+   \c!numberstyle=,           % linenumbering
+   \c!numbercolor=,           % linenumbering
+   \c!numberwidth=2em,        % linenumbering
+         \c!align=\v!auto,    % linenumbering
+         \c!width=1em,
+        \c!margin=1em,
+    \c!labelstyle=\v!bold,
+        \c!before=,
+         \c!after=,
+   \c!spacebefore=\v!line,
+    \c!spaceafter=\v!line]
+
+\protect \endinput

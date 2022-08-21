@@ -1,0 +1,418 @@
+%D \module
+%D   [     file=s-cor-02,
+%D      version=2012.12.09,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Memos,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\unprotect
+
+\startmodule[memo]
+
+\usemodule[cor-00]
+
+\setupmodule
+  [\c!style=memo]
+
+% Namespaces
+
+\installnamespace {memolayerrenderings}
+\installnamespace {memosectionrenderings}
+
+% Commands
+
+\definecorrespondence[\v!memo]
+
+\def\definememolayer              {\dodoubleargument\correspondence_layer_define               [\v!memo]}
+\def\definememosection            {\dodoubleargument\correspondence_section_define             [\v!memo]}
+\def\definememodescription        {\dodoubleargument\correspondence_description_define         [\v!memo]}
+\def\definememohead               {\dodoubleargument\correspondence_head_define                [\v!memo]}
+
+\def\definememolayeralternative   {\doquadrupleempty\correspondence_layer_alternative_define   [\v!memo]}
+\def\definememosectionalternative {\doquadrupleempty\correspondence_section_alternative_define [\v!memo]}
+
+\def\definememoelements           {\dotripleargument\correspondence_elements_define            [\v!memo]}
+\def\setupmemoelements            {\dotripleargument\correspondence_elements_define            [\v!memo]}
+
+\def\setupmemostyle               {\dotripleargument\correspondence_style_setup                [\v!memo]}
+\def\setupmemolayer               {\dotripleargument\correspondence_layer_setup                [\v!memo]}
+\def\setupmemoframe               {\dotripleargument\correspondence_frame_setup                [\v!memo]}
+\def\setupmemolayout              {\dotripleargument\correspondence_layout_setup               [\v!memo]}
+\def\setupmemosection             {\dotripleargument\correspondence_section_setup              [\v!memo]}
+\def\setupmemodescription         {\dotripleargument\correspondence_description_setup          [\v!memo]}
+\def\setupmemohead                {\dotripleargument\correspondence_head_setup                 [\v!memo]}
+\def\setupmemooptions             {\dodoubleargument\correspondence_option_setup               [\v!memo]}
+
+\def\setupmemolayeralternative    {\dotripleargument\correspondence_layer_alternative_setup    [\v!memo]}
+\def\setupmemosectionalternative  {\dotripleargument\correspondence_section_alternative_setup  [\v!memo]}
+
+\def\usememostyle                 {\dodoubleargument\correspondence_file_load                  [\v!memo]}
+
+\def\definememoelement            {\doquadrupleargument\correspondence_element_define          [\v!memo]}
+\def\memoelement                  {\doquadrupleargument\correspondence_element_place           [\v!memo]}
+
+\def\namedmemolayerparameter  #element{\namedcorrespondencelayerparameter  {\v!memo:#element}}
+\def\namedmemoframeparameter  #element{\namedcorrespondenceframeparameter  {\v!memo:#element}}
+\def\namedmemosectionparameter#element{\namedcorrespondencesectionparameter{\v!memo:#element}}
+
+% Heading
+
+\definememohead [\v!memo\v!section]
+\definememohead [\v!memo\v!subsection]
+
+% Layers
+
+\definememolayer [\v!head]
+\definememolayer [\v!nexthead]
+\definememolayer [\v!lefthead]
+\definememolayer [\v!righthead]
+
+\definememolayer [\v!foot]
+\definememolayer [\v!nextfoot]
+\definememolayer [\v!leftfoot]
+\definememolayer [\v!rightfoot]
+
+\definememolayer [\v!topmark]
+\definememolayer [\v!botmark]
+\definememolayer [\v!cutmark]
+\definememolayer [\v!endmark]
+\definememolayer [\v!usermark]
+
+\definememolayer [\v!memomain]
+\definememolayer [\v!memonext]
+
+% Section
+
+\definememosection [\v!head]
+\definememosection [\v!date]
+\definememosection [\v!reference]
+\definememosection [\v!specialnotation]
+\definememosection [\v!address]
+\definememosection [\v!title]
+\definememosection [\v!opening]
+\definememosection [\v!subject]
+\definememosection [\v!content]
+\definememosection [\v!closing]
+\definememosection [\v!appendices]
+
+% Descriptions
+
+\definememodescription [\v!copy]
+\definememodescription [\v!enclosure]
+\definememodescription [\v!postscript]
+
+% Setups
+
+% layer: head
+
+% setups -> see s-cor-00.mkvi
+
+% layer: nexthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: lefthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: righthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: foot
+
+\definememolayeralternative[\v!foot:\v!pagenumber][\c!renderingsetup=\????memosectionrenderings:\v!foot:\v!pagenumber]
+
+\startsetups[\????memosectionrenderings:\v!foot:\v!pagenumber]
+  \centerbox{\hbox{\begstrut\leftmemotext\c!pagenumber\subpagenumber\rightmemotext\c!pagenumber\lastsubpagenumber\endstrut}}
+\stopsetups
+
+% layer: topmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: botmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: cutmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: endmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: usermark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: memomain
+
+% setups -> see s-cor-00.mkvi
+
+% layer: memonext
+
+% setups -> see s-cor-00.mkvi
+
+% section: head
+
+\definememosectionalternative[\v!head:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!head:\s!default]
+\definememosectionalternative[\v!head:\v!memo   ][\c!renderingsetup=\????memosectionrenderings:\v!head:\v!memo   ]
+\definememosectionalternative[\v!head:\v!table  ][\c!renderingsetup=\????memosectionrenderings:\v!head:\v!table  ]
+\definememosectionalternative[\v!head:\v!margin ][\c!renderingsetup=\????memosectionrenderings:\v!head:\v!margin ]
+
+\startsetups[\????memosectionrenderings:\v!memo:\v!head:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!fromaddress
+\stopsetups
+
+\startsetups[\????memosectionrenderings:\v!head:\v!memo]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \startpacked
+  \doifsomething{\correspondenceparameter\c!fromname}{\memotext\c!fromname \correspondenceparameter\c!fromname \par}
+  \doifsomething{\correspondenceparameter\c!date    }{\memotext\c!date     \correspondenceparameter\c!date     \par}
+  \doifsomething{\correspondenceparameter\c!toname  }{\memotext\c!toname   \correspondenceparameter\c!toname   \par}
+  \doifsomething{\correspondenceparameter\c!subject }{\memotext\c!subject  \correspondenceparameter\c!subject  \par}
+  \stoppacked
+\stopsetups
+
+\unexpanded\def\correspondence_memo_head_table#element%
+  {\doifsomething{\correspondenceparameter#element}
+     {\NC % label
+        \def\currentcorrespondencestyle{\v!memo:#element}%
+        \usecorrespondencestylestyleandcolor\c!titlestyle\c!titlecolor
+        \memotext#element
+      \EQ % text
+        \def\currentcorrespondencestyle{\v!memo:#element}%
+        \usecorrespondencestylestyleandcolor\c!textstyle\c!textcolor
+        \correspondenceparameter#element
+      \NC\NR}}
+
+\startsetups[\????memosectionrenderings:\v!head:\v!table]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \starttabulate[|l|p|]
+  \correspondence_memo_head_table\c!fromname
+  \correspondence_memo_head_table\c!date
+  \correspondence_memo_head_table\c!toname
+  \correspondence_memo_head_table\c!subject
+  \stoptabulate
+\stopsetups
+
+\unexpanded\def\correspondence_memo_head_margin#element%
+  {\doifsomething{\correspondenceparameter#element}
+     {\def\currentcorrespondencestyle{\v!memo:#element}%
+      \dontleavehmode\llap\bgroup % label
+         \usecorrespondencestylestyleandcolor\c!titlestyle\c!titlecolor
+         \memotext#element
+         \hskip\leftmargindistance
+      \egroup
+      \bgroup
+        \usecorrespondencestylestyleandcolor\c!textstyle\c!textcolor
+        \correspondenceparameter#element
+      \egroup
+      \par}}
+
+\startsetups[\????memosectionrenderings:\v!head:\v!margin]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \startpacked
+  \correspondence_memo_head_margin\c!fromname
+  \correspondence_memo_head_margin\c!date
+  \correspondence_memo_head_margin\c!toname
+  \correspondence_memo_head_margin\c!subject
+  \stoppacked
+\stopsetups
+
+% section: date
+
+\definememosectionalternative[\v!date:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!date:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!date:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!date
+\stopsetups
+
+% section: reference
+
+\definememosectionalternative[\v!reference:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!reference:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!reference:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!reference
+\stopsetups
+
+% section: specialnotation
+
+\definememosectionalternative[\v!specialnotation:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!specialnotation:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!specialnotation:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!dispatch
+\stopsetups
+
+% section: address
+
+\definememosectionalternative[\v!address:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!address:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!address:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!toname
+  \doifsomething{\correspondenceparameter\c!toname}\\
+  \correspondenceparameter\c!toaddress
+\stopsetups
+
+% section: title
+
+\definememosectionalternative[\v!title:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!title:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!title:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!title
+\stopsetups
+
+% section: opening
+
+\definememosectionalternative[\v!opening:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!opening:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!opening:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!opening
+\stopsetups
+
+% section: subject
+
+\definememosectionalternative[\v!subject:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!subject:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!subject:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \memotext\c!subject\correspondenceparameter\c!subject
+\stopsetups
+
+% section: content
+
+\definememosectionalternative[\v!content:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!content:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!content:\s!default]
+  \getbufferdata[\????correspondencebuffer\v!memo]
+\stopsetups
+
+% section: closing
+
+\definememosectionalternative[\v!closing:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!closing:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!closing:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!closing
+  \doifsomething{\correspondenceparameter\c!signature}
+    {\blank[\correspondencesectionparameter\c!spaceinbetween]
+     \correspondenceparameter\c!signature}
+\stopsetups
+
+% section: appendices
+
+\definememosectionalternative[\v!appendices:\s!default][\c!renderingsetup=\????memosectionrenderings:\v!appendices:\s!default]
+
+\startsetups[\????memosectionrenderings:\v!appendices:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \startpacked
+  \normalexpanded{\processcommalistwithparameters[\correspondence_elements_access\v!memo\v!description]}{\correspondence_description_place[\v!memo]}
+  \stoppacked
+\stopsetups
+
+% for backwards compatibility
+
+\startsetups[\v!memo:\v!place]
+\placecorrespondence[\v!memo]
+\stopsetups
+
+% Extras
+
+\appendtoks
+  \ifx\currentcorrespondence\v!memo
+    \processallactionsinset
+      [\correspondenceoptionparameter\c!option]
+      [  \v!test=>{\usememostyle[test]},
+       \v!setups=>{\usememostyle[setups]}]%
+  \fi
+\to \t_correspondence_before
+
+\appendtoks
+  \ifx\currentcorrespondence\v!memo
+    \doif{\correspondenceoptionparameter\c!marking}\v!no{\setupmemolayer[\v!topmark,\v!botmark,\v!cutmark,\v!endmark,\v!usermark][\c!state=\v!stop]}%
+  \fi
+\to \t_correspondence_before
+
+% Labels
+
+\definelabelclass[memo]
+
+% pagenumber:
+
+\setupmemotext[\s!en][\c!pagenumber={Page , of }]
+\setupmemotext[\s!nl][\c!pagenumber=]
+\setupmemotext[\s!de][\c!pagenumber={Seite , von }]
+\setupmemotext[\s!fr][\c!pagenumber=]
+\setupmemotext[\s!it][\c!pagenumber=]
+\setupmemotext[\s!es][\c!pagenumber=]
+
+% date:
+
+\setupmemotext[\s!en][\c!date=Date: ]
+\setupmemotext[\s!nl][\c!date=Datum: ]
+\setupmemotext[\s!de][\c!date=Datum: ]
+\setupmemotext[\s!fr][\c!date=Date\thinspace: ]
+\setupmemotext[\s!it][\c!date=Data: ]
+\setupmemotext[\s!es][\c!date=Fecha: ]
+
+% fromname:
+
+\setupmemotext[\s!en][\c!fromname=From: ]
+\setupmemotext[\s!nl][\c!fromname=Van: ]
+\setupmemotext[\s!de][\c!fromname=Von: ]
+\setupmemotext[\s!fr][\c!fromname=De\thinspace: ]
+\setupmemotext[\s!it][\c!fromname=Da: ]
+\setupmemotext[\s!es][\c!fromname=De: ]
+
+% toname:
+
+\setupmemotext[\s!en][\c!toname=To: ]
+\setupmemotext[\s!nl][\c!toname=Aan: ]
+\setupmemotext[\s!de][\c!toname=An: ]
+\setupmemotext[\s!fr][\c!toname=À\thinspace: ]
+\setupmemotext[\s!it][\c!toname=A: ]
+\setupmemotext[\s!es][\c!toname=A: ]
+
+% subject:
+
+\setupmemotext[\s!en][\c!subject=Subject: ]
+\setupmemotext[\s!nl][\c!subject=Onderwerp: ]
+\setupmemotext[\s!de][\c!subject=Betrifft: ]
+\setupmemotext[\s!fr][\c!subject=Concernant\thinspace: ]
+\setupmemotext[\s!it][\c!subject=Oggetto: ]
+\setupmemotext[\s!es][\c!subject=Asunto: ]
+
+% Files
+
+\usememostyle[default,\currentmoduleparameter\c!style]
+
+\stopmodule
+
+\protect \endinput

@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2011.12.29">
+
+<cd:define name="letterlayer">
+    <cd:constant type="head"/>
+    <cd:constant type="nexthead"/>
+    <cd:constant type="lefthead"/>
+    <cd:constant type="righthead"/>
+    <cd:constant type="foot"/>
+    <cd:constant type="nextfoot"/>
+    <cd:constant type="leftfoot"/>
+    <cd:constant type="rightfoot"/>
+    <cd:constant type="address"/>
+    <cd:constant type="backaddress"/>
+    <cd:constant type="reference"/>
+    <cd:constant type="location"/>
+    <cd:constant type="topmark"/>
+    <cd:constant type="botmark"/>
+    <cd:constant type="cutmark"/>
+    <cd:constant type="endmark"/>
+    <cd:constant type="usermark"/>  
+    <cd:constant type="lettermain"/>
+    <cd:constant type="letternext"/>
+</cd:define>
+
+<cd:define name="lettersection">
+    <cd:constant type="head"/>
+    <cd:constant type="date"/>
+    <cd:constant type="reference"/>
+    <cd:constant type="specialnotation"/>
+    <cd:constant type="address"/>
+    <cd:constant type="title"/>
+    <cd:constant type="subject"/>
+    <cd:constant type="opening"/>
+    <cd:constant type="content"/>
+    <cd:constant type="closing"/>
+    <cd:constant type="appendices"/>
+</cd:define>
+
+<cd:define name="letterdescription">
+    <cd:constant type="copy"/>
+    <cd:constant type="enclosure"/>
+    <cd:constant type="postscript"/>
+</cd:define>
+
+<cd:command name="defineletterelement" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="defineletterelement"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="layer"/>
+            <cd:constant type="section"/>
+        </cd:keywords>
+        <cd:keywords n="2">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="3">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:content n="4"/>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="letterelement" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="letterelement"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="layer"/>
+            <cd:constant type="section"/>
+        </cd:keywords>
+        <cd:keywords n="2">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="3">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletter" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletter"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes">
+            <cd:parameter name="KEY">
+                <cd:constant type="VALUE"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletterdescription" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletterdescription"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="spacebefore">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceafter">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceinbetween">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="before">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="after">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="headstyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="headcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <!--
+            <cd:parameter name="textstyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="textcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            -->
+            <cd:parameter name="width">
+                <cd:constant type="fit" default="yes"/>
+                <cd:constant type="broad"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="distance">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="location">
+                <cd:constant type="left" default="yes"/>
+                <cd:constant type="top"/>
+                <cd:constant type="text"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletterelements" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletterelements"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="2" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletterframe" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletterframe"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:inherit name="setupframe" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletterlayer" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletterlayer"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="x">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="y">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="preset">
+                <cd:constant type="lefttop"/>
+                <cd:constant type="righttop"/>
+                <cd:constant type="leftbottom"/>
+                <cd:constant type="rightbottom"/>
+                <cd:constant type="middle"/>
+                <cd:constant type="middletop"/>
+                <cd:constant type="middlebottom"/>
+                <cd:constant type="middleleft"/>
+                <cd:constant type="middleright"/>
+            </cd:parameter>
+            <cd:parameter name="state">
+                <cd:constant type="start"/>
+                <cd:constant type="stop"/>
+                <cd:constant type="next"/>
+                <cd:constant type="repeat"/>
+                <cd:constant type="left"/>
+                <cd:constant type="right"/>
+                <cd:constant type="even"/>
+                <cd:constant type="odd"/>
+            </cd:parameter>
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="leftmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="rightmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="symbol">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="distance">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="alternative">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="list">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="separator">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletterlayout" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletterlayout"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:inherit name="setuplayout" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletteroptions" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletteroptions"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes">
+            <cd:parameter name="bodyfont">
+                <cd:inherit name="setupbodyfont"/>
+            </cd:parameter>
+            <cd:parameter name="whitespace">
+                <cd:inherit name="setupwhitespace"/>
+            </cd:parameter>
+            <cd:parameter name="backgroundcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="backgroundimage">
+                <cd:constant type="cd:file"/>
+            </cd:parameter>
+            <cd:parameter name="background">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="indenting">
+                <cd:inherit name="setupindenting"/>
+            </cd:parameter>
+            <cd:parameter name="marking">
+                <cd:constant type="yes" default="yes"/>
+                <cd:constant type="no"/>
+            </cd:parameter>
+            <cd:parameter name="position">
+                <cd:constant type="yes"/>
+                <cd:constant type="no" default="yes"/>
+            </cd:parameter>
+            <cd:parameter name="option">
+                <cd:constant type="test"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setuplettersection" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setuplettersection"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="spacebefore">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceafter">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceinbetween">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="leftmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="rightmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="before">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="after">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="align">
+                <cd:inherit name="setupalign" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="indenting">
+                <cd:inherit name="setupindenting" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="alternative">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="separator">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupletterstyle" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="setupletterstyle"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="titlestyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="titlecolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="textstyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="textcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="separator">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="width">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="letter" type="environment" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="letter"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes" optional="yes">
+            <cd:inherit name="setupletter" n="1"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="useletterstyle" file="s-cor-01.mkvi">
+    <cd:sequence>
+        <cd:string value="useletterstyle"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:file"/>
+        </cd:keywords>
+    </cd:arguments>
+</cd:command>
+
+</cd:interface>

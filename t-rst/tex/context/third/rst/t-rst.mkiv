@@ -1,0 +1,241 @@
+%D \module [
+%D         file=t-rst,
+%D      version=0.6c ‘It’s the Arts’,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=reStructuredText,
+%D       author=Philipp Gesang,
+%D         date=\currentdate,
+%D    copyright=Philipp Gesang,
+%D      license=2-clause BSD,
+%D ]
+
+%M \usemodule  [rst]
+%M \usemodule  [int-load]
+%M \loadsetups [t-letterspace.xml]
+
+%C Read the license conditions in the file \type{COPYING}.
+
+%M \definecolor [gutenred] [x=bf221f] % rubrication from digitized Göttingen Gutenberg bible
+%M \setupinteraction [contrastcolor=gutenred,color=gutenred]
+%M
+%M \define\beautifyshowsetups{%
+%M   \unexpanded \def \setupnumfont  {\rm}%
+%M   \unexpanded \def \setuptxtfont  {\rm}%
+%M   \unexpanded \def \setupintfont  {\rm\sc\Word}%
+%M   \unexpanded \def \setupvarfont  {\rm\it}%
+%M   \unexpanded \def \setupoptfont  {\rm\it}%
+%M   \unexpanded \def \setupalwcolor {gutenred}%
+%M   \unexpanded \def \setupoptcolor {gutenred}%
+%M   \defineframedtext [setuptext] [
+%M     frame=off,
+%M     background=color,
+%M     backgroundcolor=gray:2,
+%M     width=\hsize,
+%M     height=fit,
+%M     align=right,
+%M     offset=0.75em,
+%M   ]%
+%M }
+%M 
+%M \let \Oldshowsetup \showsetup
+%M 
+%M \define [1] \showsetup {%
+%M   \bgroup \beautifyshowsetups%
+%M     \Oldshowsetup{#1}%
+%M   \egroup%
+%M }
+
+\writestatus{loading}{ConTeXt User Module / reStructuredText}
+
+\unprotect
+
+\startinterface all
+  \setinterfacevariable {RST} {RST}
+\stopinterface
+
+\definenamespace [\v!RST] [
+  type=module,
+  comment=reStructuredText module,
+  version=0.6c,
+  name=\v!RST,
+  style=\v!no,
+  command=\v!yes,
+  setup=\v!list,
+  parent=\v!RST,
+]
+
+%D Loading the reStructuredText parser.
+\ctxloadluafile{rst_parser}
+
+%D Easy way to define a global test setting. Activated
+%D by \type{\usemodule[rst][test=yes]}.
+
+\startmoduletestsection
+  \ctxlua{thirddata.rst_helpers.rst_debug = true}
+\stopmoduletestsection
+
+%D To process inline reST markup we’ll have to reset all catcodes
+%D except for grouping, escaping and cs arguments.
+
+\newcatcodetable   \RST_catcodes
+\startcatcodetable \RST_catcodes
+  \catcode`\^^I = 12
+  \catcode`\^^M = 12
+  \catcode`\^^L = 12
+  \catcode`\    = 12
+  \catcode`\^^Z = 12
+  \catcode`\\   =  0
+  \catcode`\%   = 12
+  \catcode`\#   =  6
+  \catcode`\_   = 12
+  \catcode`\^   = 12
+  \catcode`\&   = 12
+  \catcode`\|   = 12
+  \catcode`\{   =  1
+  \catcode`\}   =  2
+  \catcode`\~   = 12
+  \catcode`\$   = 12
+\stopcatcodetable
+
+%D \section {User-level Commands}
+%D
+%D \subsection{Typesetting reST-Files}
+%D
+%D \macros
+%D    {typesetRSTfile}
+%D
+%D This command loads and processes an \type{*.rst} file.
+%D All necessary setups for the elements to be used (e.g. tables)
+%D have to be specified {\em before} this macro is called.
+%D As \type{\typesetRSTfile} is intended to process a single file
+%D only, it will handle \type{\start|stoptext} automatically.
+%D Thus, the user should never supply any of these manually,
+%D neither before nor after \type{\typesetRSTfile}.
+%D
+%D We now handle rogue utf-8 byte order marks on demand, just set
+%D the optional parameter \type{stripBOM} to {\em true}.
+%D
+%D There also is an option \type{expandtab} to convert tabs
+%D (ascii 0x09) to indents prior to converting reST input. The
+%D expansion width defaults to {\em 4} and can be configured
+%D through the parameter \type{shiftwidth} (takes an integer).
+%D
+%D \showsetup{typesetRSTfile}
+
+\def\do_typeset_RST_file[#1]#2{%
+  \iffirstargument
+    \getparameters[RST][#1]%
+    \doifdefined{RSTstripBOM}  {\ctxlua{thirddata.rst.strip_BOM  = \RSTstripBOM}}%
+    \doifdefined{RSTexpandtab} {\ctxlua{thirddata.rst.expandtab  = \RSTexpandtab}}%
+    \doifdefined{RSTshiftwidth}{\ctxlua{thirddata.rst.shiftwidth = \RSTshiftwidth}}%
+  \fi
+  \ctxlua{thirddata.rst.do_rst_file("#2")}%
+}
+
+\def\typesetRSTfile{%
+  \dosingleempty\do_typeset_RST_file%
+}
+
+%D \subsection{Typesetting Inline Snippets}
+%D
+%D reST markup can be handy in situations where \CONTEXT\ markup
+%D would result in unappropriately verbose source code, e.g. when
+%D typesetting tables with simple layout.
+%D
+%D \macros
+%D    {RST,startRST}
+%D
+%D The environment \type{\[start|stop]RST} and the macro
+%D \type{\RST} allow access to reST-parser from inside a
+%D \CONTEXT\ document when the module is loaded.
+%D
+%D \showsetup{RST}
+%D \showsetup{startRST}
+
+% Wolfgang’s code below.
+
+\unexpanded \def \startRST{%
+  \begingroup
+  \setcatcodetable \RST_catcodes
+  \do_start_RST%
+}
+
+\let \stopRST \relax
+
+\def \do_start_RST#1\stopRST{%
+  \endgroup%
+  \ctxlua{thirddata.rst.do_rst_snippet(\!!bs#1\!!es)}%
+}
+
+\def \RST{%
+  \begingroup
+  \setcatcodetable \RST_catcodes
+  \do_RST%
+}
+
+\def \do_RST#1{%
+  \endgroup%
+  \ctxlua{thirddata.rst.do_rst_snippet(\!!bs#1\!!es)}%
+}
+
+%D \subsection{Including multiple reST files}
+%D
+%D \macros
+%D    {defineRSTinclusion,startRSTproject,RSTinclusion}
+%D
+%D When content is split among multiple files, these macros allow
+%D for including them in arbitrary order. Note that setups from
+%D previous includes, unless overwritten, will remain defined.
+%D \type{\defineRSTinclusion} takes three arguments: the first one
+%D will be the identifier that can be used to refer to the actual
+%D inclusion, which is specified via the second argument as a
+%D filename. The third optional argument receives the usual
+%D setups \type{stripBOM}, \type{expandtab} and
+%D \type{shiftwidth}.
+%D
+%D Defined inclusions can be typeset only within an the
+%D \type{\startRSTproject} environment using the macro
+%D \type{RSTinclusion}. Between those inclusion all kinds of
+%D \TEX\ code except for \type{\starttext} and \type{\stoptext}
+%D are permitted.
+
+\def\do_define_RST_inclusion[#1][#2][#3]{%
+  \ifthirdargument
+    \getparameters[RST][#3]%
+    \doifdefined{RSTstripBOM}  {\ctxlua{thirddata.rst.strip_BOM  = \RSTstripBOM}}%
+    \doifdefined{RSTexpandtab} {\ctxlua{thirddata.rst.expandtab  = \RSTexpandtab}}%
+    \doifdefined{RSTshiftwidth}{\ctxlua{thirddata.rst.shiftwidth = \RSTshiftwidth}}%
+  \fi
+  \ifsecondargument
+    \ctxlua{thirddata.rst.do_rst_inclusion("#1", "#2")}%
+  \fi%
+}
+
+\def\defineRSTinclusion{%
+  \dotripleempty\do_define_RST_inclusion%
+}
+
+\def\do_RST_inclusion[#1]{%
+  \iffirstargument
+    \ctxlua{thirddata.rst.get_rst_inclusion("#1")}%
+  \fi%
+}
+
+\def\do_RST_setups{%
+  \ctxlua{thirddata.rst.do_rst_setups()}%
+}
+
+\def\startRSTproject{
+  \begingroup
+  \def\RSTinclusion{\dosingleempty\do_RST_inclusion}
+  \do_RST_setups
+  \starttext%
+}
+
+\def\stopRSTproject{
+  \stoptext \endgroup \endinput
+}
+
+\protect \endinput
+
+% vim:ft=context:sw=2:ts=2

@@ -1,0 +1,68 @@
+%D \module
+%D   [     file=type-imp-aller,
+%D      version=2011.08.28,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Aller Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [aller]
+
+\starttypescript [\s!sans] [aller,aller-light,aller-display]
+    \definefontsynonym [Aller-Regular]      [\s!file:allerrg]      [\s!features=\s!default]
+    \definefontsynonym [Aller-Italic]       [\s!file:allerit]      [\s!features=\s!default]
+    \definefontsynonym [Aller-Bold]         [\s!file:allerbd]      [\s!features=\s!default]
+    \definefontsynonym [Aller-BoldItalic]   [\s!file:allerbdit]    [\s!features=\s!default]
+    \definefontsynonym [Aller-Display]      [\s!file:allerdisplay] [\s!features=\s!default]
+    \definefontsynonym [Aller-LightRegular] [\s!file:allerlt]      [\s!features=\s!default]
+    \definefontsynonym [Aller-LightItalic]  [\s!file:allerltit]    [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [aller]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [Aller-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]     [Aller-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [Aller-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [Aller-BoldItalic] [\s!features=\s!default]
+    \definefontsynonym [\s!SansCaps]       [Aller-Regular]    [\s!features=\s!smallcaps]
+\stoptypescript
+
+\starttypescript [\s!sans] [aller-light]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [Aller-LightRegular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]     [Aller-LightItalic]  [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [Aller-Regular]      [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [Aller-Italic]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansCaps]       [Aller-LightRegular] [\s!features=\s!smallcaps]
+\stoptypescript
+
+\starttypescript [\s!sans] [aller-display]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans] [Aller-Display] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [aller,aller-light,aller-display]
+    \definetypeface [\typescriptone] [ss] [\s!sans] [\typescriptone] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

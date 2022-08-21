@@ -1,0 +1,28 @@
+
+
+                                BNF Module News
+
+
+
+VERSION 0.3
+
+  Nothing more than a clean-up of the project tree.  Although the autotools
+  setup was working OK it was more confusing than helpful.  People tend to
+  install these kinds of things in a much more ad hoc manner anyway.
+
+
+
+VERSION 0.2
+
+
+  Total rewrite of the logic.  Much easier to specify grammars, as the need for
+  commas and full-stops has been lifted.   Furthermore, there is now an
+  alternative way of specifying non-terminals, using '-pairs instead.  The
+  output is a lot nicer now as well, albeit not as compact as before.
+
+
+
+VERSION 0.1
+
+
+  Initial release, nothing much to report here.

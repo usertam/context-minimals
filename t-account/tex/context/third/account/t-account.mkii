@@ -1,0 +1,38 @@
+%D \module
+%D   [       file=t-account,
+%D        version=2007.01.15, % last change: 2008.02.13
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Miscelaneous,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+\unprotect
+
+\defineXMLpickup [account] [name=TACCOUNT]
+  {\startACCOUNT
+     [\XMLpar{account}{name}{TACCOUNT}]
+     [calculate=\XMLpar{account}{calculate}{no},
+      left=\XMLpar{account}{left}{},
+      middle=\XMLpar{account}{middle}{},
+      right=\XMLpar{account}{right}{},
+      background=\XMLpar{account}{background}{},
+      rule=\XMLpar{account}{rule}{on},
+      framecolor=\XMLpar{account}{framecolor}{black}]}
+  {\stopACCOUNT}
+
+\defineXMLpickup [debits]
+  \startDEBITS
+  \stopDEBITS
+
+\defineXMLpickup [credits]
+  \startCREDITS
+  \stopCREDITS
+
+\defineXMLsingular [debit] {\debit[\XMLpar{debit}{text}{}]{\XMLpar{debit}{value}{}}}
+
+\defineXMLsingular [credit] {\credit[\XMLpar{credit}{text}{}]{\XMLpar{credit}{value}{}}}
+
+\protect \endinput

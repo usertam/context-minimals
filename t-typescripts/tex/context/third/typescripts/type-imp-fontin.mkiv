@@ -1,0 +1,70 @@
+%D \module
+%D   [     file=type-imp-fontin,
+%D      version=2010.10.27,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Fontin Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [fontin]
+
+\starttypescript [\s!serif] [fontin]
+    \definefontsynonym [Fontin-Regular] [\s!file:fontinregular]   [\s!features=\s!default]
+    \definefontsynonym [Fontin-Italic]  [\s!file:fontinitalic]    [\s!features=\s!default]
+    \definefontsynonym [Fontin-Bold]    [\s!file:fontinbold]      [\s!features=\s!default]
+    \definefontsynonym [Fontin-Caps]    [\s!file:fontinsmallcaps] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [fontin]
+    \setups[\s!font:\s!fallback:\s!serif]
+    \definefontsynonym [\s!Serif]       [Fontin-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SerifItalic] [Fontin-Italic]  [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold]   [Fontin-Bold]    [\s!features=\s!default]
+    \definefontsynonym [\s!SerifCaps]   [Fontin-Caps]    [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [fontin]
+    \definefontsynonym [FontinSans-Regular]    [\s!file:fontinsansr45b]  [\s!features=\s!default]
+    \definefontsynonym [FontinSans-Italic]     [\s!file:fontinsansi45b]  [\s!features=\s!default]
+    \definefontsynonym [FontinSans-Bold]       [\s!file:fontinsansb45b]  [\s!features=\s!default]
+    \definefontsynonym [FontinSans-BoldItalic] [\s!file:fontinsansbi45b] [\s!features=\s!default]
+    \definefontsynonym [FontinSans-Caps]       [\s!file:fontinsanssc45b] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [fontin]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [FontinSans-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]     [FontinSans-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [FontinSans-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [FontinSans-BoldItalic] [\s!features=\s!default]
+    \definefontsynonym [\s!SansCaps]       [FontinSans-Caps]       [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [fontin]
+    \definetypeface [fontin] [rm] [\s!serif] [fontin]   [\s!default]
+    \definetypeface [fontin] [ss] [\s!sans]  [fontin]   [\s!default]
+    \definetypeface [fontin] [tt] [\s!mono]  [modern]   [\s!default] [rscale=1.1]
+    \definetypeface [fontin] [mm] [\s!math]  [palatino] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

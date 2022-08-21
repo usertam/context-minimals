@@ -1,0 +1,55 @@
+%D \module
+%D   [     file=s-cor-06,
+%D      version=2012.09.21,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Address entries,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2012 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\unprotect
+
+\installnamespace                        {addressentry}
+\installcommandhandler \????addressentry {addressentry} \????addressentry
+
+\appendtoks
+  \addressentryparameter\c!reset
+\to \everypresetaddressentry
+
+\appendtoks
+  \addressentryparameter\c!set
+\to \everydefineaddressentry
+
+\unexpanded\def\addressentry
+  {\dodoubleempty\addressentry_cmd}
+
+\def\addressentry_cmd[#id][#key]%
+  {\begingroup
+   \ifsecondargument
+     \edef\currentaddressentry   {#id}%
+     \edef\currentaddressentrykey{#key}%
+   \else
+     \edef\currentaddressentrykey{#id}%
+   \fi
+   \addressentryparameter\currentaddressentrykey
+   \endgroup}
+
+\stopmodule
+
+\protect \endinput

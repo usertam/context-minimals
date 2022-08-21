@@ -1,0 +1,141 @@
+\setuppapersize[A5][A5]
+
+\setupcombinedlist[content][interaction=all,]
+
+\setupinteraction[
+  state=start,
+  focus=standard,
+  color=darkcyan,
+  contrastcolor=\interactionparameter{color},
+]
+
+\setupindenting[yes,next,medium] % -> lead to the glue node error in mkiv
+
+\setuphead[chapter]   [style={\rm\sc},before={\blank[line,force]},after={\blank[2*line,force]}]
+\setuphead[section]   [style={\rm\it},before={\blank[line]}      ,after={\blank[line]}]
+\setuphead[subsection][style={\rm},before={\blank[line]}         ,after={\blank[line]}]
+
+\setupheads[indentnext=yes]
+\setupfloats[indentnext=yes]
+
+\setupbodyfont[latin-modern,10pt]
+\definefontfeature [textfigures]    [onum=yes]
+\definefontfeature [liningfigures]  [onum=no]
+\definefontfeature [texligatures]   [tlig=yes]
+\definefontfeature [notexligatures] [tlig=yes]
+\addfs{textfigures,texligatures}
+
+\setuptyping[
+  style={\addff{liningfigures,notexligatures}\ttx},
+]
+
+% title page
+\startbuffer[frontpage]
+\startstandardmakeup
+\raggedcenter
+\vfill
+{\setupbodyfont[,19pt]
+{\em Typesetting}
+\blank [2*big]
+{\tfc {\em re}{\ss Structured}{\em \kern-6ptText}}
+\blank [2*big]
+{\em with \CONTEXT}
+\blank [5*big]
+{\tfa A Manual for {\em rst}{\kern1pt\CONTEXT}}
+}
+\vfill
+\stopstandardmakeup
+\stopbuffer
+
+% additional information
+\startbuffer[author]
+\startstandardmakeup
+\vfill
+\framed [align=right,frame=off,topframe=on] {%
+\tfxx\ss\setupinterlinespace[small]\noindentation
+Copyright 2010--2014 Philipp Gesang, Tübingen.\par
+Mail any bug reports, patches or suggestions to\par
+\type{string.format("%s@%s.com", "phg42.2a", "gmail")}.\par
+Alternatively, pay a visit
+to \goto{my BitBucket handle}[url(http://bitbucket.org/phg/)]
+or \goto{my home page}[url(https://phi-gamma.net/coding)]
+\par
+}
+\stopstandardmakeup
+\stopbuffer
+
+
+% table of contents
+\startbuffer [toc]
+\setuppagenumbering[
+  state=start,
+  alternative=doublesided,
+  location=,
+]
+\setuplayout [grid=no]
+\setuptolerance [verytolerant]
+\setuptolerance [vertical,verytolerant]
+
+\newdimen \mypagenumdistance \mypagenumdistance .7em
+\def\fillercmd{\nobreak\hskip\mypagenumdistance}
+
+\definelistplacement[my_list_placement][command]#1#2#3%
+  {#2\fillercmd#3\hskip1.5em}
+
+\setuplist [chapter] [alternative=a,style=\word\sc]
+\setuplist [section] [alternative=my_list_placement,]
+
+\startsetups toc:subsection
+    \noindentation\placelist[subsection]
+\stopsetups
+
+\startsetups toc:section
+  \blank
+  \setupnarrower [middle=9em,]
+  \startnarrower[middle]\tfx
+  \noindentation\placelist[section][after=\setups{toc:subsection}]
+  \stopnarrower
+  \blank
+\stopsetups
+
+\title{Contents}
+
+\placelist [chapter] [criterium=text,after=\setups{toc:section}]
+
+% \setupheadertexts
+%   [{\tfx\sc\getmarking[chapter]}]   [{\tfx\bf \pagenumber}]
+%   [{\tfx\bf \pagenumber}]           [{\tfx{\em rst}{\kern.5pt\CONTEXT}}]
+% \completecontent
+\stopbuffer
+
+% something radically changed in mkiv
+\startluacode
+jobvariables           = job.variables or {}
+jobvariables.tobesaved = jobvariables.tobesaved or {}
+\stopluacode
+
+% list of publications
+\startbuffer[pubs]
+\setuplayout[grid=no]
+\setuptolerance[verytolerant]
+\setuptolerance[vertical,verytolerant]
+
+\completepublications
+\stopbuffer
+
+\appendtoks
+  \startfrontmatter
+    \getbuffer[frontpage]
+    \getbuffer[author]
+    \getbuffer[toc]
+  \stopfrontmatter
+\to \everystarttext
+
+%\prependtoks \getbuffer[pubs]      \to \everystoptext
+
+\setupwhitespace[none]
+\setuplayout[grid=verystrict]
+\setuptolerance[tolerant]
+\language[en]
+\setuppagenumbering[state=stop,location=]
+\input doc.tex

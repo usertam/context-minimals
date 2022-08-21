@@ -1,0 +1,130 @@
+%D \module
+%D   [     file=t-title,
+%D      version=2013.02.05,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Document titles,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+%M \loadsetups[t-title.xml]
+
+%D \showsetup{placetitle}
+%D \showsetup{setuptitle}
+%D \showsetup{titleelement}
+
+\writestatus{loading}{ConTeXt User Module / Document titles}
+
+\unprotect
+
+\installnamespace {title}
+\installnamespace {titlealternative}
+\installnamespace {titlerenderings}
+
+\installsimplecommandhandler \????title            {title}            \????title
+\installcommandhandler       \????titlealternative {titlealternative} \????titlealternative
+
+\unexpanded\def\title_place
+  {\begingroup
+   \dostarttagged\t!division\v!title
+   \dosingleempty\title_place_indeed}
+
+\def\title_place_indeed[#parameters]%
+  {\let\currenttitle\empty
+   \iffirstargument
+     \setupcurrenttitle[#parameters]%
+   \fi
+   \edef\currenttitlealternative{\roottitleparameter\c!alternative}%
+   \edef\p_renderingsetup{\titlealternativeparameter\c!renderingsetup}%
+   \autosetups\p_renderingsetup
+   \dostoptagged
+   \doif{\roottitleparameter\c!pagestate}\v!stop{\aftergroup\noheaderandfooterlines}% why here and not after \endgroup?
+   \endgroup}
+
+\def\title_parameter#element%
+  {\begingroup
+   \def\currenttitle{#element}%
+   \usetitlestyleandcolor\c!style\c!color
+   \dostarttagged\t!construct\currenttitle
+   \setupinterlinespace\roottitleparameter\currenttitle\par
+   \dostoptagged
+   \endgroup}
+
+\let\placetitle  \title_place
+\let\titleelement\title_parameter
+
+\definetitlealternative[\s!default][\c!renderingsetup=\????titlerenderings:\s!default]
+
+\startsetups[\????titlerenderings:\s!default]
+
+    \blank[\roottitleparameter\c!spacebefore]
+
+    \startalignment[\roottitleparameter\c!align]
+
+        \titleelement\c!title
+    
+        \blank[1.5em]
+    
+        \titleelement\c!author
+    
+        \blank[1em]
+    
+        \titleelement\c!date
+
+    \stopalignment
+
+
+    \blank[\roottitleparameter\c!spaceafter]
+
+\stopsetups
+
+\setuptitle
+  [\c!spacebefore={\v!force,2em},
+    \c!spaceafter={1.5em},
+         \c!align=\v!middle,
+     \c!pagestate=\v!stop,
+   \c!alternative=\s!default]
+
+\setuptitle
+  [\c!title]
+  [\c!style=\tfd,
+   \c!color=]
+
+\setuptitle
+  [\c!author,\c!date]
+  [\c!style=\tfa,
+   \c!color=]
+
+\protect
+
+\continueifinputfile{t-title.mkvi}
+
+\starttext
+
+\placetitle
+  [author=Ben Lee User,
+    title=How to write a \tex{placetitle} command,
+     date=\currentdate\space\currenttime]
+
+\dorecurse{6}
+  {\startparagraph
+   \input tufte\par
+   \stopparagraph}
+
+\stoptext

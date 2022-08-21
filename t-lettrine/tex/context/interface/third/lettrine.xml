@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" 
+              name="context/third/t-lettrine" 
+              language="all" version="2005.03.26">
+
+<cd:command name="setuplettrine" file="t-lettrine.tex">
+  <cd:sequence>
+    <cd:string value="setuplettrine"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:keywords optional="yes">
+      <cd:constant type="cd:text"/>
+    </cd:keywords>
+    <cd:assignments list="yes">
+      <cd:parameter name="Lines">
+        <cd:constant type="cd:number"/>
+      </cd:parameter>
+      <cd:parameter name="Hang">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="Oversize">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="Raise">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="Findent">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="Nindent">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="Slope">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="Ante">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="FontHook">
+        <cd:constant type="cd:command"/>
+      </cd:parameter>
+      <cd:parameter name="TextFont">
+        <cd:constant type="cd:command"/>
+      </cd:parameter>
+      <cd:parameter name="Image">
+        <cd:constant type="yes"/>
+        <cd:constant type="no" default="yes"/>
+      </cd:parameter>
+    </cd:assignments>
+  </cd:arguments>
+</cd:command>
+<cd:command name="lettrine" file="t-lettrine.tex">
+  <cd:sequence>
+    <cd:string value="lettrine"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:assignments list="yes" optional="yes">
+      <cd:inherit name="setuplettrine"/>
+    </cd:assignments>
+    <cd:content/>
+    <cd:content/>
+  </cd:arguments>
+</cd:command>
+</cd:interface>

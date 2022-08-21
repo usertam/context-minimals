@@ -1,0 +1,84 @@
+%D \module
+%D   [       file=t-account,
+%D        version=2007.01.15, % last change: 2008.02.13
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Miscelaneous,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+\unprotect
+
+\startxmlsetups xml:account
+  \xmlsetsetup{\xmldocument}{account|debits|credits|debit|credit}{*}
+\stopxmlsetups
+
+\xmlregistersetup{xml:account}
+
+\startxmlsetups account
+
+	\bgroup
+
+	\startcollecting
+
+	\startcollect\startACCOUNT\stopcollect
+	\doifelsenothing{\xmlatt{#1}{name}}
+		{\startcollect[TACCOUNT]\stopcollect}
+		{\startexpandedcollect[\xmlatt{#1}{name}]\stopexpandedcollect}
+	\startcollect[\stopcollect
+	\doifsomething{\xmlatt{#1}{background}}{\startexpandedcollect background=\xmlatt{#1}{background},\stopexpandedcollect}
+    \doifsomething{\xmlatt{#1}{backgroundcolor}}{\startexpandedcollect backgroundcolor=\xmlatt{#1}{backgroundcolor},\stopexpandedcollect}
+    \doifsomething{\xmlatt{#1}{backgroundoffset}}{\startexpandedcollect backgroundoffset=\xmlatt{#1}{backgroundoffset},\stopexpandedcollect}
+    \doifsomething{\xmlatt{#1}{backgroundscreen}}{\startexpandedcollect backgroundscreen=\xmlatt{#1}{backgroundscreen},\stopexpandedcollect}
+    \doifsomething{\xmlatt{#1}{frame}}{\startexpandedcollect frame=\xmlatt{#1}{frame},\stopexpandedcollect}
+    \doifsomething{\xmlatt{#1}{framecolor}}{\startexpandedcollect framecolor=\xmlatt{#1}{framecolor},\stopexpandedcollect}
+    \doifsomething{\xmlatt{#1}{offset}}{\startexpandedcollect offset=\xmlatt{#1}{offset},\stopexpandedcollect}
+    \doifsomething{\xmlatt{#1}{calculate}}{\startexpandedcollect calculate=\xmlatt{#1}{calculate},\stopexpandedcollect}
+	\doifsomething{\xmlatt{#1}{rule}}{\startexpandedcollect rule=\xmlatt{#1}{rule},\stopexpandedcollect}
+    \startcollect]\stopcollect
+
+	\xmlflush{#1}
+
+	\startcollect\stopACCOUNT\stopcollect
+
+	\stopcollecting
+
+	\egroup
+
+\stopxmlsetups
+
+\startxmlsetups debits
+
+	\startcollect\startDEBITS\stopcollect
+	\xmlflush{#1}
+	\startcollect\stopDEBITS\stopcollect
+
+\stopxmlsetups
+
+\startxmlsetups debit
+
+	\startexpandedcollect
+		\noexpand\debit[\xmlatt{#1}{text}]{\xmlatt{#1}{value}}
+	\stopexpandedcollect
+
+\stopxmlsetups
+
+\startxmlsetups credits
+
+	\startcollect\startCREDITS\stopcollect
+	\xmlflush{#1}
+	\startcollect\stopCREDITS\stopcollect
+
+\stopxmlsetups
+
+\startxmlsetups credit
+
+	\startexpandedcollect
+		\noexpand\credit[\xmlatt{#1}{text}]{\xmlatt{#1}{value}}
+	\stopexpandedcollect
+
+\stopxmlsetups
+
+\protect \endinput

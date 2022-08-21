@@ -1,0 +1,439 @@
+%D \module
+%D   [       file=t-account,
+%D        version=2007.01.15, % last change: 2009.02.06
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Miscelaneous,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+%M \usemodule [account]
+%M \loadsetups[t-account.xml]
+
+\writestatus{loading}{Context User Module / Miscelaneous}
+
+\unprotect
+
+\usemodule[floatnumber]
+
+\def\????ac{@@@@ac} % Account
+
+%D This is the second version of my T-Account module. If I want
+%D to be true I wrote this module the n-th time but the current
+%D version is my second version that has all things implemented
+%D that I wanted and is written as a real \CONTEXT\ module and
+%D in a simple plain \TEX\ style, although it is sometimes better
+%D to try writing things for plain \TEX\ and creating an extended
+%D for \CONTEXT\ later, after everything works.
+
+%D The next two count registers save the values for the values
+%D from the \tex{debit} and \tex{credit} macros. You can output
+%D the values at the end of the account.
+
+\definefloatnumber[creditvalue][\c!command=\accountparameter\c!numbercommand]
+\definefloatnumber[debitvalue] [\c!command=\accountparameter\c!numbercommand]
+
+\definefloatnumber[creditsum][\c!command=\accountparameter\c!numbercommand]
+\definefloatnumber[debitsum] [\c!command=\accountparameter\c!numbercommand]
+
+%D The following dimens are needed to save the textwidth in the
+%D first run with my account parser and feed these values into
+%D the account boxes, most of them only needed for the
+%D \mono{width=fit} option.
+
+\newdimen\!!debitwidth
+\newdimen\!!debitheight
+\newdimen\!!creditwidth
+\newdimen\!!creditheight
+\newdimen\!!accountwidth
+\newdimen\!!accountheight
+\newdimen\!!debittextwidth
+\newdimen\!!debitnumberwidth
+\newdimen\!!credittextwidth
+\newdimen\!!creditnumberwidth
+
+%D I collect the content from the debit environment in an box and
+%D put the content into the main box, after all values are collected.
+%D The same happens for the credit environment and his content.
+
+\newbox\debitbox
+\newbox\creditbox
+
+%D And the last thing is a private token register to save the account
+%D content and use it for both parsing the content and using it afterwards
+%D to fill the box with the processed content.
+
+\newtoks\accounttoks
+
+%D This nice thing was taken from \mono{core-rul.tex}.
+
+\def\accountparameter#1%
+  {\csname\@@account#1\endcsname}
+
+%D \macros{startACCOUNT,stopACCOUNT}
+%D
+%D \showsetup{startaccount}
+
+%D My first version used a buffers to store the content between the
+%D \tex{startACCOUNT} \unknown\ \tex{stopACCOUNT} pair. This has
+%D worked untill I tried to put the environment into a float or to
+%D put a few of them side by side in an \mono{combination} environment.
+%D A solution for this problems could have been to call the output
+%D from my \mono{ACCOUNT} environment by a command like \tex{useACCOUNT}
+%D like the \mono{MPgraphics}, but is was not what I wanted and the
+%D only solution for this was to use an delimited environment on the
+%D one side or collext the text into braces like \tex{ACCOUNT{}} on
+%D the other side. The second way would have made it easier to define
+%D new macros to for the account with presets with the sideeffect to
+%D enclose the content with braces. The first way avoids braces and
+%D uses delimitercommands instead, more to write and harder to define
+%D wrapper macros (in the way I like) but I prefered this solution
+%D as shown below.
+
+\def\startACCOUNT
+  {\dodoubleempty\dostartACCOUNT}
+
+\long\def\dostartACCOUNT[#1][#2]#3\stopACCOUNT
+  {\bgroup
+   \edef\@@account{\????ac#1}%
+   \ifsecondargument
+     \setupACCOUNT[#1][#2]%
+   \fi
+   \edef\accountwidth    {\accountparameter\c!width}%
+   \edef\accountdistance {\accountparameter\c!distance}%
+   \resetfloatnumber[creditsum]%
+   \resetfloatnumber[debitsum]%
+   \def\creditsum{\getfloatnumber[creditsum]}%
+   \def\debitsum {\getfloatnumber[debitsum]}%
+   \doifvaluesomething{\accountparameter\c!bodyfont}
+     {\expanded{\switchtobodyfont
+        [\accountparameter\c!bodyfont]}}%
+   \parseACCOUNT{#3}%
+   \doifnot\accountwidth\v!fit
+     {\global\!!accountwidth\the\dimexpr\accountwidth\relax
+      \global\advance\!!accountwidth-\accountdistance
+      \global\!!accountwidth0.5\!!accountwidth}%
+   #3\removeunwantedspaces
+   \checkACCOUNT
+   \presetlocalframed[\????ac]%
+   \localframed
+     [\????ac]
+     [\c!background=\accountparameter\c!background,
+      \c!backgroundcolor=\accountparameter\c!backgroundcolor,
+      \c!backgroundoffset=\accountparameter\c!backgroundoffset,
+      \c!backgroundscreen=\accountparameter\c!backgroundscreen,
+      \c!frame=\accountparameter\c!frame,
+      \c!framecolor=\accountparameter\c!framecolor,
+      \c!offset=\accountparameter\c!offset]
+   \bgroup
+   \setbox\scratchbox\vbox
+     {\offinterlineskip
+      \doifelsenothing
+        {\accountparameter\c!left%
+         \accountparameter\c!middle%
+         \accountparameter\c!right}
+        {\xdef\MPaccountheaderheight{\the\zeropoint}}
+        {\setbox\scratchbox\hbox\!!to\dimexpr2\!!accountwidth+\accountdistance\relax
+           {\doif{\accountparameter\c!strut}\v!yes\strut
+            \rlap{\accountparameter\c!left}\hfil
+                  \accountparameter\c!middle\hfil
+            \llap{\accountparameter\c!right}}%
+            \xdef\MPaccountheaderheight{\the\dimexpr\ht\scratchbox+\dp\scratchbox\relax}%
+            \box\scratchbox}
+      \doifelse{\accountparameter\c!rule}\v!on
+        {\doifsomething{\accountparameter\c!framecolor}
+           {\color[\accountparameter\c!framecolor]}
+           {\hrule\!!height\accountparameter\c!rulethickness\relax}}
+        {\vskip\accountparameter\c!rulethickness\relax}%
+      \hbox{\box\debitbox\betweenaccount\box\creditbox}%
+      \doifelse{\accountparameter\c!calculate}\v!yes
+        {\setbox\scratchbox\vbox
+           {\doifelse{\accountparameter\c!rule}\v!on
+              {\doifsomething{\accountparameter\c!framecolor}
+                 {\color[\accountparameter\c!framecolor]}
+                 {\hrule\!!height\accountparameter\c!rulethickness\relax}}
+              {\vskip\accountparameter\c!rulethickness\relax}
+            \hbox
+              {\hbox\!!to\!!accountwidth
+                 {\doif{\accountparameter\c!strut}\v!yes\strut%
+                  \hfil\debitsum}%
+               \spacebetweenaccount
+               \hbox\!!to\!!accountwidth
+                 {\doif{\accountparameter\c!strut}\v!yes\strut%
+                  \hfil\creditsum}}}%
+         \xdef\MPaccountfooterheight{\the\dimexpr\ht\scratchbox+\dp\scratchbox\relax}%
+         \box\scratchbox}
+        {\xdef\MPaccountfooterheight{\the\zeropoint}}}%
+   \xdef\MPaccountmaxheight{\the\dimexpr\ht\scratchbox+\dp\scratchbox\relax}%
+   \xdef\MPaccountmaxwidth {\the\wd\scratchbox}%
+   \box\scratchbox
+   \egroup
+   \egroup}
+
+\defineoverlay[account][\useMPgraphic{account}]
+
+%D We are not limited to simple rules with \TEX\ primitives.
+%D The following \METAPOST\ example graphic shows one way to
+%D draw more complicated rules behind the T-Account, you can
+%D use thus as an example for your own backgrounds.
+
+\startuseMPgraphic{account}
+  AccountNumberGap := 0.5*\MPaccountmaxwidth-\MPaccountwidth ;
+  AccountRuleWidth := \the\dimexpr\accountparameter\c!rulethickness\relax ;
+
+  z11 = (0,\MPaccountmaxheight-\MPaccountheaderheight) ;
+  z12 = (\MPaccountmaxwidth,\MPaccountmaxheight-\MPaccountheaderheight) ;
+
+  z21 = (\MPaccountwidth-\MPaccountnumberwidth-AccountNumberGap,\MPaccountmaxheight-\MPaccountheaderheight-\MPaccountdebitheight) ;
+  z22 = (0.5*\MPaccountmaxwidth,\MPaccountmaxheight-\MPaccountheaderheight-\MPaccountdebitheight) ;
+  z23 = (\MPaccountmaxwidth-\MPaccountnumberwidth-AccountNumberGap,\MPaccountmaxheight-\MPaccountheaderheight-\MPaccountcreditheight) ;
+  z24 = (\MPaccountmaxwidth,\MPaccountmaxheight-\MPaccountheaderheight-\MPaccountcreditheight) ;
+
+  z31 = (\MPaccountwidth-\MPaccountnumberwidth-AccountNumberGap,\MPaccountfooterheight) ;
+  z32 = (0.5*\MPaccountmaxwidth-AccountNumberGap,\MPaccountfooterheight) ;
+  z33 = (\MPaccountmaxwidth-\MPaccountnumberwidth-AccountNumberGap,\MPaccountfooterheight) ;
+  z34 = (\MPaccountmaxwidth,\MPaccountfooterheight) ;
+  
+  z41 = (0.5*\MPaccountmaxwidth,\MPaccountmaxheight-\MPaccountheaderheight) ;
+  z42 = (0.5*\MPaccountmaxwidth,0) ;
+  z43 = whatever[z41,z42]=whatever[z22,z23] ;
+  z44 = (0.5*\MPaccountmaxwidth,\MPaccountfooterheight) ;
+
+  z51 = (0,\MPaccountfooterheight) ;
+  z52 = (\MPaccountnumberwidth,\MPaccountfooterheight) ;
+  z53 = (0.5*\MPaccountmaxwidth-\MPaccountnumberwidth-AccountNumberGap,\MPaccountmaxheight-\MPaccountheaderheight-\MPaccountdebitheight) ;
+  z54 = (0.5*\MPaccountmaxwidth-AccountNumberGap,\MPaccountmaxheight-\MPaccountheaderheight-\MPaccountdebitheight) ;
+  
+  z61 = (\MPaccountwidth-\MPaccountnumberwidth-AccountNumberGap,0) ;
+  z62 = (0.5*\MPaccountmaxwidth-AccountNumberGap,0) ;
+  z63 = (\MPaccountmaxwidth-\MPaccountnumberwidth-AccountNumberGap,0) ;
+  z64 = (\MPaccountmaxwidth,0) ;
+
+  drawoptions (withpen pencircle scaled AccountRuleWidth withcolor \MPcolor{\accountparameter\c!framecolor}) ;
+  linecap := butt ; % no round end of the lines
+
+  draw z11--z12 ;
+  draw z33--z34 ;
+
+  if \MPaccountfooterheight>0pt:
+    draw z61--z62 ;
+    draw z63--z64 ;
+  fi
+
+  if \MPaccountcreditheight>\MPaccountdebitheight:
+    draw z31--z32 ;
+    draw z41--z44 ;
+    draw z51--z52--z53--z54 ;
+  else:
+    draw z21--z22--z23--z24 ;
+    draw z41--z43 ;
+  fi
+
+  setbounds currentpicture to unitsquare xyscaled (\MPaccountmaxwidth,\MPaccountmaxheight) ;
+\stopuseMPgraphic
+
+%D \showsetup{startdebits}
+%D \showsetup{debit}
+
+\long\def\startDEBITS#1\stopDEBITS
+  {\bgroup
+   \def\debit{\dosingleempty\dodebit}%
+   \def\dodebit[##1]%
+     {\def\dododebit####1{\dodododebit[##1]{####1}}%
+      \permitspacesbetweengroups
+      \dosinglegroupempty\dododebit}%
+   \def\dodododebit[##1]##2%
+     {\setfloatnumber[debitvalue]{##2}%
+      \incrementfloatnumber[debitsum]{\rawfloatnumber[debitvalue]}%
+      \hbox\!!to\hsize{\strut##1\hfill\getfloatnumber[debitvalue]}}%
+   \global\setbox\debitbox\vtop{\hsize\!!accountwidth#1}%
+   \!!debitheight\ht\debitbox
+   \advance\!!debitheight\dp\debitbox
+   \xdef\MPaccountdebitheight{\the\!!debitheight}%
+   \egroup}
+
+%D \showsetup{startcredits}
+%D \showsetup{credit}
+
+\long\def\startCREDITS#1\stopCREDITS
+  {\bgroup
+   \def\credit{\dosingleempty\docredit}%
+   \def\docredit[##1]%
+     {\def\dodocredit####1{\dododocredit[##1]{####1}}%
+      \permitspacesbetweengroups
+      \dosinglegroupempty\dodocredit}%
+   \def\dododocredit[##1]##2%
+     {\setfloatnumber[creditvalue]{##2}%
+      \incrementfloatnumber[creditsum]{\rawfloatnumber[creditvalue]}%
+      \hbox\!!to\hsize{\strut##1\hfill\getfloatnumber[creditvalue]}}%
+   \global\setbox\creditbox\vtop{\hsize\!!accountwidth#1}%
+   \!!creditheight\ht\creditbox
+   \advance\!!creditheight\dp\creditbox
+   \xdef\MPaccountcreditheight{\the\!!creditheight}%
+   \egroup}
+
+\long\def\parseACCOUNT#1%
+  {\bgroup
+   \resetfloatnumber[creditsum]%
+   \resetfloatnumber[debitsum]%
+   \def\startCREDITS##1\stopCREDITS
+     {\def\credit{\dosingleempty\docredit}%
+      \def\docredit[####1]%
+        {\def\dodocredit########1{\dododocredit[####1]{########1}}%
+         \permitspacesbetweengroups
+         \dosinglegroupempty\dodocredit}%
+      \def\dododocredit[####1]####2%
+        {\incrementfloatnumber[creditsum]{####2}%
+         \setbox\scratchbox\hbox{####1}\!!dimena\wd\scratchbox
+         \compareaccountdimen\!!credittextwidth\!!dimena}%
+      ##1\removeunwantedspaces}%
+   \def\startDEBITS##1\stopDEBITS
+     {\def\debit{\dosingleempty\dodebit}%
+      \def\dodebit[####1]%
+        {\def\dododebit########1{\dodododebit[####1]{########1}}%
+         \permitspacesbetweengroups
+         \dosinglegroupempty\dododebit}%
+      \def\dodododebit[####1]####2%
+        {\incrementfloatnumber[debitsum]{####2}%
+         \setbox\scratchbox\hbox{####1}\!!dimena\wd\scratchbox
+         \compareaccountdimen\!!debittextwidth\!!dimena}%
+      ##1\removeunwantedspaces}%
+   #1\removeunwantedspaces
+   \compareACCOUNTnumberwidth
+   \compareaccountdimen\!!debittextwidth\!!credittextwidth
+   \global\!!accountwidth\!!debittextwidth
+   \global\advance\!!accountwidth\dimexpr\MPaccountnumberwidth\relax
+   \global\advance\!!accountwidth\accountparameter\c!columndistance
+   \xdef\MPaccounttextwidth{\the\!!debittextwidth}%
+   \xdef\MPaccountwidth    {\the\!!accountwidth}%
+   \resetfloatnumber[creditsum]%
+   \resetfloatnumber[debitsum]%
+   \egroup}
+
+\def\compareACCOUNTnumberwidth
+  {\bgroup
+   \setbox\plusone\hbox{\getfloatnumber[debitsum]}%
+   \setbox\plustwo\hbox{\getfloatnumber[creditsum]}%
+   \ifdim\wd\plusone>\wd\plustwo
+     \xdef\MPaccountnumberwidth{\the\wd\plusone}%
+   \else
+     \xdef\MPaccountnumberwidth{\the\wd\plustwo}%
+   \fi
+   \egroup}
+
+\def\compareaccountdimen#1#2%
+  {\ifdim#2>#1\relax
+     #1#2
+   \fi}
+
+\def\checkACCOUNT
+  {\bgroup
+   \compareaccountdimen\!!debitheight\!!creditheight
+   \xdef\MPaccountheight{\the\!!debitheight}%
+   \egroup}
+
+\def\linebetweenaccount
+  {\bgroup
+   \xdef\MPaccountdistance{\the\dimexpr\accountdistance\relax}%
+   \ifdim\accountdistance>\zeropoint\relax
+     \!!dimena\accountdistance
+   \else
+     \!!dimena\linewidth
+   \fi
+   \advance\!!dimena-\linewidth
+   \hskip.5\!!dimena
+   \doifsomething{\accountparameter\c!framecolor}
+     {\color[\accountparameter\c!framecolor]}%
+     {\vrule\!!width\accountparameter\c!rulethickness}%
+   \hskip.5\!!dimena\relax
+   \egroup}
+
+\def\spacebetweenaccount
+  {\xdef\MPaccountdistance{\zeropoint}%
+   \hskip\accountdistance}
+
+%D \macros{setupACCOUNT}
+%D
+%D \showsetup{setupaccount}
+
+\def\setupACCOUNT
+  {\dodoubleargument\dosetupACCOUNT}
+
+\def\dosetupACCOUNT[#1][#2]%
+  {\getparameters[\????ac#1][#2]%
+   \processaction
+     [\getvalue{\????ac#1\c!rule}]
+     [     \v!on=>\let\betweenaccount\linebetweenaccount,
+          \v!off=>\let\betweenaccount\spacebetweenaccount,
+      \s!default=>\let\betweenaccount\spacebetweenaccount,
+      \s!unknown=>\let\betweenaccount\spacebetweenaccount]}
+
+\def\defineACCOUNT
+  {\dodoubleempty\dodefineACCOUNT}
+
+\def\dodefineACCOUNT[#1][#2]%
+  {\setupACCOUNT
+     [#1]
+     [\c!background=,
+      \c!backgroundoffset=0pt,
+      \c!backgroundscreen=,
+      \c!backgroundcolor=,
+      \c!bodyfont=,
+      \c!calculate=\v!no,
+      \c!columndistance=\bodyfontsize,
+      \c!distance=\bodyfontsize,
+      \c!frame=\v!off,
+      \c!framecolor=,
+      \c!left=,
+      \c!middle=,
+      \c!offset=0.25ex,
+      \c!right=,
+      \c!rule=\v!on,
+      \c!rulethickness=\linewidth,
+      \c!width=\v!fit,
+      \c!strut=\v!yes,
+      \c!numbercommand=\integerrounding,
+      #2]%
+   \processbetween{#1}{\ACCOUNT[#1]}%
+   \setvalue{\e!setup#1\e!endsetup}{\dodoubleargument\setupACCOUNT[#1]}}
+
+\def\ACCOUNT[#1]#2%
+  {\startACCOUNT[#1]#2\stopACCOUNT}
+
+\defineACCOUNT[TACCOUNT]
+
+\defineACCOUNT[TKONTO]
+
+%D \subject{Example}
+%D 
+%D \startbuffer
+%D \startTACCOUNT[left=S,middle=Retained Earnings,right=H]
+%D \startTACCOUNT
+%D   \startDEBITS
+%D     \debit [Rent Expense]      {2200}
+%D     \debit [Salaries Expense]  {1650}
+%D     \debit [Interest Expense]  {3950}
+%D     \debit [Dividends]         {2000}
+%D   \stopDEBITS
+%D   \startCREDITS
+%D     \credit [Sales Revenue]    {8500}
+%D     \credit [Interest Revenue] {1300}
+%D   \stopCREDITS
+%D \stopTACCOUNT
+%D \stopbuffer
+%D 
+%D A simple example:
+%D 
+%D \typebuffer
+%D 
+%D This results in the following output:
+%D 
+%D \startlinecorrection
+%D \getbuffer
+%D \stoplinecorrection
+
+\loadmarkfile{t-account}
+
+\protect \endinput

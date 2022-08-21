@@ -1,0 +1,163 @@
+# dummy release script
+#
+# DO NOT invoke this from a pgfplots directory, 
+# use 
+# make -f pgfplots/scripts/pgfplots/Makefile.pgfplots_release_sourceforge
+DIR=pgfplots
+VERSION=_unstable
+#VERSION=_1.18.1
+
+ZIP=pgfplots$(VERSION).tds.zip
+CTANZIP=pgfplots$(VERSION).ctan.flatdir.zip
+PDF=pgfplots$(VERSION).pdf
+TEX_NOTES=$(DIR)/doc/latex/pgfplots/TeX-programming-notes.pdf
+PDFTABLE=pgfplotstable$(VERSION).pdf
+CHANGELOG=ChangeLog$(VERSION)
+README=README$(VERSION)
+REVISIONFILE=pgfplots$(VERSION).revision
+
+files: zip ctanzip pdf $(README) $(CHANGELOG)
+
+all: uploaddist download gallery 
+
+zip: $(ZIP)
+
+pdf: $(PDF) $(PDFTABLE)
+
+revisionfile: $(REVISIONFILE)
+
+# XXX : update for github!
+#
+upload: $(ZIP) $(PDF) $(PDFTABLE) $(CHANGELOG) $(README) $(REVISIONFILE)
+	scp $^ $(TEX_NOTES) cfeuersaenger,pgfplots@web.sourceforge.net:htdocs/
+
+uploaddist: 
+	scp $(DIR)/doc/latex/pgfplots/pgfplots.pdf \
+		$(DIR)/doc/latex/pgfplots/pgfplotstable.pdf \
+		cfeuersaenger,pgfplots@web.sourceforge.net:htdocs/
+
+FORCE:
+
+ctanzip: $(CTANZIP)
+
+# code to satisfy http://www.ctan.org/upload ...
+$(CTANZIP): $(ZIP)
+	rm -fr /tmp/pgfplots /tmp/pgfplots.ctan.tmp $@
+	mkdir -p /tmp/pgfplots /tmp/pgfplots.ctan.tmp
+	cd /tmp/pgfplots.ctan.tmp && unzip $(abspath $(ZIP))
+	mv /tmp/pgfplots.ctan.tmp/doc/latex/pgfplots /tmp/pgfplots/doc
+	mv /tmp/pgfplots.ctan.tmp/doc/generic/pgfplots/README /tmp/pgfplots
+	cp $(ZIP) /tmp/pgfplots.tds.zip
+	mkdir /tmp/pgfplots/tex
+	mkdir /tmp/pgfplots/source
+	mkdir /tmp/pgfplots/scripts
+	find /tmp/pgfplots.ctan.tmp/tex -type f -exec mv -i {} /tmp/pgfplots/tex \;
+	find /tmp/pgfplots.ctan.tmp/source -type f -exec mv -i {} /tmp/pgfplots/source \;
+	find /tmp/pgfplots.ctan.tmp/scripts -type f -exec mv -i {} /tmp/pgfplots/scripts \;
+	find /tmp/pgfplots.ctan.tmp/doc -type f -exec mv -i {} /tmp/pgfplots/doc \;
+	find /tmp/pgfplots.ctan.tmp -not -perm -o=r -exec chmod o+r {} \;
+	echo "Please search for pgfplots.tds.zip and install that one into a local texmf branch (which is typically simpler). This release is intended to satisfy CTAN package browsing policies." > /tmp/pgfplots/INSTALL
+	@NUM_FILES=$$(find /tmp/pgfplots.ctan.tmp/ -type f |wc -l); \
+	if [ $$NUM_FILES -gt 0 ]; then echo "INTERNAL FAILURE: $$NUM_FILES FILES LEFT OVER IN /tmp/pgfplots.ctan.tmp! All must be included into $@. Left-overs:"; find /tmp/pgfplots.ctan.tmp/ -type f; exit 1; fi
+	cd /tmp && zip -r $(abspath $@) pgfplots pgfplots.tds.zip
+
+
+$(ZIP): FORCE
+	rm -fr /tmp/pgfplots /tmp/$@
+	cd $(DIR) && scripts/pgfplots/pgfplotsrevisionfile.sh
+	rsync --copy-links \
+		--exclude=.git \
+		--exclude='.*.sw?' \
+		--exclude='*.aux' \
+		--exclude='*.log' \
+		--exclude='html' \
+		--exclude='*~' \
+		--exclude='*.bbl' \
+		--exclude='*.blg' \
+		--exclude='*.idx' \
+		--exclude='*.ilg' \
+		--exclude='README.md' \
+		--exclude='*.log' \
+		--exclude='*.rej' \
+		--exclude='*.log.all' \
+		--exclude='*.dpth' \
+		--exclude='*.figlist' \
+		--exclude='*.auxlock' \
+		--exclude='*.ind' \
+		--exclude='*.toc' \
+		--exclude='*.out' \
+		--exclude='*.djs' \
+		--exclude='*.tmp' \
+		--exclude='*.tuo' \
+		--exclude='*.tui' \
+		--exclude='*.tuc' \
+		--exclude='*.top' \
+		--exclude='*.pgf' \
+		--exclude='luaunit' \
+		--exclude='*.mp' \
+		--exclude='*.md5' \
+		--exclude='.gitignore' \
+		--exclude='.cvsignore' \
+		--exclude='pgfplotsrevisionfile.sh' \
+		--exclude='pgfplots_in_ubuntu.readme.txt' \
+		--exclude='pgfplotstable.example1.out.*' \
+		--exclude='source/latex/pgfplots/pgfplotstest/unittests/references' \
+		--exclude='source/latex/pgfplots/pgfplotstest/regressiontests/references' \
+		--exclude='doc/latex/pgfplots/bugtracker' \
+		--exclude='P.sh' \
+		--exclude='*.diff' \
+		--exclude='*.diff.png' \
+		--exclude='expensiveexample*' \
+		--exclude='Makefile.pgfplots_release_sourceforge' \
+		--exclude='acquirecopy.sh' \
+		--exclude='pgfplotsDEV_copy_files_from_pgf.sh' \
+		--exclude='.github' \
+		--exclude='tlpkg' \
+		-r $(DIR) /tmp
+	make -C /tmp/$(DIR)/doc/latex/pgfplots/gallery/ clean
+	rm -fr /tmp/$(DIR)/doc/latex/pgfplots/figures/generated
+	cd /tmp/$(DIR)/doc/latex/pgfplots && ls pgfplotsexample* *.pdf > /tmp/exclude.lst
+	cd /tmp/$(DIR)/doc/latex/pgfplots && tar cjf /tmp/pgfplots.doc.src.tar.bz2 --exclude-from /tmp/exclude.lst --remove-files *
+	mv /tmp/pgfplots.doc.src.tar.bz2 /tmp/$(DIR)/doc/latex/pgfplots
+	rm /tmp/exclude.lst
+	make -C /tmp/$(DIR)/source/latex/pgfplots/pgfplotstest/unittest clean
+	make -C /tmp/$(DIR)/source/latex/pgfplots/pgfplotstest/regressiontests clean
+	rm -f /tmp/$(DIR)/source/context/third/pgfplots/pgfplotstest/pgfplotstest.pdf
+	#cd /tmp/$(DIR)/source/latex/pgfplots/ && zip --move -r pgfplotstests.zip *
+	#cd /tmp/$(DIR)/source/context/third/pgfplots/ && zip --move -r pgfplotstests.zip *
+	cd /tmp/$(DIR)/source/latex/pgfplots/ && tar cjf pgfplotstests.tar.bz2 --remove-files *
+	cd /tmp/$(DIR)/source/context/third/pgfplots/ && tar cjf pgfplotstests.context.tar.bz2 --remove-files *
+	cd /tmp/$(DIR) && zip -r /tmp/$@ *
+	cp /tmp/$@ $@
+	find `pwd` -maxdepth 1 \( -name '$(@:.zip=)*' \) -ls
+
+$(REVISIONFILE): FORCE
+	P=`pwd`; cd $(DIR) && echo "`date +%Y-%m-%d` Revision `git describe --tags HEAD`" >$$P/$@
+
+$(CHANGELOG): FORCE
+	cp $(DIR)/doc/latex/pgfplots/ChangeLog $@
+
+$(README): FORCE
+	cp $(DIR)/doc/generic/pgfplots/README $@
+
+$(PDF): $(DIR)/doc/latex/pgfplots/pgfplots.pdf
+	cp $< $@
+
+$(PDFTABLE): $(DIR)/doc/latex/pgfplots/pgfplotstable.pdf
+	cp $< $@
+
+# XXX : is that html of PHP? 
+# XXX : update for github?
+download:
+	scp  cfeuersaenger,pgfplots@web.sourceforge.net:htdocs/index.html /tmp || exit 1
+	echo "index.html copied to /tmp"
+
+uploadindexhtml: /tmp/index.html
+	scp $< cfeuersaenger,pgfplots@web.sourceforge.net:htdocs/
+	
+
+
+gallery:
+	echo "Remaking gallery ... "
+	#make -C $(DIR)/doc/latex/pgfplots/gallery 
+	scp $(DIR)/doc/latex/pgfplots/gallery/gallery.{html,css} $(DIR)/doc/latex/pgfplots/gallery/example*.png $(DIR)/doc/latex/pgfplots/gallery/example*.pdf $(DIR)/doc/latex/pgfplots/gallery/example*.tex cfeuersaenger,pgfplots@web.sourceforge.net:htdocs/

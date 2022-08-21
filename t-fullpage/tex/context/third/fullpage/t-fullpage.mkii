@@ -1,0 +1,321 @@
+%D \module
+%D   [     file=t-fullpage,
+%D      version=2011.01.26,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Fullpage documents,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+%M \loadsetups[t-fullpage.xml]
+
+%D \subject{Introduction}
+%D
+%D The \filename {fullpage} module is a port of the \LATEX\ package
+%D with the same name. The module was written after Mohammed Bana
+%D asked on the \CONTEXT\ mailing list if a module with the same
+%D function as the \LATEX\ package is available for \CONTEXT.
+%D
+%D The purpose of the module is to easily change the margins of
+%D all four margins of the page to the same value without the need
+%D of \type {\setuplayout} in the document.
+%D
+%D \subject{Usage}
+%D
+%D To use the module you have to load it with the \type {\usemodule}
+%D command. Parameters for the module can be either set with the
+%D \type {\setupfullpage} command or as argument to \type {\usemodule}
+%D when you load the module for your document.
+%D
+%D A example how to use the module is:
+%D
+%D \starttyping
+%D \usemodule[fullpage][style={cm,empty}]
+%D
+%D \starttext
+%D \input knuth
+%D \stoptext
+%D \stoptyping
+%D
+%D You can give for \type {\usemodule} the same argument as you can
+%D give to \type {\setupfullpage}, which has the following sytnax:
+%D
+%D \showsetup{setupfullpage}
+%D
+%D The meaning of the values for the “style” key is:
+%D
+%D \starttable[|Bl|l|]
+%D \HL
+%D \NC in       \NC set the margins to 1in                 \NC\AR
+%D \NC cm       \NC set the margins to 1.5cm               \NC\AR
+%D \NC margin   \NC set the margins to the “margin” value  \NC\AR
+%D \NC plain    \NC no header and narrow footer with 0.5cm \NC\AR
+%D \NC headings \NC narrow header and footer with 0.5cm    \NC\AR
+%D \NC empty    \NC no header and footer                   \NC\AR
+%D \HL
+%D \stoptable
+%D
+%D The “margin” value is only usefull when you use also the margin key
+%D which expects a dimension as argument because it’s default value is
+%D 0pt which result otherwise in no margins at all. You can see the
+%D result of all combinations of the style argument \at{at page}[sec:examples],
+%D the examples for the margin argument use a value of 4cm for the margin key.
+%D 
+%D \subject[sec:examples]{Examples}
+%D
+%D \startbuffer[none]
+%D \usemodule[fullpage][style=none]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[headings]
+%D \usemodule[fullpage][style=headings]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[plain]
+%D \usemodule[fullpage][style=plain]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[empty]
+%D \usemodule[fullpage][style=empty]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[in]
+%D \usemodule[fullpage][style={in}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[in+headings]
+%D \usemodule[fullpage][style={in,headings}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[in+plain]
+%D \usemodule[fullpage][style={in,plain}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[in+empty]
+%D \usemodule[fullpage][style={in,empty}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[cm]
+%D \usemodule[fullpage][style={cm}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[cm+headings]
+%D \usemodule[fullpage][style={cm,headings}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[cm+plain]
+%D \usemodule[fullpage][style={cm,plain}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[cm+empty]
+%D \usemodule[fullpage][style={cm,empty}]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{8}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[margin]
+%D \usemodule[fullpage][style={margin},margin=4cm]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{4}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[margin+headings]
+%D \usemodule[fullpage][style={margin,headings},margin=4cm]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{4}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[margin+plain]
+%D \usemodule[fullpage][style={margin,plain},margin=4cm]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{4}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startbuffer[margin+empty]
+%D \usemodule[fullpage][style={margin,empty},margin=4cm]
+%D \showframe[text]
+%D \starttext
+%D \dorecurse{4}{\input knuth\par}
+%D \stoptext
+%D \stopbuffer
+%D
+%D \startcombination[4*4]
+%D   {\typesetbuffer[none]           [frame=on,width=.2\textwidth]}{none}
+%D   {\typesetbuffer[headings]       [frame=on,width=.2\textwidth]}{headings}
+%D   {\typesetbuffer[plain]          [frame=on,width=.2\textwidth]}{plain}
+%D   {\typesetbuffer[empty]          [frame=on,width=.2\textwidth]}{empty}
+%D   {\typesetbuffer[in]             [frame=on,width=.2\textwidth]}{in}
+%D   {\typesetbuffer[in+headings]    [frame=on,width=.2\textwidth]}{in + headings}
+%D   {\typesetbuffer[in+plain]       [frame=on,width=.2\textwidth]}{in + plain}
+%D   {\typesetbuffer[in+empty]       [frame=on,width=.2\textwidth]}{in + empty}
+%D   {\typesetbuffer[cm]             [frame=on,width=.2\textwidth]}{cm}
+%D   {\typesetbuffer[cm+headings]    [frame=on,width=.2\textwidth]}{cm + headings}
+%D   {\typesetbuffer[cm+plain]       [frame=on,width=.2\textwidth]}{cm + plain}
+%D   {\typesetbuffer[cm+empty]       [frame=on,width=.2\textwidth]}{cm + empty}
+%D   {\typesetbuffer[margin]         [frame=on,width=.2\textwidth]}{margin}
+%D   {\typesetbuffer[margin+headings][frame=on,width=.2\textwidth]}{margin + headings}
+%D   {\typesetbuffer[margin+plain]   [frame=on,width=.2\textwidth]}{margin + plain}
+%D   {\typesetbuffer[margin+empty]   [frame=on,width=.2\textwidth]}{margin + empty}
+%D \stopcombination
+
+\writestatus{loading}{ConTeXt User Module / Fullpage}
+
+\unprotect
+
+\startmodule[fullpage]
+
+\startinterface all
+  \setinterfacevariable {fullpage} {fullpage}
+  \setinterfacevariable {in}       {in}
+  \setinterfacevariable {cm}       {cm}
+  \setinterfacevariable {plain}    {plain}
+  \setinterfacevariable {headings} {headings}
+\stopinterface
+
+\def\????fullpage{@@@@fullpage} % FullPage
+
+\def\fullpageparameter#1%
+  {\csname\????fullpage#1\endcsname}
+
+\setupmodule
+  [ \c!style={\v!in,\v!plain},
+   \c!margin=0pt]
+
+\startsetups[\v!fullpage:\v!in]
+
+  \setuplayout
+    [\c!backspace=1in,
+         \c!width=\v!middle,
+      \c!topspace=1in,
+        \c!height=\v!middle]
+
+\stopsetups
+
+\startsetups[\v!fullpage:\v!cm]
+
+  \setuplayout
+    [\c!backspace=15mm,
+         \c!width=\v!middle,
+      \c!topspace=15mm,
+        \c!height=\v!middle]
+
+\stopsetups
+
+\startsetups[\v!fullpage:\v!margin]
+
+  \setuplayout
+    [\c!backspace=\fullpageparameter\c!margin,
+         \c!width=\v!middle,
+      \c!topspace=\fullpageparameter\c!margin,
+        \c!height=\v!middle]
+
+\stopsetups
+
+\startsetups[\v!fullpage:\v!plain]
+
+  \setuplayout
+    [\c!header=0pt,
+     \c!footer=.5in]
+
+\stopsetups
+
+\startsetups[\v!fullpage:\v!empty]
+
+  \setuplayout
+    [\c!header=0pt,
+     \c!footer=0pt]
+
+\stopsetups
+
+\startsetups[\v!fullpage:\v!headings]
+
+  \setuplayout
+    [\c!header=.5in,
+     \c!footer=.5in]
+
+\stopsetups
+
+\unexpanded\def\setupfullpage
+  {\dosingleargument\dosetupfullpage}
+
+\def\dosetupfullpage[#1]%
+  {\getparameters[\????fullpage][#1]%
+   \def\dodosetupfullpage##1{\setup[\v!fullpage:##1]}%
+   \processcommacommand[\fullpageparameter\c!style]\dodosetupfullpage}
+
+\normalexpanded{\setupfullpage
+  [ \c!style={\currentmoduleparameter\c!style},
+   \c!margin={\currentmoduleparameter\c!margin}]}
+
+\stopmodule
+
+\protect \endinput

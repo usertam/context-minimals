@@ -1,0 +1,130 @@
+%D \module
+%D   [      file=t-chromato,
+%D        version=2008.04.05,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Macros for chromatograms,
+%D         author=Peter Münster,
+%D           date=\currentdate,
+%D      copyright={Peter Münster}]
+%C This module is copyrighted by Peter Münster.
+%C Please send any comments to pmrb at free.fr.
+
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; either version 2
+% of the License, or (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but without any warranty; without even the implied warranty of
+% merchantability or fitness for a particular purpose.  See the
+% GNU General Public License for more details.
+
+\startmodule[chromato]
+
+\writestatus{loading}{Macros for chromatograms}
+
+\unprotect
+
+%D Some internal dimensions:
+\doifundefined{Width}{\newdimen\Width}
+\doifundefined{Height}{\newdimen\Height}
+
+%D \macros{startChromato}
+%D Starting a chromatogram.
+\def\startChromato{\bgroup\dosingleempty\dostartChromato}
+\def\dostartChromato[#1]#2#3{\getparameters[CHROM][dim=0.6,#1]
+  \def\myChromFig{\doifdefinedelse{CHROMSdim}{%
+    \externalfigure[#2][height=\CHROMSdim\textheight]}{%
+    \externalfigure[#2][width=\CHROMdim\makeupwidth]}}%
+  \setbox\scratchbox\hbox{\myChromFig}%
+  \Width=\wd\scratchbox \Height=\ht\scratchbox \setuppositioning[unit=pt]
+  \gdef\SavedCaption{#3}\doifundefined{CHROMSdim}{\placefigure[][fig:#2]{#3}}%
+  \bgroup\startpositioning\position(0,0){\myChromFig}}
+
+%D \macros{stopChromato}
+%D End of chromatogram.
+\def\stopChromato{\stoppositioning\egroup\egroup{\doifdefined{CHROMSdim}{%
+      \SavedCaption}}}
+
+%D \macros{startChromatos}
+%D Begin set of chromatograms.
+\def\startChromatos{\dosingleempty\dostartChromatos}
+\def\dostartChromatos[#1]#2#3{\placefigure[][fig:#2]{#3}\bgroup
+  \getparameters[CHROMS][dim=0.3,#1]
+  \doifdefined{CHROMSdist}{\setupcombinations[distance=\CHROMSdist em]}%
+  \startcombination[2*1]}
+
+%D \macros{stopChromatos}
+%D End of chromatograms.
+\def\stopChromatos{\stopcombination\egroup}
+
+%D Internal macro: position left or right:
+\define[3]\LRposition{\edef\YPos{\withoutpt{\the\dimexpr(\withoutpt{%
+        \the\dimexpr(#1pt/100)}\Height - 0.1\baselineskip)}}%
+  \position(#2,\YPos){\vbox to 2pt{\vss{\hbox to 0pt{#3}\vss}}}}
+
+%D \macros{Lbrace}
+%D Place a brace at the left.
+\define[4]\Lbrace{\LRposition{#1}0{\hss\rotate[rotation=90]{%
+      $\overbrace{\hskip#2\Height}^{%
+        \displaystyle\text{\rotate[rotation=270]{#4}}}$}\hskip#3em}}
+
+%D \macros{Rbrace}
+%D Place a brace at the right.
+\define[4]\Rbrace{\LRposition{#1}{\withoutpt{\the\Width}}{\hskip#3em
+    \rotate[rotation=270]{$\overbrace{\hskip#2\Height}^{%
+        \displaystyle\text{\rotate[rotation=90]{#4}}}$}\hss}}
+
+%D \macros{Larrow}
+%D Place a flesh at the left.
+\define[2]\Larrow{\LRposition{#1}0{\hss{\tx#2} $\rightarrow$}}
+
+%D \macros{Rarrow}
+%D Place a flesh at the right.
+\define[2]\Rarrow{\LRposition{#1}{\withoutpt{\the\Width}}{$\leftarrow$ \tx#2}}
+
+%D \macros{Above,Abrace}
+%D Place something above the chromatogram.
+\define[3]\Oposition{\edef\XPos{\withoutpt{\the\dimexpr(\withoutpt{%
+      \the\dimexpr(#1pt/100)}\Width)}}%
+    \position(\XPos,-\withoutpt{\the\dimexpr(#2\baselineskip)}){%
+    \hbox to 0pt{\hss#3\hss}}}
+\define[2]\Above{\Oposition{#1}{0.8}{\tx#2}}
+\define[3]\Abrace{\Oposition{#1}{2.5}{%
+    $\overbrace{\hskip#2\Width}^{\displaystyle\text{#3}}$}}
+
+\protect
+
+\stopmodule
+
+\doifnotmode{demo}{\endinput}
+
+%D Usage example:
+\usemodule[chromato]
+\setupexternalfigures[directory=samples]
+\mainlanguage[de]
+\starttext
+\startChromato{ecolizeit}{Expression der rekombinanten Fucosyltransferase~V in
+  {\em E.~coli}.}
+  \Above{5}{BRS}\Above{15}{1h}\Above{26}{2h}\Above{38}{3h}\Above{50}{4h}
+  \Above{61}{1h}\Above{72}{2h}\Above{83}{3h}\Above{94}{4h}
+  \Larrow{12}{97\,kDa}\Larrow{20}{66\,kDa}
+  \Larrow{32}{45\,kDa}\Larrow{52}{31\,kDa}
+  \Lbrace{39}{0.75}{4}{A}
+  \Lbrace{90}{0.16}{4}{B}
+  \Abrace{32}{0.42}{löslich}
+  \Abrace{77}{0.42}{unlöslich}
+  \Rarrow{29}{FucT~V}\Rarrow{87}{FucT~V}
+\stopChromato
+\startChromatos[dim=0.17,dist=2]{saeuger}{Expression von rekombinanter
+  Fucosyltransferase~V in unterschiedlichen Säugerzellinien.}
+  \startChromato{saeuger}{A}
+    \Above{26}{CHO}\Above{74}{HEK}
+    \Larrow{4}{96\,kDa}\Larrow{37}{66\,kDa}\Larrow{81}{45\,kDa}
+  \stopChromato
+  \startChromato{saeugerred}{B}
+    \Above{26}{CHO}\Above{74}{HEK}
+    \Rarrow{81}{FucT~V}
+  \stopChromato
+\stopChromatos
+\stoptext

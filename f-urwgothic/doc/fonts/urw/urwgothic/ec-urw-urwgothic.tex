@@ -1,0 +1,42 @@
+% output=pdftex interface=en
+
+\usemodule[fnt-01]
+
+\loadmapfile[ec-urw-urwgothic.map]
+
+\starttext
+
+\ShowFont[URWGothicL-Demi][ec-uagd8a][ec]
+\ShowFont[URWGothicL-DemiObli][ec-uagdo8a][ec]
+\ShowFont[URWGothicL-Book][ec-uagk8a][ec]
+\ShowFont[URWGothicL-BookObli][ec-uagko8a][ec]
+
+\setupheadertexts[\tttf example definitions]
+
+\starttyping
+texfont --fontroot=/home/taco/texmf --en=ec --ve=urw --co=urwgothic --so=auto --ro=TEXMFMAIN,TEXMFTE,TEXMFGW
+\stoptyping
+
+\starttyping
+/home/taco/texmf/fonts/map/pdftex/context/ec-urw-urwgothic.map
+\stoptyping
+
+\starttyping
+\definefontsynonym[URWGothicL-Demi][ec-uagd8a][encoding=ec]
+\definefontsynonym[URWGothicL-DemiObli][ec-uagdo8a][encoding=ec]
+\definefontsynonym[URWGothicL-Book][ec-uagk8a][encoding=ec]
+\definefontsynonym[URWGothicL-BookObli][ec-uagko8a][encoding=ec]
+\stoptyping
+
+\page
+
+\setupheadertexts[\tttf ec-urw-urwgothic.map]
+
+\starttyping
+ec-raw-uagd8a URWGothicL-Demi 4 < uagd8a.pfb ec.enc
+ec-raw-uagdo8a URWGothicL-DemiObli 4 < uagdo8a.pfb ec.enc
+ec-raw-uagk8a URWGothicL-Book 4 < uagk8a.pfb ec.enc
+ec-raw-uagko8a URWGothicL-BookObli 4 < uagko8a.pfb ec.enc
+\stoptyping
+
+\stoptext

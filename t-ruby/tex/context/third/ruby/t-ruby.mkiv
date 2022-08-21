@@ -1,0 +1,283 @@
+%D \module
+%D   [     file=t-ruby,
+%D      version=2010.11.23,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Ruby Markup,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=Public Domain]
+
+\writestatus{loading}{ConTeXt User Module / Ruby Markup}
+
+\unprotect
+
+%D simple ruby:
+%D
+%D \starttyping
+%D <ruby>
+%D   <rb>WWW</rb>
+%D   <rt>World Wide Web</rt>
+%D </ruby>
+%D \stoptyping
+%D
+%D complex ruby:
+%D
+%D \starttyping
+%D <ruby>
+%D   <rbc>
+%D     <rb>10</rb>
+%D     <rb>31</rb>
+%D     <rb>2002</rb>
+%D   </rbc>
+%D   <rtc>
+%D     <rt>Month</rt>
+%D     <rt>Day</rt>
+%D     <rt>Year</rt>
+%D   </rtc>
+%D   <rtc>
+%D     <rt rbspan="3">Expiration Date</rt>
+%D   </rtc>
+%D </ruby>
+%D \stoptyping
+
+%D Constants/variables
+
+\startinterface all
+  \setinterfaceconstant {basestyle} {basestyle}
+  \setinterfaceconstant {basecolor} {basecolor}
+  \setinterfaceconstant {overhang}  {overhang}
+\stopinterface
+
+\startinterface all
+  \setinterfacevariable {letter} {letter}
+  \setinterfacevariable {end}    {end}
+  \setinterfacevariable {inline} {inline}
+\stopinterface
+
+%D Namespace
+
+\def\????rb{@@@@rb}
+
+%D Additional registers
+
+\newdimen \!!rubywidth
+\newdimen \!!rubyleftmargin
+\newdimen \!!rubyrightmargin
+\newsignal\!!rubysignal
+\newcount \!!rubycount
+\newtoks  \!!rubybase
+\newtoks  \!!rubytext
+
+%D \macros
+%D   {setupruby}
+
+\def\setupruby
+  {\dodoubleargument\getparameters[\????rb]}
+
+\def\rubyparameter#1{\csname\????rb#1\endcsname}
+
+%D \macros
+%D   {bRUBY,eRUBY,bRB,eRB,bRT,eRT}
+
+\def\bRUBY
+  {\dosingleempty\dobRUBY}
+
+\def\dobRUBY[#1]%
+  {\begingroup
+   \iffirstargument
+     \setupruby[#1]%
+   \fi
+   \scratchdimen\lastskip
+   \ifdim\scratchdimen=\!!rubysignal\else\global\!!rubywidth\!!zeropoint\fi
+   \global\advance\!!rubycount\plusone
+   \xypos{rubyposition:\number\!!rubycount}%
+   \doifmodeelse\v!first
+     {\edef\rubyposition{\the\onepoint}}%
+     {\edef\rubyposition{\the\dimexpr\MPx{rubyposition:\number\!!rubycount}-\MPx{text:\the\realpageno}\relax}}}
+
+\def\eRUBY
+  {\setbox\scratchboxone\hbox{\redoconvertfont\doattributes\????rb\c!basestyle\c!basecolor{\the\!!rubybase}}%
+   \setbox\scratchboxtwo\hbox{\redoconvertfont\doattributes\????rb\c!textstyle\c!textcolor{\the\!!rubytext}}%
+   \scratchdimenone\wd\scratchboxone
+   \scratchdimentwo\wd\scratchboxtwo
+   %\scratchdimenthree\ifdim\scratchdimenone<\scratchdimentwo\space\scratchdimenone\else\scratchdimentwo\fi
+   \scratchdimenthree\scratchdimenone
+   \executeifdefined{\????rb:\c!align   :\rubyparameter\c!align   }{\getvalue{\????rb:\c!align   :\v!auto  }}%
+   \executeifdefined{\????rb:\c!position:\rubyparameter\c!position}{\getvalue{\????rb:\c!position:\v!before}}%
+   \executeifdefined{\????rb:\c!overhang:\rubyparameter\c!overhang}{\getvalue{\????rb:\c!overhang:\v!auto  }}%
+   \hskip\!!rubysignal\relax
+   \endgroup}
+
+\def\bRB{\dodoubleempty\dobRB}
+\def\bRT{\dodoubleempty\dobRT}
+
+\def\dobRB[#1][#2]#3\eRB{\!!rubybase{#3}}
+\def\dobRT[#1][#2]#3\eRT{\!!rubytext{#3}}
+
+\def\placerubystrut{\doif{\rubyparameter\c!strut}\v!yes{\setstrut\strut}}
+
+%D Alignment
+
+\def\RUBYdistributespace #1{\processtokens{\hss  }{\hss\hss}{\hss  }{\hss\hss}{#1}}
+\def\RUBYdistributeletter#1{\processtokens{\relax}{\hss    }{\relax}{\hss\hss}{#1}}
+
+\setvalue{\????rb:\c!align:\v!space}%
+  {\!!rubyleftmargin \zeropoint
+   \!!rubyrightmargin\zeropoint
+   \ifdim\scratchdimenone>\scratchdimentwo
+     \setbox\scratchboxone\hbox to \scratchdimenone{\hss\box\scratchboxone\hss}%
+     \setbox\scratchboxtwo\hbox to \scratchdimenone{\redoconvertfont\doattributes\????rb\c!textstyle\c!textcolor{\@EA\RUBYdistributespace\@EA{\the\!!rubytext}}}%
+   \else
+     \setbox\scratchboxone\hbox to \scratchdimentwo{\redoconvertfont\doattributes\????rb\c!basestyle\c!basecolor{\@EA\RUBYdistributespace\@EA{\the\!!rubybase}}}%
+     \setbox\scratchboxtwo\hbox to \scratchdimentwo{\hss\box\scratchboxtwo\hss}%
+   \fi}
+
+\setvalue{\????rb:\c!align:\v!letter}%
+  {\!!rubyleftmargin \zeropoint
+   \!!rubyrightmargin\zeropoint
+   \ifdim\scratchdimenone>\scratchdimentwo
+     \setbox\scratchboxone\hbox to \scratchdimenone{\hss\box\scratchboxone\hss}%
+     \setbox\scratchboxtwo\hbox to \scratchdimenone{\redoconvertfont\doattributes\????rb\c!textstyle\c!textcolor{\@EA\RUBYdistributeletter\@EA{\the\!!rubytext}}}%
+   \else
+     \setbox\scratchboxone\hbox to \scratchdimentwo{\redoconvertfont\doattributes\????rb\c!basestyle\c!basecolor{\@EA\RUBYdistributeletter\@EA{\the\!!rubybase}}}%
+     \setbox\scratchboxtwo\hbox to \scratchdimentwo{\hss\box\scratchboxtwo\hss}%
+   \fi}
+
+\setvalue{\????rb:\c!align:\v!auto}% I need special alignments for the begin/end of the line!!!
+  {\ifdim\scratchdimenone>\scratchdimentwo
+     \getvalue{\????rb:\c!align:\v!space}%
+   \else
+     \ifdim\rubyposition=\!!zeropoint % begin of the line
+       \getvalue{\????rb:\c!align:\v!left}%
+     \else\ifdim\rubyposition=\the\dimexpr\textwidth-\scratchdimenthree\relax % end of the line
+       \getvalue{\????rb:\c!align:\v!right}%
+     \else
+       \getvalue{\????rb:\c!align:\v!space}%
+     \fi\fi
+   \fi}
+
+\setvalue{\????rb:\c!align:\v!left}%
+  {\ifdim\scratchdimenone>\scratchdimentwo
+     \!!rubyleftmargin \zeropoint
+     \!!rubyrightmargin\zeropoint
+   \else
+     \!!rubyleftmargin \zeropoint
+     \!!rubyrightmargin\dimexpr\scratchdimentwo-\scratchdimenone\relax
+   \fi
+   \setbox\scratchboxone\hbox to \scratchdimenthree{\box\scratchboxone\hss}%
+   \setbox\scratchboxtwo\hbox to \scratchdimenthree{\box\scratchboxtwo\hss}}
+
+\setvalue{\????rb:\c!align:\v!start}%
+  {\getvalue{\????rb:\c!align:\v!left}}
+
+\setvalue{\????rb:\c!align:\v!center}%
+  {\ifdim\scratchdimenone>\scratchdimentwo
+     \!!rubyleftmargin \zeropoint
+     \!!rubyrightmargin\zeropoint
+   \else
+     \!!rubyleftmargin \dimexpr(\scratchdimentwo-\scratchdimenone)/2\relax
+     \!!rubyrightmargin\dimexpr(\scratchdimentwo-\scratchdimenone)/2\relax
+   \fi
+   \setbox\scratchboxone\hbox to \scratchdimenthree{\hss\box\scratchboxone\hss}%
+   \setbox\scratchboxtwo\hbox to \scratchdimenthree{\hss\box\scratchboxtwo\hss}}
+
+\setvalue{\????rb:\c!align:\v!right}%
+  {\ifdim\scratchdimenone>\scratchdimentwo
+     \!!rubyleftmargin \zeropoint
+     \!!rubyrightmargin\zeropoint
+   \else
+     \!!rubyleftmargin \dimexpr\scratchdimentwo-\scratchdimenone\relax
+     \!!rubyrightmargin\zeropoint
+   \fi
+   \setbox\scratchboxone\hbox to \scratchdimenthree{\hss\box\scratchboxone}%
+   \setbox\scratchboxtwo\hbox to \scratchdimenthree{\hss\box\scratchboxtwo}}
+
+\setvalue{\????rb:\c!align:\v!end}%
+  {\getvalue{\v!ruby:\c!align:\v!right}}
+
+\setvalue{\????rb:\c!align:\v!edge}% modify to take care of overlap etc.
+  {\ifdim\rubyposition=\zeropoint
+     \getvalue{\????rb:\c!align:\v!left}%
+   \else\ifdim\rubyposition=\the\dimexpr\textwidth-\scratchdimenthree\relax
+     \getvalue{\????rb:\c!align:\v!right}%
+   \else
+     \getvalue{\????rb:\c!align:\v!center}%
+   \fi\fi}
+
+%D Positioning
+
+\setvalue{\????rb:\c!position:\v!before}%
+  {\setbox\scratchboxthree\vbox
+     {\offinterlineskip
+      \hbox{\undepthed{\placerubystrut\box\scratchboxtwo}}
+      \rubyparameter\c!inbetween
+      \hbox{\placerubystrut\box\scratchboxone}}}
+
+\setvalue{\????rb:\c!position:\v!after}%
+  {\setbox\scratchboxthree\vtop
+     {\offinterlineskip
+      \hbox{\undepthed{\placerubystrut\box\scratchboxone}}
+      \rubyparameter\c!inbetween
+      \hbox{\placerubystrut\box\scratchboxtwo}}}
+
+\setvalue{\????rb:\c!position:\v!inline}% pure text to allow line breaks in the text
+  {\setbox\scratchboxthree\box\voidbox
+   \!!rubyleftmargin \zeropoint
+   \!!rubyrightmargin\zeropoint
+   \the\!!rubybase
+   \rubyparameter\c!separator
+   \rubyparameter\c!lefttext\the\!!rubytext\rubyparameter\c!righttext}
+
+%D Overhang
+
+\setvalue{\????rb:\c!overhang:\v!auto}%
+  {\ifdim\!!rubywidth>\!!zeropoint
+     \kern\dimexpr\!!rubyleftmargin+\!!rubywidth\relax
+   \fi
+   \box\scratchboxthree
+   \global\!!rubywidth\!!rubyrightmargin}
+
+\setvalue{\????rb:\c!overhang:\v!start}%
+  {\box\scratchboxthree\kern\!!rubyrightmargin
+   \global\!!rubywidth\!!rubyrightmargin}
+
+\setvalue{\????rb:\c!overhang:\v!end}%
+  {\ifdim\!!rubywidth>\!!zeropoint
+     \kern\dimexpr\!!rubyleftmargin+\!!rubywidth\relax
+   \else
+     \kern\!!rubyleftmargin
+   \fi
+   \box\scratchboxthree
+   \global\!!rubywidth\!!zeropoint}
+
+\setvalue{\????rb:\c!overhang:\v!none}%
+  {\kern\!!rubyleftmargin\box\scratchboxthree\kern\!!rubyrightmargin
+   \global\!!rubywidth\!!zeropoint}
+
+%D \macros
+%D   {ruby}
+
+\def\ruby
+  {\dontleavehmode\dosingleempty\doruby}
+
+\def\doruby[#1]#2#3%
+  {\pdfactualtext
+     {\dobRUBY[#1]\bRB#2\eRB\bRT#3\eRT\eRUBY}
+     {#2\rubyparameter\c!separator\rubyparameter\c!lefttext#3\rubyparameter\c!righttext}}
+
+%D Default values
+
+\setupruby
+  [\c!position=\v!before, % before|after|inline
+   \c!align=\v!auto,      % auto|start|left|center|end|right|distribute-letter|distribute-space|line-edge
+   \c!overhang=\v!auto,   % auto|start|end|none
+   \c!separator={ },
+   \c!lefttext=(,
+   \c!righttext=),
+   \c!strut=\v!no,
+   \c!inbetween={\blank[\v!small]},
+   \c!textstyle=\txx]
+
+\protect \endinput

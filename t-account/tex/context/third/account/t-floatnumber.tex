@@ -1,0 +1,78 @@
+%D \module
+%D   [       file=t-floatnumber,
+%D        version=2008.02.11,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Float Numbers,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+\writestatus{loading}{Context User Module / Float Numbers}
+
+\unprotect
+
+% Commands for floatnumbers:
+%
+% \definefloatnumber[name]
+% \setfloatnumber[name]{value}
+% \resetfloatnumber[name]
+% \incrementfloatnumber[name]{value}
+% \decrementfloatnumber[name]{value}
+% \multiplyfloatnumber[name]{value}
+% \dividefloatnumber[name]{value}
+% \savefloatnumber[name]
+% \restorefloatnumber[name]
+% \getfloatnumber[name]
+
+\def\setupfloatnumber
+  {\dodoubleargument\dosetupfloatnumber}
+
+\def\dosetupfloatnumber[#1][#2]%
+  {\getparameters[\s!float\s!number#1][#2]}
+
+\def\definefloatnumber
+  {\dodoubleempty\dodefinefloatnumber}
+
+\def\dodefinefloatnumber[#1][#2]%
+  {\setupfloatnumber
+     [#1]
+     [\c!command=\twodigitrounding,
+      #2]%
+   \makefloatcounter{\s!float\s!number#1}}
+
+\def\setfloatnumber[#1]#2%
+  {\setfloatcounter{\s!float\s!number#1}{#2}}
+
+\def\resetfloatnumber[#1]%
+  {\resetfloatcounter{\s!float\s!number#1}}
+
+\def\incrementfloatnumber[#1]#2%
+  {\plusfloatcounter{\s!float\s!number#1}{#2}}
+
+\def\decrementfloatnumber[#1]#2%
+  {\minusfloatcounter{\s!float\s!number#1}{#2}}
+
+\def\multiplyfloatnumber[#1]#2%
+  {\multiplyfloatcounter{\s!float\s!number#1}{#2}}
+
+\def\dividefloatnumber[#1]#2%
+  {\dividefloatcounter{\s!float\s!number#1}{#2}}
+
+\def\savefloatnumber[#1]%
+  {\savefloatcounter{\s!float\s!number#1}}
+
+\def\restorefloatnumber[#1]%
+  {\restorefloatcounter{\s!float\s!number#1}}
+
+\def\getfloatnumber[#1]%
+  {\csname\s!float\s!number#1\c!command\endcsname
+     {\floatcountervalue{\s!float\s!number#1}}}
+
+\def\rawfloatnumber[#1]%
+  {\floatcountervalue{\s!float\s!number#1}}
+
+\loadmarkfile{t-floatnumber}
+
+\protect \endinput

@@ -1,0 +1,53 @@
+%D \module
+%D   [     file=type-imp-delicious,
+%D      version=2010.10.27,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Delicious Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [delicious]
+
+\starttypescript [\s!sans] [delicious]
+    \definefontsynonym [Delicious-Regular]    [\s!file:deliciousroman]      [\s!features=\s!default]
+    \definefontsynonym [Delicious-Italic]     [\s!file:deliciousitalic]     [\s!features=\s!default]
+    \definefontsynonym [Delicious-Bold]       [\s!file:deliciousbold]       [\s!features=\s!default]
+    \definefontsynonym [Delicious-BoldItalic] [\s!file:deliciousbolditalic] [\s!features=\s!default]
+    \definefontsynonym [Delicious-Caps]       [\s!file:delicioussmallcaps]  [\s!features=\s!default]
+    \definefontsynonym [Delicious-Heavy]      [\s!file:deliciousheavy]      [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [delicious]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [Delicious-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]     [Delicious-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [Delicious-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [Delicious-BoldItalic] [\s!features=\s!default]
+    \definefontsynonym [\s!SansCaps]       [Delicious-Caps]       [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [delicious]
+    \definetypeface [delicious] [ss] [\s!sans] [delicious] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

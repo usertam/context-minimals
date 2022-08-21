@@ -1,0 +1,32 @@
+Modulename : t-animation
+Author     : Wolfgang Schuster
+License    : GNU General Public License
+
+Description
+-----------
+
+Generate fieldstack based animation with ConTeXt
+with a easy to use mechanism without the need
+to define symbols, layers and fieldstacks.
+
+Usage
+-----
+
+\usemodule[animation]
+
+\setupinteraction[state=start]
+
+\starttext
+
+\startanimation
+  {One}
+  {Two}
+\stopanimation
+
+\stoptext
+
+Options
+-------
+
+- menu
+- frame

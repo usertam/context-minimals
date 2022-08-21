@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" 
+              name="context"
+              language="en" 
+              version="0.6; 2013-03-27 00:26:22+0100">
+
+  <cd:command name="typesetRSTfile" generated="no" file="t-rst.mkiv">
+    <cd:sequence>
+      <cd:variable value="typesetRSTfile"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:assignments n="1" list="yes" optional="yes">
+        <cd:parameter name="expandtab">
+          <cd:constant type="false" default="false"/>
+          <cd:constant type="true"/>
+        </cd:parameter>
+        <cd:parameter name="shiftwidth">
+          <cd:constant type="cd:number" default="4"/>
+        </cd:parameter>
+        <cd:parameter name="stripBOM">
+          <cd:constant type="false" default="false"/>
+          <cd:constant type="true"/>
+        </cd:parameter>
+      </cd:assignments>
+      <cd:content n="2" optional="no"/>
+    </cd:arguments>
+  </cd:command>
+
+  <cd:command name="RST" generated="no" file="t-rst.mkiv">
+    <cd:sequence>
+      <cd:variable value="RST"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:content n="1" optional="no"/>
+    </cd:arguments>
+  </cd:command>
+
+  <cd:command name="RST" generated="no" type="environment" file="t-rst.mkiv">
+    <cd:sequence>
+      <cd:variable value="RST"/>
+    </cd:sequence>
+  </cd:command>
+
+  <cd:command name="RSTproject" generated="no" type="environment" file="t-rst.mkiv">
+    <cd:sequence>
+      <cd:variable value="RST"/>
+    </cd:sequence>
+  </cd:command>
+
+  <cd:command name="defineRSTinclusion" generated="no" file="t-rst.mkiv">
+    <cd:sequence>
+      <cd:variable value="defineRSTinclusion"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:content n="1" optional="yes" name="id"/>
+      <cd:content n="2" optional="yes" name="filename"/>
+      <cd:assignments n="3" list="yes" optional="yes">
+        <cd:parameter name="expandtab">
+          <cd:constant type="false" default="false"/>
+          <cd:constant type="true"/>
+        </cd:parameter>
+        <cd:parameter name="shiftwidth">
+          <cd:constant type="cd:number" default="4"/>
+        </cd:parameter>
+        <cd:parameter name="stripBOM">
+          <cd:constant type="false" default="false"/>
+          <cd:constant type="true"/>
+        </cd:parameter>
+      </cd:assignments>
+    </cd:arguments>
+  </cd:command>
+
+  <cd:command name="RSTinclusion" generated="no" file="t-rst.mkiv">
+    <cd:sequence>
+      <cd:variable value="RSTinclusion"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:content n="1" optional="yes" name="id"/>
+    </cd:arguments>
+  </cd:command>
+
+</cd:interface>

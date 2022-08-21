@@ -1,0 +1,94 @@
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; either version 2
+% of the License, or (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but without any warranty; without even the implied warranty of
+% merchantability or fitness for a particular purpose.  See the
+% GNU General Public License for more details.
+
+% raw fonts
+
+\starttypescript[serif] [garamond] [texnansi]
+
+\definefontsynonym[Garamond] [ugmr8a] [encoding=texnansi]
+\definefontsynonym[GaramondItalic] [ugmri8a] [encoding=texnansi]
+\definefontsynonym[GaramondBold] [ugmm8a] [encoding=texnansi]
+\definefontsynonym[GaramondBoldItalic][ugmmi8a] [encoding=texnansi]
+
+\stoptypescript
+
+% names
+
+\starttypescript [serif] [garamond] [name]
+
+\setups[font:fallback:serif]
+
+\definefontsynonym[Serif] [Garamond]
+\definefontsynonym[SerifBold] [Garamond-Bold]
+\definefontsynonym[SerifItalic] [Garamond-Italic]
+\definefontsynonym[SerifBoldItalic][Garamond-BoldItalic]
+
+\stoptypescript
+
+% synonyms
+
+\starttypescript [serif] [garamond] [texnansi]
+
+\definefontsynonym [Garamond]
+[\typescriptthree-ugmr8a]
+[encoding=\typescriptthree]
+
+\definefontsynonym [Garamond-Italic]
+[\typescriptthree-ugmri8a]
+[encoding=\typescriptthree]
+
+\definefontsynonym [Garamond-Bold]
+[\typescriptthree-ugmm8a]
+[encoding=\typescriptthree]
+
+\definefontsynonym [Garamond-BoldItalic]
+[\typescriptthree-ugmmi8a]
+[encoding=\typescriptthree]
+
+\stoptypescript
+
+% maps
+
+\starttypescript [map] [garamond] [texnansi]
+
+\loadmapfile[texnansi-urw-garamond.map]
+
+\stoptypescript%
+
+% typefaces
+
+\starttypescript [URWGaramond]
+
+\definebodyfontenvironment
+  [urwgaramond]
+  [default]
+  [interlinespace=2.8ex]
+
+\definetypeface [urwgaramond]
+[rm] [serif] [garamond] [default]
+[encoding=texnansi]
+
+\definetypeface [urwgaramond]
+[ss] [sans] [helvetica] [default]
+[encoding=texnansi]
+
+\definetypeface [urwgaramond]
+[mm] [math] [palatino] [default]
+[encoding=texnansi]
+
+\definetypeface [urwgaramond]
+[tt] [mono] [modern] [default]
+[encoding=texnansi]
+
+\stoptypescript
+
+%%% Local Variables: 
+%%% mode: context
+%%% End: 

@@ -1,0 +1,50 @@
+%D \module
+%D   [     file=type-imp-anivers,
+%D      version=2011.08.28,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Anivers Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [anivers]
+
+\starttypescript [\s!sans] [anivers]
+    \definefontsynonym [Anivers-Regular] [\s!file:aniversregular]   [\s!features=\s!default]
+    \definefontsynonym [Anivers-Italic]  [\s!file:aniversitalic]    [\s!features=\s!default]
+    \definefontsynonym [Anivers-Bold]    [\s!file:aniversbold]      [\s!features=\s!default]
+    \definefontsynonym [Anivers-Caps]    [\s!file:aniverssmallcaps] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [anivers]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]       [Anivers-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic] [Anivers-Italic]  [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]   [Anivers-Bold]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansCaps]   [Anivers-Caps]    [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [anivers]
+    \definetypeface [anivers] [ss] [\s!sans] [anivers] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

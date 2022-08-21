@@ -1,0 +1,62 @@
+%D \module
+%D   [     file=letter-imp-setups,
+%D      version=2012.01.01,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Setups style,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\setupletterlayer
+  [\v!head,\v!nexthead,\v!lefthead,\v!righthead]
+  [\c!alternative=\v!setups]
+
+\setupletterlayer
+  [\v!foot,\v!nextfoot,\v!leftfoot,\v!rightfoot]
+  [\c!alternative=\v!setups]
+
+\setupletterlayer
+  [\v!address,\v!backaddress]
+  [\c!alternative=\v!setups]
+
+\setupletterlayer
+  [\v!reference,\v!location]
+  [\c!alternative=\v!setups]
+
+% \setupletterlayer 
+%   [\v!topmark,\v!botmark,\v!cutmark,\v!endmark,\v!usermark]
+%   [\c!alternative=\v!setups]
+
+\setupletterlayer
+  [\v!lettermain,\v!letternext]
+  [\c!alternative=\v!setups]
+
+\setuplettersection % only used for blockstyle layouts
+  [\v!head,\v!date,\v!reference,\v!specialnotation,\v!address]
+  [\c!alternative=\v!setups]
+
+\setuplettersection % default sections
+  [\v!title,\v!subject,\v!opening,\v!content,\v!closing,\v!appendices]
+  [\c!alternative=\v!setups]
+
+% \setuplettersection  % otherwise no text is shown
+%   [\v!content]
+%   [\c!alternative=\s!default]
+
+\endinput

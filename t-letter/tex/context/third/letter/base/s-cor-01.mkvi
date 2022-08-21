@@ -1,0 +1,924 @@
+%D \module
+%D   [     file=s-cor-01,
+%D      version=2013.07.31,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Letters,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\unprotect
+
+\startmodule[letter]
+
+\usemodule[cor-00]
+\usemodule[cor-06]
+
+\setupmodule
+  [\c!style=dinb]
+
+% Namespaces
+
+\installnamespace {letterlayerrenderings}
+\installnamespace {lettersectionrenderings}
+
+% Commands
+
+\definecorrespondence[\v!letter]
+
+\def\defineletterlayer              {\dodoubleargument\correspondence_layer_define               [\v!letter]}
+\def\definelettersection            {\dodoubleargument\correspondence_section_define             [\v!letter]}
+\def\defineletterdescription        {\dodoubleargument\correspondence_description_define         [\v!letter]}
+\def\defineletterhead               {\dodoubleargument\correspondence_head_define                [\v!letter]}
+
+\def\defineletterlayeralternative   {\doquadrupleempty\correspondence_layer_alternative_define   [\v!letter]}
+\def\definelettersectionalternative {\doquadrupleempty\correspondence_section_alternative_define [\v!letter]}
+\def\defineletterheadalternative    {\doquadrupleempty\correspondence_head_alternative_define    [\v!letter]}
+
+\def\defineletterelements           {\dotripleargument\correspondence_elements_define            [\v!letter]}
+\def\setupletterelements            {\dotripleargument\correspondence_elements_define            [\v!letter]}
+
+\def\setupletterstyle               {\dotripleargument\correspondence_style_setup                [\v!letter]}
+\def\setupletterlayer               {\dotripleargument\correspondence_layer_setup                [\v!letter]}
+\def\setupletterframe               {\dotripleargument\correspondence_frame_setup                [\v!letter]}
+\def\setupletterlayout              {\dotripleargument\correspondence_layout_setup               [\v!letter]}
+\def\setuplettersection             {\dotripleargument\correspondence_section_setup              [\v!letter]}
+\def\setupletterdescription         {\dotripleargument\correspondence_description_setup          [\v!letter]}
+\def\setupletterhead                {\dotripleargument\correspondence_head_setup                 [\v!letter]}
+\def\setupletteroptions             {\dodoubleargument\correspondence_option_setup               [\v!letter]}
+
+\def\setupletterlayeralternative    {\dotripleargument\correspondence_layer_alternative_setup    [\v!letter]}
+\def\setuplettersectionalternative  {\dotripleargument\correspondence_section_alternative_setup  [\v!letter]}
+\def\setupletterheadalternative     {\dotripleargument\correspondence_head_alternative_setup     [\v!letter]}
+
+\def\useletterstyle                 {\dodoubleargument\correspondence_file_load                  [\v!letter]}
+
+\def\defineletterelement            {\doquadrupleargument\correspondence_element_define          [\v!letter]}
+\def\letterelement                  {\doquadrupleargument\correspondence_element_place           [\v!letter]}
+
+\def\namedletterlayerparameter  #element{\namedcorrespondencelayerparameter  {\v!letter:#element}}
+\def\namedletterframeparameter  #element{\namedcorrespondenceframeparameter  {\v!letter:#element}}
+\def\namedlettersectionparameter#element{\namedcorrespondencesectionparameter{\v!letter:#element}}
+
+% Heading
+
+\defineletterhead [\v!letter\v!section]
+\defineletterhead [\v!letter\v!subsection]
+
+% Layers
+
+\defineletterlayer [\v!head]
+\defineletterlayer [\v!nexthead]
+\defineletterlayer [\v!lefthead]
+\defineletterlayer [\v!righthead]
+
+\defineletterlayer [\v!foot]
+\defineletterlayer [\v!nextfoot]
+\defineletterlayer [\v!leftfoot]
+\defineletterlayer [\v!rightfoot]
+
+\defineletterlayer [\v!address]
+\defineletterlayer [\v!backaddress]
+
+\defineletterlayer [\v!reference]
+\defineletterlayer [\v!location]
+
+\defineletterlayer [\v!topmark]
+\defineletterlayer [\v!botmark]
+\defineletterlayer [\v!cutmark]
+\defineletterlayer [\v!endmark]
+\defineletterlayer [\v!usermark]
+
+\defineletterlayer [\v!lettermain]
+\defineletterlayer [\v!letternext]
+
+% Section
+
+\definelettersection [\v!head]
+\definelettersection [\v!date]
+\definelettersection [\v!reference]
+\definelettersection [\v!specialnotation]
+\definelettersection [\v!address]
+\definelettersection [\v!title]
+\definelettersection [\v!subject]
+\definelettersection [\v!opening]
+\definelettersection [\v!content]
+\definelettersection [\v!closing]
+\definelettersection [\v!appendices]
+
+% Descriptions
+
+\defineletterdescription [\v!copy]
+\defineletterdescription [\v!enclosure]
+\defineletterdescription [\v!postscript]
+
+% Setups
+
+% layer: head
+
+\defineletterlayeralternative[\v!head:\s!default][\c!renderingsetup=\????letterlayerrenderings:\v!head:\s!default]
+
+\defineletterlayeralternative
+  [\v!head:\v!generic]
+  [\c!renderingsetup=\????letterlayerrenderings:\v!head:\v!generic,
+   \c!rule=\correspondencelayerparameter\c!rule,
+   \c!rulewidth=\correspondencelayerparameter\c!rulewidth,
+   \c!rulecolor=\correspondencelayerparameter\c!rulecolor,
+   \c!rulethickness=\correspondencelayerparameter\c!rulethickness]
+
+\defineletterlayeralternative[\v!head:\v!left   ][\v!head:\v!generic][\c!align=\v!flushleft ]
+\defineletterlayeralternative[\v!head:\v!middle ][\v!head:\v!generic][\c!align=\v!middle    ]
+\defineletterlayeralternative[\v!head:\v!right  ][\v!head:\v!generic][\c!align=\v!flushright]
+
+\defineletterlayeralternative[\v!head:\v!gbrief ][\c!renderingsetup=\????letterlayerrenderings:\v!head:\v!gbrief ]
+
+\startsetups[\????letterlayerrenderings:\v!head:\s!default]
+  \def\\{\correspondencelayerparameter\c!separator}
+  \correspondenceparameter\c!fromname
+  \doifsomething{\correspondenceparameter\c!fromname}\\
+  \correspondenceparameter\c!fromaddress
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!head:\v!generic]
+  \edef\p_rulewidth    {\correspondencelayeralternativeparameter\c!rulewidth    }
+  \edef\p_rulethickness{\correspondencelayeralternativeparameter\c!rulethickness}
+  \edef\p_rulecolor    {\correspondencelayeralternativeparameter\c!rulecolor    }
+  \startframed[\c!frame=\v!off,\c!align=\correspondencelayeralternativeparameter\c!align,\c!width=\v!broad,\c!offset=\zeropoint]
+    \begingroup
+      \def\currentcorrespondencestyle{\v!letter:\c!fromname}%
+      \usecorrespondencestylestyleandcolor\c!style\c!color
+      \correspondenceparameter\c!fromname
+    \endgroup
+    \endgraf
+    \doifcommonelse{\correspondencelayeralternativeparameter\c!rule}{\v!top,\c!before,\v!yes}\donetrue\donefalse
+    \ifdone
+      \vskip-.5\lineheight
+      \dontleavehmode
+      \blackrule
+        [ \c!width=\ifx\p_rulewidth    \empty\hsize    \else\p_rulewidth    \fi,
+         \c!height=\ifx\p_rulethickness\empty\linewidth\else\p_rulethickness\fi,
+          \c!color=\ifx\p_rulecolor    \empty\s!black  \else\p_rulecolor    \fi]
+    \fi
+    \endgraf
+    \begingroup
+      \def\currentcorrespondencestyle{\v!letter:\c!fromaddress}%
+      \usecorrespondencestylestyleandcolor\c!style\c!color
+      \correspondenceparameter\c!fromaddress
+      \doifsomething{\correspondenceparameter\c!fromphone}{\\\correspondenceparameter\c!fromphone}%
+      \doifsomething{\correspondenceparameter\c!fromfax  }{\\\correspondenceparameter\c!fromfax  }%
+      \doifsomething{\correspondenceparameter\c!frommail }{\\\correspondenceparameter\c!frommail }%
+      \doifsomething{\correspondenceparameter\c!fromurl  }{\\\correspondenceparameter\c!fromurl  }%
+    \endgroup
+    \endgraf
+    \doifcommonelse{\correspondencelayeralternativeparameter\c!rule}{\v!bottom,\c!after,\v!yes}\donetrue\donefalse
+    \ifdone
+      \vskip-.5\lineheight
+      \dontleavehmode
+      \blackrule
+        [ \c!width=\ifx\p_rulewidth    \empty\hsize    \else\p_rulewidth    \fi,
+         \c!height=\ifx\p_rulethickness\empty\linewidth\else\p_rulethickness\fi,
+          \c!color=\ifx\p_rulecolor    \empty\s!black  \else\p_rulecolor    \fi]
+    \fi
+  \stopframed
+\stopsetups
+
+\setupcorrespondencelayeralternative
+  [\c!commandbefore=\correspondencelayerparameter\c!commandbefore,
+    \c!commandafter=\correspondencelayerparameter\c!commandafter]
+
+\startsetups[\????letterlayerrenderings:\v!head:\v!gbrief]
+  \def\\{\correspondencelayerparameter\c!separator}
+  \correspondenceparameter\c!fromname
+  \hrule
+\stopsetups
+
+% layer: nexthead
+
+\defineletterlayeralternative[\v!nexthead:\v!gbrief    ][\c!renderingsetup=\????letterlayerrenderings:\v!nexthead:\v!gbrief   ]
+\defineletterlayeralternative[\v!nexthead:\v!fullblock ][\c!renderingsetup=\????letterlayerrenderings:\v!nexthead:\v!fullblock]
+\defineletterlayeralternative[\v!nexthead:\v!hanging   ][\c!renderingsetup=\????letterlayerrenderings:\v!nexthead:\v!hanging  ]
+\defineletterlayeralternative[\v!nexthead:\v!semiblock ][\c!renderingsetup=\????letterlayerrenderings:\v!nexthead:\v!semiblock]
+\defineletterlayeralternative[\v!nexthead:\v!simplified][\c!renderingsetup=\????letterlayerrenderings:\v!nexthead:\v!fullblock]
+\defineletterlayeralternative[\v!nexthead:\v!modified  ][\c!renderingsetup=\????letterlayerrenderings:\v!nexthead:\v!hanging  ]
+\defineletterlayeralternative[\v!nexthead:\v!knuth     ][\c!renderingsetup=\????letterlayerrenderings:\v!nexthead:\v!knuth    ]
+
+\startsetups[\????letterlayerrenderings:\v!nexthead:\v!gbrief]
+  \maxaligned
+    {\rlap{\correspondenceparameter\c!fromname}
+     \midaligned{\leftlettertext\c!pagenumber\subpagenumber\rightlettertext\c!pagenumber\lastsubpagenumber}
+     \llap{\correspondenceparameter\c!date}}
+  \hairline
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!nexthead:\v!fullblock]
+  \maxaligned
+    {\rlap{\correspondenceparameter\c!toname}
+     \midaligned{\subpagenumber}
+     \llap{\framed[\c!frame=\v!off,\c!location=\v!top,\c!align=\v!left]
+       {\correspondenceparameter\c!date   \\
+        \correspondenceparameter\c!reference}}}
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!nexthead:\v!hanging]
+  \maxaligned
+    {\framed[\c!frame=\v!off,\c!location=\v!top,\c!align=v!right]
+      {\correspondenceparameter\c!toname    \\
+       \correspondenceparameter\c!date      \\
+       \correspondenceparameter\c!reference \\
+       \lettertext\c!page\subpagenumber}}
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!nexthead:\v!semiblock]
+  \maxaligned
+    {\rlap{\correspondenceparameter\c!toname}
+     \midaligned{\subpagenumber}
+     \llap{\correspondenceparameter\c!date}}
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!nexthead:\v!knuth]
+  \maxaligned
+    {\rlap{\correspondenceparameter\c!toname}
+     \midaligned{\currentdate}
+     \llap{\lettertext\c!page\subpagenumber}}
+\stopsetups
+
+% layer: lefthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: righthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: foot
+
+\defineletterlayeralternative[\v!foot:\v!gbrief    ][\c!renderingsetup=\????letterlayerrenderings:\v!foot:\v!gbrief]
+\defineletterlayeralternative[\v!foot:\v!pagenumber][\c!renderingsetup=\????letterlayerrenderings:\v!foot:\v!pagenumber]
+
+\startsetups[\????letterlayerrenderings:\v!foot:\v!gbrief]
+  \bTABLE[\c!frame=\v!off,\c!width=.25\hsize,\c!offset=\zeropoint]
+    \bTR[\c!style=\bfxx,\c!topframe=\v!on]
+      \bTD \lettertext\c!address \eTD
+      \bTD \lettertext\c!phone   \eTD
+      \bTD \lettertext\c!email   \eTD
+      \bTD \lettertext\c!bank    \eTD
+    \eTR
+    \bTR
+      \bTD \correspondenceparameter\c!street  \\\correspondenceparameter\c!city                                                 \eTD
+      \bTD \correspondenceparameter\c!phone                                                                                     \eTD
+      \bTD \correspondenceparameter\c!email                                                                                     \eTD
+      \bTD \correspondenceparameter\c!bankname\\\correspondenceparameter\c!banknumber\\\correspondenceparameter\c!accountnumber \eTD
+    \eTR
+  \eTABLE
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!foot:\v!pagenumber]
+  \centerbox{\hbox{\begstrut\leftlettertext\c!pagenumber\subpagenumber\rightlettertext\c!pagenumber\lastsubpagenumber\endstrut}}
+\stopsetups
+
+% layer: nextfoot
+
+% setups -> see s-cor-00.mkvi
+
+% layer: leftfoot
+
+% setups -> see s-cor-00.mkvi
+
+% layer: rightfoot
+
+% setups -> see s-cor-00.mkvi
+
+% layer: address
+
+\defineletterlayeralternative[\v!address:\s!default][\c!renderingsetup=\????letterlayerrenderings:\v!address:\s!default]
+\defineletterlayeralternative[\v!address:\v!a      ][\c!renderingsetup=\????letterlayerrenderings:\v!address:\v!a      ]
+
+\startsetups[\????letterlayerrenderings:\v!address:\s!default]
+  \def\\{\correspondencelayerparameter\c!separator}
+  \doifsomething{\correspondenceparameter\c!dispatch}{\correspondenceparameter\c!dispatch\\}
+  \doifsomething{\correspondenceparameter\c!toname  }{\correspondenceparameter\c!toname  \\}
+  \correspondenceparameter\c!toaddress
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!address:\v!a]
+  \def\\{\correspondencelayerparameter\c!separator}
+  \doifsomethingelse{\correspondenceparameter\c!dispatch}
+    {\correspondenceparameter\c!dispatch\\} % check number of lines!
+    {\blank[2*\v!line]}
+  \doifsomething{\correspondenceparameter\c!toname}{\correspondenceparameter\c!toname\\}
+  \correspondenceparameter\c!toaddress
+\stopsetups
+
+% layer: backaddress
+
+\defineletterlayeralternative[\v!backaddress:\s!default][\c!renderingsetup=\????letterlayerrenderings:\v!backaddress:\s!default]
+\defineletterlayeralternative[\v!backaddress:\v!auto   ][\c!renderingsetup=\????letterlayerrenderings:\v!backaddress:\v!auto   ]
+
+\startsetups[\????letterlayerrenderings:\v!backaddress:\s!default]
+  \def\\{\correspondencelayerparameter\c!separator}
+  \correspondenceparameter\c!fromname
+  \doifsomething{\correspondenceparameter\c!fromaddress}\\
+  \correspondenceparameter\c!fromaddress
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!backaddress:\v!auto]
+  \def\\{\correspondencelayerparameter\c!separator}
+  \doifsomethingelse{\correspondenceparameter\c!backaddress}
+    {\correspondenceparameter\c!backaddress}
+    {\correspondenceparameter\c!fromname
+     \doifsomething{\correspondenceparameter\c!fromaddress}\\
+     \correspondenceparameter\c!fromaddress}
+\stopsetups
+
+% layer: reference
+
+\defineletterlayeralternative[\v!reference:\s!default][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\s!default]
+\defineletterlayeralternative[\v!reference:\v!a      ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!a      ]
+%defineletterlayeralternative[\v!reference:\v!top    ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!a      ]
+\defineletterlayeralternative[\v!reference:\v!b      ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!b      ]
+%defineletterlayeralternative[\v!reference:\v!block  ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!b      ]
+\defineletterlayeralternative[\v!reference:\v!c      ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!c      ]
+%defineletterlayeralternative[\v!reference:\v!line   ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!c      ]
+\defineletterlayeralternative[\v!reference:\v!d      ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!d      ]
+%defineletterlayeralternative[\v!reference:\v!table  ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!d      ]
+\defineletterlayeralternative[\v!reference:\v!e      ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!e      ]
+%defineletterlayeralternative[\v!reference:\v!width  ][\c!renderingsetup=\????letterlayerrenderings:\v!reference:\v!e      ]
+
+
+\startsetups[\????letterlayerrenderings:\v!reference:\s!default]
+  \correspondenceparameter\c!reference
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!reference:\v!a]
+  \ctxlua{thirddata.correspondence.letter.reference_a("\v!letter","\correspondencelayerparameter\c!list")}
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!reference:\v!b]
+  \ctxlua{thirddata.correspondence.letter.reference_b("\v!letter","\correspondencelayerparameter\c!list")}
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!reference:\v!c]
+  \ctxlua{thirddata.correspondence.letter.reference_c("\v!letter","\correspondencelayerparameter\c!list")}
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!reference:\v!d]
+  \ctxlua{thirddata.correspondence.letter.reference_d("\v!letter","\correspondencelayerparameter\c!list")}
+\stopsetups
+
+\startsetups[\????letterlayerrenderings:\v!reference:\v!e]
+  \ctxlua{thirddata.correspondence.letter.reference_e("\v!letter","\correspondencelayerparameter\c!list")}
+\stopsetups
+
+% layer: location
+
+\defineletterlayeralternative[\v!location:\v!french][\c!renderingsetup=\????letterlayerrenderings:\v!location:\v!french]
+
+\startsetups[\????letterlayerrenderings:\v!location:\v!french]
+  \def\\{\correspondencelayerparameter\c!separator}
+  \doifsomething{\correspondenceparameter\c!place}{\correspondenceparameter\c!place\\}
+  \correspondenceparameter\c!date
+\stopsetups
+
+% layer: topmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: botmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: cutmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: endmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: usermark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: lettermain
+
+% setups -> see s-cor-00.mkvi
+
+% layer: letternext
+
+% setups -> see s-cor-00.mkvi
+
+% section: head
+
+\definelettersectionalternative[\v!head:\v!blockstyle][\c!renderingsetup=\????lettersectionrenderings:\v!head:\v!blockstyle]
+
+\startsetups[\????lettersectionrenderings:\v!head:\v!blockstyle]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!fromaddress
+\stopsetups
+
+% section: date
+
+\definelettersectionalternative[\v!date:\v!blockstyle][\c!renderingsetup=\????lettersectionrenderings:\v!date:\v!blockstyle]
+
+\startsetups[\????lettersectionrenderings:\v!date:\v!blockstyle]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!date
+\stopsetups
+
+% section: reference
+
+\definelettersectionalternative[\v!reference:\v!blockstyle][\c!renderingsetup=\????lettersectionrenderings:\v!reference:\v!blockstyle]
+
+\startsetups[\????lettersectionrenderings:\v!reference:\v!blockstyle]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!reference
+\stopsetups
+
+% section: specialnotation
+
+\definelettersectionalternative[\v!specialnotation:\v!blockstyle][\c!renderingsetup=\????lettersectionrenderings:\v!specialnotation:\v!blockstyle]
+
+\startsetups[\????lettersectionrenderings:\v!specialnotation:\v!blockstyle]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!dispatch
+\stopsetups
+
+% section: address
+
+\definelettersectionalternative[\v!address:\v!blockstyle][\c!renderingsetup=\????lettersectionrenderings:\v!address:\v!blockstyle]
+\definelettersectionalternative[\v!address:\v!knuth     ][\c!renderingsetup=\????lettersectionrenderings:\v!address:\v!blockstyle]
+
+\startsetups[\????lettersectionrenderings:\v!address:\v!blockstyle]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!toname
+  \doifsomething{\correspondenceparameter\c!toname}\\
+  \correspondenceparameter\c!toaddress
+\stopsetups
+
+% section: title
+
+\definelettersectionalternative[\v!title:\s!default][\c!renderingsetup=\????lettersectionrenderings:\v!title:\s!default]
+
+\startsetups[\????lettersectionrenderings:\v!title:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \doifsomethingelse{\correspondenceparameter\c!title}
+    {\correspondenceparameter\c!title}
+    {\lettertext\c!attention\correspondenceparameter\c!attention}
+\stopsetups
+
+% section: subject
+
+\definelettersectionalternative[\v!subject:\s!default][\c!renderingsetup=\????lettersectionrenderings:\v!subject:\s!default]
+
+\startsetups[\????lettersectionrenderings:\v!subject:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \lettertext\c!subject\correspondenceparameter\c!subject
+\stopsetups
+
+% section: opening
+
+\definelettersectionalternative[\v!opening:\s!default][\c!renderingsetup=\????lettersectionrenderings:\v!opening:\s!default]
+\definelettersectionalternative[\v!opening:\v!french ][\c!renderingsetup=\????lettersectionrenderings:\v!opening:\v!french ]
+
+\startsetups[\????lettersectionrenderings:\v!opening:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \doifsomethingelse{\correspondenceparameter\c!opening}
+    {\correspondenceparameter\c!opening}
+    {\correspondenceparameter\c!salutation}
+\stopsetups
+
+\startsetups[\????lettersectionrenderings:\v!opening:\v!french]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \doifsomething{\correspondenceoptionparameter\c!indenting}{\setupindenting[\correspondenceoptionparameter\c!indenting]}
+  \doifsomethingelse{\correspondenceparameter\c!opening}
+    {\correspondenceparameter\c!opening}
+    {\correspondenceparameter\c!salutation}
+\stopsetups
+
+% section: content
+
+\definelettersectionalternative[\v!content:\s!default][\c!renderingsetup=\????lettersectionrenderings:\v!content:\s!default]
+
+\startsetups[\????lettersectionrenderings:\v!content:\s!default]
+  \getbufferdata[\????correspondencebuffer\v!letter]
+\stopsetups
+
+% section: closing
+
+\definelettersectionalternative[\v!closing:\s!default   ][\c!renderingsetup=\????lettersectionrenderings:\v!closing:\s!default   ]
+\definelettersectionalternative[\v!closing:\v!french    ][\c!renderingsetup=\????lettersectionrenderings:\v!closing:\v!french    ]
+\definelettersectionalternative[\v!closing:\v!simplified][\c!renderingsetup=\????lettersectionrenderings:\v!closing:\v!simplified]
+\definelettersectionalternative[\v!closing:\v!knuth     ][\c!renderingsetup=\????lettersectionrenderings:\v!closing:\v!knuth     ]
+
+\startsetups[\????lettersectionrenderings:\v!closing:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!closing
+  \doifsomething{\correspondenceparameter\c!signature}
+    {\blank[\correspondencesectionparameter\c!spaceinbetween]
+     \correspondenceparameter\c!signature}
+\stopsetups
+
+\startsetups[\????lettersectionrenderings:\v!closing:\v!french]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \doifsomething{\correspondenceoptionparameter\c!indenting}{\setupindenting[\correspondenceoptionparameter\c!indenting,\v!first]}
+  \correspondenceparameter\c!closing
+  \doifsomething{\correspondenceparameter\c!signature}
+    {\blank[\correspondencesectionparameter\c!spaceinbetween]
+     \raggedcenter\doadaptleftskip{.5\textwidth}
+     \correspondenceparameter\c!signature\endgraf}
+\stopsetups
+
+\startsetups[\????lettersectionrenderings:\v!closing:\v!simplified]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \doifsomething{\correspondenceparameter\c!signature}{\blank[\correspondencesectionparameter\c!spaceinbetween]}
+  \correspondenceparameter\c!signature
+\stopsetups
+
+\startsetups[\????lettersectionrenderings:\v!closing:\v!knuth]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \doadaptleftskip{\dimexpr\textwidth/13*8\relax}
+  \correspondenceparameter\c!closing
+  \doifsomething{\correspondenceparameter\c!signature}
+    {\blank[\correspondencesectionparameter\c!spaceinbetween]
+     \correspondenceparameter\c!signature}
+\stopsetups
+
+% section: appendices
+
+\definelettersectionalternative[\v!appendices:\s!default][\c!renderingsetup=\????lettersectionrenderings:\v!appendices:\s!default]
+
+\startsetups[\????lettersectionrenderings:\v!appendices:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \startpacked
+  \processcommacommand[\correspondence_elements_access\v!letter\v!description]{\correspondence_description_place\v!letter}
+  \stoppacked
+\stopsetups
+
+% for backwards compatibility
+
+\startsetups[\v!letter:\v!place]
+\placecorrespondence[\v!letter]
+\stopsetups
+
+% Extras
+
+\appendtoks
+  \ifx\currentcorrespondence\v!letter
+    \edef\p_correspondence_option_option{\correspondenceoptionparameter\c!option}%
+    \ifx\p_correspondence_option_option\empty \else
+      \processallactionsinset
+        [\correspondenceoptionparameter\c!option]
+        [  \v!test=>{\useletterstyle[test]},
+         \v!setups=>{\useletterstyle[setups]}]%
+    \fi
+  \fi
+\to \t_correspondence_before
+
+\appendtoks
+  \ifx\currentcorrespondence\v!letter
+    \edef\p_correspondence_option_marking{\correspondenceoptionparameter\c!marking}%
+    \ifx\p_correspondence_option_marking\v!yes
+      \setupletterlayer[\v!topmark,\v!botmark,\v!cutmark,\v!endmark,\v!usermark][\c!state=\v!start]%
+    \else\ifx\p_correspondence_option_marking\v!no
+      \setupletterlayer[\v!topmark,\v!botmark,\v!cutmark,\v!endmark,\v!usermark][\c!state=\v!stop ]%
+    \fi\fi
+  \fi
+\to \t_correspondence_before
+
+\appendtoks
+  \ifx\currentcorrespondence\v!letter
+    \edef\p_correspondence_option_position{\correspondenceoptionparameter\c!position}%
+    \ifx\p_correspondence_option_position\v!yes % low level code, I need a better solution for this!
+      \setbox\scratchbox\vbox
+        {\edef\currentcorrespondencelayer      {\v!letter:\v!reference}%
+         \edef\currentcorrespondenceenvironment{\v!letter}%
+         \correspondence_layer_alternative_place}%
+      \normalexpanded
+        {\setupletterlayout
+           [\v!firstpage]
+           [\c!topspace=\dimexpr\namedletterlayerparameter\v!reference\c!y+\ht\scratchbox+\namedletterlayerparameter\v!reference\c!distance\relax]}%
+    \fi
+  \fi
+\to \t_correspondence_before
+
+\appendtoks
+  \ifx\currentcorrespondence\v!letter
+    \edef\p_correspondence_option_indenting{\correspondenceoptionparameter\c!indenting}%
+    \ifx\p_correspondence_option_indenting\empty \else
+      \setuplettersection[\v!content][\c!indenting=\p_correspondence_option_indenting]%
+    \fi
+  \fi
+\to \t_correspondence_before
+
+\appendtoks % provide this also for the other modules
+  \ifx\currentcorrespondence\v!letter
+    \edef\p_correspondence_addressentry{\correspondenceparameter\c!addressentry}%
+    \ifx\p_correspondence_addressentry\empty \else
+      \let\currentaddressentry\p_correspondence_addressentry
+    \fi
+  \fi
+\to \t_correspondence_before
+
+% Labels
+
+\definelabelclass [letter]
+
+% name:
+
+\setuplettertext[\s!en][\c!name=Name]
+\setuplettertext[\s!nl][\c!name=]
+\setuplettertext[\s!de][\c!name=Name]
+\setuplettertext[\s!fr][\c!name=Nom]
+\setuplettertext[\s!it][\c!name=]
+\setuplettertext[\s!es][\c!name=]
+
+% room:
+
+\setuplettertext[\s!en][\c!room=Room]
+\setuplettertext[\s!nl][\c!room=]
+\setuplettertext[\s!de][\c!room=Zimmer]
+\setuplettertext[\s!fr][\c!room=Salle] % Salle or Pièce
+\setuplettertext[\s!it][\c!room=]
+\setuplettertext[\s!es][\c!room=]
+
+% yourref:
+
+\setuplettertext[\s!en][\c!yourref=Your ref.]
+\setuplettertext[\s!nl][\c!yourref=Uw kenmerk]
+\setuplettertext[\s!de][\c!yourref=Ihr Zeichen]
+\setuplettertext[\s!fr][\c!yourref=Vos références]
+\setuplettertext[\s!it][\c!yourref=Vs./Rif.]
+\setuplettertext[\s!es][\c!yourref=Su ref.]
+
+% yourmail:
+
+\setuplettertext[\s!en][\c!yourmail=Your letter of]
+\setuplettertext[\s!nl][\c!yourmail=Uw brief van]
+\setuplettertext[\s!de][\c!yourmail=Ihre Nachricht vom]
+\setuplettertext[\s!fr][\c!yourmail=Votre lettre du]
+\setuplettertext[\s!it][\c!yourmail=Vs.~lettera del]
+\setuplettertext[\s!es][\c!yourmail=Su carta de]
+
+% myref:
+
+\setuplettertext[\s!en][\c!myref=Our ref.]
+\setuplettertext[\s!nl][\c!myref=Ons kenmerk]
+\setuplettertext[\s!de][\c!myref=Unser Zeichen]
+\setuplettertext[\s!fr][\c!myref=Nos références]
+\setuplettertext[\s!it][\c!myref=Ns./Rif.]
+\setuplettertext[\s!es][\c!myref=Nuestra ref.]
+
+% mymail:
+
+\setuplettertext[\s!en][\c!mymail=Our letter of]
+\setuplettertext[\s!nl][\c!mymail=Ons brief van]
+\setuplettertext[\s!de][\c!mymail=Unsere Nachricht vom]
+\setuplettertext[\s!fr][\c!mymail=Notre lettre du]
+\setuplettertext[\s!it][\c!mymail=]
+\setuplettertext[\s!es][\c!mymail=]
+
+% customer:
+
+\setuplettertext[\s!en][\c!customer=Customer no.]
+\setuplettertext[\s!nl][\c!customer=Klant No.]
+\setuplettertext[\s!de][\c!customer=Kundennummer]
+\setuplettertext[\s!fr][\c!customer=Numéro de client]
+\setuplettertext[\s!it][\c!customer=Nr.~cliente]
+\setuplettertext[\s!es][\c!customer=No. de cliente]
+
+% invoice:
+
+\setuplettertext[\s!en][\c!invoice=Invoice no.]
+\setuplettertext[\s!nl][\c!invoice=Rekening No.]
+\setuplettertext[\s!de][\c!invoice=Rechnungsnummer]
+\setuplettertext[\s!fr][\c!invoice=Numéro de facture]
+\setuplettertext[\s!it][\c!invoice=Nr.~fattura]
+\setuplettertext[\s!es][\c!invoice=No. de factura]
+
+% attention:
+
+\setuplettertext[\s!en][\c!attention=] % Attention
+\setuplettertext[\s!nl][\c!attention=]
+\setuplettertext[\s!de][\c!attention=]
+\setuplettertext[\s!fr][\c!attention=]
+\setuplettertext[\s!it][\c!attention=]
+\setuplettertext[\s!es][\c!attention=]
+
+% subject:
+
+\setuplettertext[\s!en][\c!subject=] % Subject
+\setuplettertext[\s!nl][\c!subject=] % Onderwerp
+\setuplettertext[\s!de][\c!subject=] % Betrifft
+\setuplettertext[\s!fr][\c!subject=] % Concernant or Sujet
+\setuplettertext[\s!it][\c!subject=] % Oggetto
+\setuplettertext[\s!es][\c!subject=] % Asunto
+
+% copy:
+
+\setuplettertext[\s!en][\c!copy=cc: ]
+\setuplettertext[\s!nl][\c!copy=Kopie aan: ]
+\setuplettertext[\s!de][\c!copy=Kopien an: ]
+\setuplettertext[\s!fr][\c!copy=Copieà: ]
+\setuplettertext[\s!it][\c!copy=Per conoscenza: ]
+\setuplettertext[\s!es][\c!copy=Copias: ]
+
+% enclosure:
+
+\setuplettertext[\s!en][\c!enclosure=encl: ]
+\setuplettertext[\s!nl][\c!enclosure=Bijlage(n): ]
+\setuplettertext[\s!de][\c!enclosure=Anlagen: ]
+\setuplettertext[\s!fr][\c!enclosure=Annexes: ]
+\setuplettertext[\s!it][\c!enclosure=Allegato: ]
+\setuplettertext[\s!es][\c!enclosure=Adjunto: ]
+
+% to:
+
+\setuplettertext[\s!en][\c!to=To]
+\setuplettertext[\s!nl][\c!to=Aan]
+\setuplettertext[\s!de][\c!to=An]
+\setuplettertext[\s!fr][\c!to=À]
+\setuplettertext[\s!it][\c!to=A]
+\setuplettertext[\s!es][\c!to=A]
+
+% toname:
+
+\setuplettertext[\s!en][\c!toname=To]
+\setuplettertext[\s!nl][\c!toname=Aan]
+\setuplettertext[\s!de][\c!toname=An]
+\setuplettertext[\s!fr][\c!toname=À]
+\setuplettertext[\s!it][\c!toname=A]
+\setuplettertext[\s!es][\c!toname=A]
+
+% from:
+
+\setuplettertext[\s!en][\c!from=From]
+\setuplettertext[\s!nl][\c!from=Van]
+\setuplettertext[\s!de][\c!from=Von]
+\setuplettertext[\s!fr][\c!from=De]
+\setuplettertext[\s!it][\c!from=Da]
+\setuplettertext[\s!es][\c!from=De]
+
+% fromname:
+
+\setuplettertext[\s!en][\c!fromname=From]
+\setuplettertext[\s!nl][\c!fromname=Van]
+\setuplettertext[\s!de][\c!fromname=Von]
+\setuplettertext[\s!fr][\c!fromname=De]
+\setuplettertext[\s!it][\c!fromname=Da]
+\setuplettertext[\s!es][\c!fromname=De]
+
+% date:
+
+\setuplettertext[\s!en][\c!date=Date]
+\setuplettertext[\s!nl][\c!date=Datum]
+\setuplettertext[\s!de][\c!date=Datum]
+\setuplettertext[\s!fr][\c!date=Date]
+\setuplettertext[\s!it][\c!date=Data]
+\setuplettertext[\s!es][\c!date=Fecha]
+
+% phone:
+
+\setuplettertext[\s!en][\c!phone=Phone]
+\setuplettertext[\s!nl][\c!phone=Telefoon]
+\setuplettertext[\s!de][\c!phone=Telefon]
+\setuplettertext[\s!fr][\c!phone=Téléphone]
+\setuplettertext[\s!it][\c!phone=Telefono]
+\setuplettertext[\s!es][\c!phone=Teléfono]
+
+% fax:
+
+\setuplettertext[\s!en][\c!fax=Fax]
+\setuplettertext[\s!nl][\c!fax=Fax]
+\setuplettertext[\s!de][\c!fax=Fax]
+\setuplettertext[\s!fr][\c!fax=Téléfax] % or Fax
+\setuplettertext[\s!it][\c!fax=Fax]
+\setuplettertext[\s!es][\c!fax=Fax]
+
+% email:
+
+\setuplettertext[\s!en][\c!email=Email]
+\setuplettertext[\s!nl][\c!email=E–mail]
+\setuplettertext[\s!de][\c!email=E-Mail]
+\setuplettertext[\s!fr][\c!email=Courriel] % Adresse électronique
+\setuplettertext[\s!it][\c!email=Email]
+\setuplettertext[\s!es][\c!email=Email]
+
+% url:
+
+\setuplettertext[\s!en][\c!url=Url]
+\setuplettertext[\s!nl][\c!url=URL]
+\setuplettertext[\s!de][\c!url=URL]
+\setuplettertext[\s!fr][\c!url=Site web]
+\setuplettertext[\s!it][\c!url=Sito Web]
+\setuplettertext[\s!es][\c!url=URL]
+
+% bank:
+
+\setuplettertext[\s!en][\c!bank=Bank account]
+\setuplettertext[\s!nl][\c!bank=Bankrekening]
+\setuplettertext[\s!de][\c!bank=Bankverbindung]
+\setuplettertext[\s!fr][\c!bank=Compte en banque]
+\setuplettertext[\s!it][\c!bank=Conto bancario]
+\setuplettertext[\s!es][\c!bank=Cuenta bancaria]
+
+% organization:
+
+\setuplettertext[\s!en][\c!organization=Organization]
+\setuplettertext[\s!nl][\c!organization=]
+\setuplettertext[\s!de][\c!organization=Organisation]
+\setuplettertext[\s!fr][\c!organization=]
+\setuplettertext[\s!it][\c!organization=]
+\setuplettertext[\s!es][\c!organization=]
+
+% city:
+
+\setuplettertext[\s!en][\c!city=City]
+\setuplettertext[\s!nl][\c!city=]
+\setuplettertext[\s!de][\c!city=Stadt]
+\setuplettertext[\s!fr][\c!city=]
+\setuplettertext[\s!it][\c!city=]
+\setuplettertext[\s!es][\c!city=]
+
+% zip:
+
+\setuplettertext[\s!en][\c!zip=Zip]
+\setuplettertext[\s!nl][\c!zip=]
+\setuplettertext[\s!de][\c!zip=PLZ]
+\setuplettertext[\s!fr][\c!zip=]
+\setuplettertext[\s!it][\c!zip=]
+\setuplettertext[\s!es][\c!zip=]
+
+% country:
+
+\setuplettertext[\s!en][\c!country=Country]
+\setuplettertext[\s!nl][\c!country=]
+\setuplettertext[\s!de][\c!country=Land]
+\setuplettertext[\s!fr][\c!country=]
+\setuplettertext[\s!it][\c!country=]
+\setuplettertext[\s!es][\c!country=]
+
+% street:
+
+\setuplettertext[\s!en][\c!street=Street]
+\setuplettertext[\s!nl][\c!street=]
+\setuplettertext[\s!de][\c!street=Straße]
+\setuplettertext[\s!fr][\c!street=]
+\setuplettertext[\s!it][\c!street=]
+\setuplettertext[\s!es][\c!street=]
+
+% page:
+
+\setuplettertext[\s!en][\c!page=Page~]
+\setuplettertext[\s!nl][\c!page=]
+\setuplettertext[\s!de][\c!page=Seite~]
+\setuplettertext[\s!fr][\c!page=]
+\setuplettertext[\s!it][\c!page=]
+\setuplettertext[\s!es][\c!page=]
+
+% pagenumber:
+
+\setuplettertext[\s!en][\c!pagenumber={Page , of }]
+\setuplettertext[\s!nl][\c!pagenumber=]
+\setuplettertext[\s!de][\c!pagenumber={Seite , von }]
+\setuplettertext[\s!fr][\c!pagenumber=]
+\setuplettertext[\s!it][\c!pagenumber=]
+\setuplettertext[\s!es][\c!pagenumber=]
+
+% address:
+
+\setuplettertext[\s!en][\c!address=Address]
+\setuplettertext[\s!nl][\c!address=]
+\setuplettertext[\s!de][\c!address=Adresse]
+\setuplettertext[\s!fr][\c!address=]
+\setuplettertext[\s!it][\c!address=]
+\setuplettertext[\s!es][\c!address=]
+
+% Files
+
+\useletterstyle[default,\currentmoduleparameter\c!style]
+
+\stopmodule
+
+\protect
+
+\continueifinputfile{s-cor-01.mkvi}
+
+\startletter
+\input lorem
+\stopletter

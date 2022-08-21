@@ -1,0 +1,438 @@
+%D \module
+%D   [       file=t-mathsets,
+%D        version=2011-01-22,
+%D          title=Math Sets,
+%D       subtitle=\CONTEXT\ port of \filename{braket.sty},
+%D         author={Aditya Mahajan},
+%D          email={adityam [at] umich [dot] edu},
+%D           date=\currentdate,
+%D        license=Simplified BSD License]
+%D
+  
+%M \usemodule[mathsets] 
+%M \setuphead[section]  [page=]
+%M \setupbodyfontenvironment[default][em=italic]
+%M \loadsetups[t-mathsets.xml]
+
+%D \section {Introduction}
+%D
+%D I write a lot of probability expressions which look like this.
+%D \startbuffer
+%D \startformula
+%D \mfunction{E} \left\{ \sum_{y} f(X,y) \,\middle|\, Z \right\}
+%D \stopformula
+%D \stopbuffer
+%D \getbuffer 
+%D
+%D The usual way to input them is as follows
+%D \typebuffer
+%D
+%D We need to ensure that the delimiters and the {\em conditional} sign \type{|}
+%D scale properly, and the spacing around the conditional sign is correct. As a
+%D result, the input is markup heavy, and consequently difficult to read.
+%D
+%D In \LATEX, Donald Arseneau's \filename{braket.sty} can be used to input such
+%D expressions in a natural manner, and automatically takes care of the scaling
+%D of delimiters and the conditional signs. (The actual package only provides
+%D this functionality of bra and ket notation, hence the name, but can be easily
+%D extended to probability expressions also. This module is a partial port of
+%D \filename{braket.sty} to \CONTEXT.
+
+%D \section {Usage}
+%D
+%D To use this module add
+%D
+%D \starttyping
+%D \usemodule[mathsets]
+%D \stoptyping
+%D 
+%D on the top of your file. This module defines one command
+%D \type{\definemathset} for defining new math-sets. The syntax of this command
+%D is:
+%D
+%D \setup{definemathset}
+%D
+%D The first argument is the name of the set to be defined. Thus, after 
+%D
+%D \starttyping
+%D \definemathset[mathset]
+%D \stoptyping
+%D
+%D \type{\mathset} is available as a command. The second argument to
+%D \type{\definemathset} are optional assignments \type{text}, \type{left},
+%D \type{middle}, \type{right}. For example, if we can use \type{text} to
+%D specify what comes at the beginning of the math-set. By default,
+%D \type{text=no} which causes no text to appear, but we can change that to any
+%D text that we want (Note that \type{\mfunction} tells \CONTEXT\ to use the
+%D current math text font)
+%D
+%D \startbuffer[EXP]
+%D \definemathset[EXP] [text=\mfunction{E}]
+%D \stopbuffer
+%D
+%D \typebuffer[EXP] \getbuffer[EXP]
+%D
+%D We can use \type{\EXP{X}} to get $\EXP{X}$ and \type{\EXP{X|Y}} to get
+%D $\EXP{X|Y}$. Scaling of the delimiters and conditional sign are take care
+%D automatically. For example
+%D
+%D \startbuffer
+%D \startformula
+%D  \EXP{\sum_y f(X,y) | Z }
+%D \stopformula
+%D \stopbuffer
+%D
+%D \typebuffer
+%D
+%D gives
+%D
+%D \getbuffer
+%D
+%D Compare the above input with the one used in the first example.
+%D
+%D By default, the contents of the set are surrounded by curly brackets (or
+%D braces); we can change them by using \type{left} and \type{right} keys. For
+%D example.
+%D
+%D \startbuffer[PR]
+%D \definemathset[PR]  [text={\mfunction{Pr}},left=(,right=)]
+%D \stopbuffer
+%D \startbuffer
+%D \startformula
+%D    \EXP{ \sum_y f(X,y) | Z = z } = \sum_{x,y} \PR{x,y | Z=z}
+%D \stopformula
+%D \stopbuffer
+%D 
+%D \typebuffer[PR] \typebuffer
+%D
+%D  gives
+%D
+%D \getbuffer[PR] \getbuffer
+%D
+%D We also provide a mechanism for changing the conditional bar using the
+%D \type{middle} key, although I am not sure if this is needed by anyone. For
+%D example, consider the following contrived example
+%D
+%D \startbuffer
+%D \definemathset[VAR][text={\mfunction{Var}}, left=(, right=), middle=\Vert]
+%D \startformula
+%D    \VAR{f(X,Y) | Y = y }
+%D \stopformula
+%D \stopbuffer
+%D
+%D \typebuffer
+%D
+%D gives
+%D
+%D \getbuffer
+%D
+%D This module also takes care of correct nesting of math-sets, so 
+%D \startbuffer
+%D \startformula
+%D   \EXP{ \sum_{Y} \EXP { \frac{1}{f(X)} | Y } } 
+%D \stopformula
+%D \stopbuffer
+%D \typebuffer gives
+%D \getbuffer[EXP] \getbuffer
+%D
+%D If you do not want some \type{|} to be considered as conditional signs, nest
+%D them inside a group \type{{}}. For example, to get 
+%D \startbuffer
+%D \startformula
+%D   \mathset{ x\in {\bf R}^2 | 0<{|x|}<\frac {3}{16} }
+%D \stopformula
+%D \stopbuffer
+%D \getbuffer
+%D we typed
+%D \typebuffer
+%D
+%D We can also use limits after the command, for example:
+%D
+%D \startbuffer
+%D \startformula
+%D   \EXP_X{F(X, Y) | Y = y } 
+%D \stopformula
+%D \stopbuffer
+%D \typebuffer gives \getbuffer
+%D
+%D Only one set, \type{\mathset}, is predefined. It is relatively simple
+%D to define sets equivalent to those defined in \filename{braket.sty}.
+%D
+%D \startbuffer
+%D \definemathset[BRAKET][left=\langle,right=\rangle]
+%D
+%D \startformula
+%D   \BRAKET{ \phi | \frac{\partial^2}{\partial t^2} | \psi }
+%D \stopformula
+%D \stopbuffer
+%D \typebuffer \getbuffer
+
+%D \section {Implementation}
+%D
+%D Most of the ideas are simply a \CONTEXT ified version of the code in
+%D \filename{braket.sty}. I mostly used \filename{bracket.sty} to define
+%D commands for probability and expectation. So, I have also added the
+%D option of declaring such operators using \type{text=no} option for
+%D \type|\definemathset|.
+
+\writestatus  {loading}   {ConTeXt Math Sets Module}
+
+\startmodule[mathsets]
+
+\unprotect
+
+%D Since two letter codes are reserved for system modules, and \CONTEXT\
+%D seems to be running out of those, I choose a more verbose variable to
+%D store options.
+
+\definesystemvariable {mathset}   % Math Set
+
+%D \macros{setupmathset}
+%D To specify the default values of text, left, middle, and right delimiters
+
+\def\setupmathset
+  {\dosingleargument\getparameters[\??mathset]}
+
+%D \macros
+%D    {definemathset}
+%D
+%D To define a new math set.
+
+\def\definemathset
+  {\dodoubleargument\dodefinemathset}
+
+
+%D Now we define internal macros to take care of the formatting
+
+\let\currentmathset\empty
+\let\currentmathsetgrouplevel\empty
+
+\def\mathsetmiddle
+  {\ifnum\currentmathsetgrouplevel=\currentgrouplevel
+      \expandafter\firstoftwoarguments
+    \else
+      \expandafter\secondoftwoarguments
+    \fi
+   {\egroup\,\middle\mathsetparameter\c!middle\,\bgroup}
+   {\mathsetparameter\c!middle}}
+
+\def\mathsetparameter#1%
+  {\executeifdefined{\??mathset\currentmathset#1}{\executeifdefined{\??mathset#1}\empty}}
+
+\def\dodefinemathset[#1][#2]%
+  {\getparameters[\??mathset#1][#2]
+   \setvalue{#1}{\dododefinemathset[#1]}}
+
+%D Since \type{|} is already active, we do not have to make it active
+%D again.
+
+\def\dododefinemathset[#1]%
+  {\begingroup
+   \def\currentmathset{#1}
+   \edef\currentmathsetgrouplevel{\the\numexpr\currentgrouplevel+2\relax}
+   % Not here, else messes subscripts
+   % \mathcode`\|32768
+   % \let|\mathsetmiddle
+   \doifelsenothing{\mathsetparameter\c!text}
+      {\dodododefinemathset!notext}
+      {\doifelse{\mathsetparameter\c!text}{\v!no}
+      {\dodododefinemathset!notext}
+      {\docapturemathoplimits\dodododefinemathset!text}}}
+
+
+\def\setmathmiddle
+  {\mathcode`\|32768
+   \let|\mathsetmiddle}
+
+
+%D \type|\docapturemathoplimits| is to capture limits that may follow
+%D the text command. This allows the following to work
+%D
+%D \startbuffer
+%D \startformula
+%D    \PR^{f,g} {f(X) | g(Y)}
+%D \stopformula
+%D \stopbuffer
+%D
+%D \typebuffer
+%D
+%D \getbuffer[PR] \getbuffer
+%D We need to be a bit careful not to activate \type{|} to soon, as it can also
+%D occur in sub- and superscripts. For example
+%D \startbuffer
+%D \startformula
+%D    \EXP_{X|Y}{f(X) | Y = y}
+%D \stopformula
+%D \stopbuffer
+%D
+%D \typebuffer
+%D
+%D gives
+%D
+%D \getbuffer[EXP] \getbuffer
+
+\def\dodododefinemathset!notext#1%
+  {\setmathmiddle
+   \mathopen{}\left\mathsetparameter\c!left
+   {#1}%
+   \right\mathsetparameter\c!right\mathclose{}%
+   \endgroup}
+  
+%D TODO. Keep the \type|\nolimits| to be configurable.
+
+\def\dodododefinemathset!text#1#2%
+    {\mathop{\kern\zeropoint\mathsetparameter\c!text}\nolimits#1%
+     \setmathmiddle
+     \left\mathsetparameter\c!left
+     {#2}%
+     \right\mathsetparameter\c!right%
+     \endgroup}
+
+%D The extra group in the definition of \type{dodododefinemathset!} is
+%D so that such expressions turn out correct
+%D \getbuffer[EXP]
+%D \startformula
+%D \EXP{ \left(\frac {a}{b}\right) | 
+%D      \left( \frac{a} {\frac{b}{\sum c}} \right) }
+%D \stopformula
+
+
+%D The \type{\left} and \type{\right} generate a math atom of type inner,
+%D while for math sets, we want a math math open atom. To see the difference,
+%D consider
+%D
+%D \startbuffer
+%D \startformula
+%D  2\left(\frac {3}{4} \right) \qquad \hbox{ vs } \qquad  
+%D  2\biggl( \frac {3}{4} \biggr)
+%D \stopformula
+%D
+%D and
+%D 
+%D \startformula
+%D  \Pr\left(\frac {3}{4} \right) \qquad \hbox{ vs } \qquad  
+%D  \Pr\biggl( \frac {3}{4} \biggr)
+%D \stopformula
+%D \stopbuffer
+%D \typebuffer 
+%D
+%D which gives (notice the spacing before the parenthesis)
+%D
+%D \getbuffer 
+%D
+%D I will assume that if \type{text} is something, then
+%D the default behaviour is desirable, if \type{text} is empty, then I add
+%D \type{\mathopen} and \type{\mathclose}.  Using \type{\mathopen} to correct
+%D the spacing is due to Frank Mittelbach, see
+%D \hyphenatedurl{http://www.latex-project.org/cgi-bin/ltxbugs2html?pr=latex/3853}
+%D
+%D Mathset module ensures that we get the correct spacing in both cases
+%D \startbuffer
+%D \definemathset[SET][left=(,right=)]
+%D \startformula
+%D  2\SET{\frac{3}{4}} \qquad \hbox{ and } \qquad 
+%D  \PR{ \frac{3}{4} }
+%D \stopformula
+%D \stopbuffer
+%D \getbuffer[PR] \getbuffer which was typed as \typebuffer
+%D
+%D Also, if its argument is a single character, \type{\mathop} centers it to
+%D with respect to the math||axis. Compare the outputs of
+%D
+%D \startbuffer
+%D \ruledhbox{$\mathop{y}\nolimits_x\left\{A\,\middle|\,B\right\}$}
+%D \ruledhbox{$\mathop{\kern\zeropoint y}\nolimits_x\left\{A\,\middle|\,B\right\}$}
+%D \stopbuffer
+%D
+%D \typebuffer
+%D \getbuffer
+%D
+%D I have added a \type{\kern\zeropoint} to prevent that.
+
+
+%D \macros
+%D    {docapturemathoplimits}
+%D
+%D The next macro captures math limits. This should probably go to some
+%D general purpose module. There are three different valid inputs
+%D \startitemize[n,packed]
+%D   \item An operator with neither subscript nor superscript.
+%D   \item An operator with one subscript or superscript.
+%D   \item An operator with both subscript and superscript.
+%D \stopitemize
+%D So we scan for four arguments, to capture the following situations
+%D \startitemize[packed]
+%D   \item \type|_{sub}^{sup}|
+%D   \item \type|^{sup}_{sub}|
+%D   \item \type|_{sub}|
+%D   \item \type|^{sup}|
+%D   \item \type|<empty>|
+%D \stopitemize
+
+\def\docapturemathoplimits#1%
+  {\doifnextcharelse _%
+    {\dodocapturemathoplimits{#1}}
+    {\doifnextcharelse ^%
+      {\dodocapturemathoplimits{#1}}
+      {#1{}}}}
+
+\def\dodocapturemathoplimits#1#2#3%
+  {\doifnextcharelse _%
+    {\redocapturemathoplimits{#1}{#2}{#3}}
+    {\doifnextcharelse ^%
+        {\redocapturemathoplimits{#1}{#2}{#3}}
+        {#1{#2{#3}}}}}
+
+\def\redocapturemathoplimits#1#2#3#4#5%
+  {#1{#2{#3}#4{#5}}}
+
+\setupmathset
+  [  \c!left={\{},
+    \c!right={\}},
+   \c!middle=\vert,
+     \c!text=no,]
+
+\definemathset[mathset]
+
+%D \section {Change log}
+%D
+%D \startitemize[n, reverse][headstyle=bold]
+%D
+%D \head \date[d=22,m=1,y=2011]
+%D
+%D  Changed license to BSD
+%D
+%D \head \date[d=6,m=12,y=2008]
+%D
+%D Defined a new macro \type{setmathmiddle}. Now \type{|} is made active after
+%D the subscripts, so that things still work when \type{|} is used in the
+%D subscripts.
+%D
+%D \head \date[d=3,m=7,y=2008] 
+%D
+%D Added \type{text=no} option, included an interface file, and cleaned up the
+%D documentation for \TEX live 2008.
+%D
+%D \head \date[d=17,m=6,y=2007] 
+%D       
+%D Added \type|\docapturemathoplimits| macro. This prevents a
+%D serious bug in the previous version, due to which things like
+%D \type{\mathset_{...}} did not work.
+%D
+%D \head \date[d=11,m=4,y=2007]
+%D
+%D This version provides some fine tuning of how the sets are displayed
+%D by working around two mis|-|features of \TEX\ math: \type|\left|
+%D \unknown \type|\right| always create a math inner atom and
+%D \type|\mathop| centers its argument if the argument is a single
+%D letter. 
+%D
+%D \head \date[d=25,m=2,y=2007]
+%D
+%D First version of the module.
+%D  
+%D \stopitemize
+
+\protect
+\stopmodule
+

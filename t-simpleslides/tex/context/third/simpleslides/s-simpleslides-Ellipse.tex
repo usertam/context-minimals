@@ -1,0 +1,128 @@
+%D \module
+%D   [      file=simpleslides-s-Ellipse,
+%D        version=2022.07.13,
+%D          title=\CONTEXT\ Style File,
+%D       subtitle=Presentation Module Ellipse,
+%D         author=Aditya Mahajan and Thomas A. Schmitz,
+%D           date=\currentdate,
+%D      copyright={Aditya Mahajan and Thomas A. Schmitz}]
+%C
+%C Copyright 2007 Aditya Mahajan and Thomas A. Schmitz
+%C This file may be distributed under the GNU General Public License v. 2.0.
+
+%D This file provides the \quotation{Ellipse} style for the presentation
+%D module. The design is inspired by Hans's "funny" presentation module
+%D (s-pre-03). It is loaded at runtime.
+
+\writestatus{simpleslides}{loading Ellipse style}
+
+\startmodule[simpleslides-s-Ellipse]
+
+\unprotect
+
+%D First, we change the page layout.
+
+\setuplayout [width=fit,
+              height=fit,
+	      margin=0cm,
+              header=1.2cm,
+              footer=0cm,
+              topspace=1.8cm,
+              backspace=1.5cm,
+              location=singlesided]
+
+\setuplayout [simpleslides:layout:horizontal][header=15mm]
+\setuplayout [simpleslides:layout:vertical]  [header=0mm]
+\setuplayout [simpleslides:layout:title]     [header=0mm]
+
+%D These macros are used for placing figures/pictures:
+
+\define\NormalHeight            {\textheight}
+\define\NormalWidth             {.5\textwidth}
+\define\PictureFrameHeight      {\textheight}
+\define\PictureFrameWidth       {.5\textwidth}
+
+\setuplayer
+  [simpleslides:layer:slidetitle]
+    [y=8mm,
+     x=15mm]
+
+%D We define our color scheme:
+
+\definecolor[simpleslides:variantcolor]              [s=0]
+\definecolor[simpleslides:backgroundcolor]           [s=.8]
+\definecolor[simpleslides:contrastcolor]             [r=.5,g=0,b=0]
+\definecolor[simpleslides:altcontrastcolor]          [r=.9,g=0,b=0]
+\definecolor[simpleslides:itemize:color]             [r=.5]
+
+%D We let Metapost calculate the background:
+
+\startuseMPgraphic{simpleslides:MP:horizontal}
+StartPage ;
+  fill Page withcolor \MPcolor{simpleslides:variantcolor} ;
+  save p ; path p ;
+  p := Page enlarged (-15pt,-15pt) superellipsed .9 ;
+  fill p withcolor \MPcolor{simpleslides:backgroundcolor} ;
+  pickup pencircle scaled 20pt ;
+  draw p withcolor \MPcolor{simpleslides:contrastcolor} ;
+StopPage ;
+\stopuseMPgraphic
+
+\startuseMPgraphic{simpleslides:MP:ornament}
+StartPage ;
+ save p ; path p ;
+ p := Page enlarged (-15pt,-15pt) superellipsed .9 ;
+ pickup pencircle scaled 20pt ;
+ save pa, pb; pair pa, pb ;
+ if RealPageNumber>1:
+  pa := point (3 + (6*RealPageNumber) / NOfPages) of p ;
+  pb := point (3 + (6*(RealPageNumber-1)) / NOfPages) of p ;
+  draw (p cutafter pa) cutbefore pb
+      withcolor \MPcolor{simpleslides:altcontrastcolor} ;
+ fi ;
+StopPage ;
+\stopuseMPgraphic
+
+%D We define these backgrounds as overlays:
+
+\defineoverlay
+  [simpleslides:background:horizontal]
+  [\useMPgraphic{simpleslides:MP:horizontal}]
+
+\defineoverlay
+  [simpleslides:background:vertical]
+  [\useMPgraphic{simpleslides:MP:horizontal}]
+
+\defineoverlay
+  [simpleslides:background:title]
+  [\useMPgraphic{simpleslides:MP:horizontal}]
+
+\defineoverlay
+  [simpleslides:background:ornament]
+  [\useMPgraphic{simpleslides:MP:ornament}]
+
+%D We want the title to placed in color.
+
+\setupTitle[\c!headcolor={simpleslides:contrastcolor}]
+
+%D We want the slide title on the top
+
+\setupSlideTitle
+   [\c!after=,
+    \c!alternative=layer,
+    \c!width=\textwidth,
+    \c!align=\v!center,
+    \c!height=3.5cm,
+    \c!color=simpleslides:contrastcolor]
+
+\setupcombinations[distance=0cm]
+
+%D The symbol for the first level of itemizations.
+
+\definesymbol[1][\useMPgraphic{simpleslides:itemize:square}]
+\setupitemize[1][\c!color={simpleslides:itemize:color}]
+
+\protect
+\stopmodule
+
+\endinput

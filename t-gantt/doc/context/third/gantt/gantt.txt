@@ -1,0 +1,63 @@
+Gantt is a (third party) ConTeXt module for drawing Gantt charts via MetaPost or PGF/TikZ.
+
+== Description ==
+To switch between the two drawing engines (MetaPost and TikZ) use the style option.
+\usemodule[gantt][alternative=mp]
+\usemodule[gantt][alternative=tikz]
+The default engine is MetaPost.
+
+Here is a short description of the environments and commands:
+
+=== Gantt ===
+The gantt environment draws the canvas of a gantt figure.
+\startgantt[…]{no of Tasks to plot}{no of time slots}
+The optional argument […] can be filled in a key=value syntax, using one or more of the following keys:
+* factor - MetaPost scale factor (default: 1)
+* xunitlength - length of one time slot (default: 1cm)
+* style - fontsize of labels (default: \tf)
+* titlestyle - fontsize of title section (default: \tfx)
+* drawledgerline - switch to enable/disable the drawing of horizontal ledger lines (default value: false)
+
+=== Ganttitle ===
+This is the environment for drawing the title section.
+\startganttitle (…) \stopganttitle
+
+=== Titleelement ===
+This draws one element of the title.
+\titleelement{label}{length}
+
+=== Numtitle ===
+This draws a numbered sequence of title elements.
+\numtitle{start number}{increment}{end number}{length of each title element}
+
+=== Ganttbar ===
+This draws a single, unconnected bar for representing a task.
+\ganttbar[pattern=value,color=value]{label}{start}{length}
+The optional comma separated arguments are:
+* <pattern> - is a TikZ pattern (e.g. north east lines (default), north west lines, crosshatch, crosshatch dots, grid, …)
+* <color> - a color of the pattern (e.g. black (default), red, green blue gray, dark gray)
+
+=== Ganttcon ===
+This draws an arrow between the bars specified by coordinates.
+\ganttcon{startx}{starty}{endx}{endy}
+
+=== Ganttbarcon ===
+This draws a single bar and connects the bar with the previous bar for consecutive tasks.
+\ganttbarcon[pattern=value,color=value]{label}{start}{length}
+The optional pattern argument are the same as for \ganttbar.
+
+=== Ganttgroup ===
+This draws a bar to group tasks.
+\ganttgroup{label}{start}{length}
+
+=== Ganttmilestone ===
+This draws a milestone using a diamond.
+\ganttmilestone[color=value]{label}{start}
+The optional color argument argument is:
+* <color> - a color of the pattern (e.g. black (default), red, green blue gray, dark gray)
+
+=== Ganttmilestonecon ===
+This draws a milestone using a diamond and connects the milestone with the previous bar or milestone.
+\ganttmilestonecon[color=value]{label}{start}
+The optional color argument argument is:
+* <color> - a color of the pattern (e.g. black (default), red, green blue gray, dark gray)

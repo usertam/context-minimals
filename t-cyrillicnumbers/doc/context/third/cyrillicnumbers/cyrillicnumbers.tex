@@ -1,0 +1,1314 @@
+% \enablemode[print]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Module loading                                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usemodule[cyrillicnumbers]
+\definecyrnum[normaltextcyrnum][
+  command=\oldrussian,
+  dots=no,
+  titlo=no,
+]
+
+\definecyrnum[rednum][
+  command={\switchtocolor[red]},
+]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Colors                                                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor  [primarycolor] [darkmagenta]
+\definecolor[secondarycolor]     [magenta]
+
+\startmode[print]
+  \definecolor  [primarycolor] [gray12]
+  \definecolor[secondarycolor] [gray22]
+\stopmode%%% print
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Letterspacing / emphases                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usemodule [letterspace]
+
+\defineletterspace [largecaps]
+\setupletterspace  [largecaps] [
+  factor=.5,
+  spaceskip=.4em,
+  suppresskern=yes,
+]
+
+\def\pompoustitle#1{%
+  \setuplocalinterlinespace[line=33pt]%
+  \color[primarycolor]{%
+    \tfd\bold\WORD\largecaps{#1}%
+  }%
+}
+
+\defineletterspace [mediumcaps]
+\setupletterspace  [mediumcaps] [
+  factor=.25,
+  spaceskip=.5em,
+  suppresskern=yes,
+]
+
+\definefontfeature[smallcaps][smcp=yes,mode=node,script=latn]
+
+\def\mediumtitle#1{%
+  \setuplocalinterlinespace[line=33pt]%
+  \color[primarycolor]{%
+    \tfa\sc\mediumcaps{#1}%
+  }%
+}
+
+\defineletterspace [smallcaps]
+\setupletterspace  [smallcaps] [
+  factor=.05,
+  spaceskip=.25em,
+  suppresskern=yes,
+]
+
+\defineletterspace [textemph]
+\setupletterspace  [textemph] [
+  factor=.125,
+  spaceskip=.33em,
+  suppresskern=no,
+]
+
+\defineletterspace [slightly]
+\setupletterspace  [slightly] [
+  factor=.075,
+  spaceskip=.33em,
+  suppresskern=no,
+]
+
+\let\te\textemph
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Font Setups                                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definefontfeature [default] [default] [
+  protrusion=quality,
+  expansion=quality,
+  mode=node,
+  script=latn,
+  onum=yes,
+  dlig=yes,
+  liga=yes,
+  kern=yes,
+]
+
+\definefontfeature [kerning] [kern=yes]%
+
+\starttypescript [serif] [bukyvede]
+  % \setups [font:fallback:serif]
+  \definefontsynonym [Serif]        [name:Bukyvede]        [features=default]
+  \definefontsynonym [SerifItalic]  [name:Bukyvede-Italic] [features=default]
+\stoptypescript
+
+\usetypescript  [bukyvede]
+\definetypeface [vintagecyrillic]       [rm] [serif]  [bukyvede]     [default] [encoding=ec]
+
+\usetypescriptfile [type-gfsbodoni.mkiv]
+\usetypescript     [gfs-bodoni]
+\usetypescriptfile [type-imp-computer-modern-unicode.mkiv]
+\usetypescript     [computer-modern-unicode]
+
+\def   \russian#1{\begingroup\language[ru]\setupbodyfont[computer-modern-unicode]#1\endgroup}
+\def\oldrussian#1{\begingroup\language[ru]\setupbodyfont[vintagecyrillic]#1\endgroup}
+\def     \greek#1{\begingroup\language[agr]\setupbodyfont[computer-modern-unicode]#1\endgroup}
+
+\usetypescript [modern]
+\starttypescript [mymodern]
+  \definetypeface [mymodern] [rm] [serif] [modern]                  [default]
+  \definetypeface [mymodern] [tt] [mono]  [computer-modern-unicode] [default]
+\stoptypescript %% this will do as lm and cmu are acceptably similar
+\usetypescript [mymodern]
+\setupbodyfont [mymodern]
+
+\usetypescript [serif] [hz] [highquality]
+\setupalign    [hanging,hz]
+
+\setupbodyfontenvironment [default] [em=italic]
+
+\def\quote#1{\bgroup\italic#1\egroup}
+\def\uprightslash{\bgroup\tf/\egroup}
+\def\uprightomiss{\bgroup\tf[\dots]\egroup}
+
+%%% The Wiki is great. Long live the Gardener!
+\definetextbackground[verbatim] [
+  background=color,
+  backgroundcolor=gray92,
+  backgroundoffset=0cm,
+  frame=off,
+  location=paragraph,
+  offset=0.5cm,
+]
+
+\setuptyping[
+  after={\stoptextbackground\blank[line]},
+  before={\blank[line]\noindentation\starttextbackground[verbatim]},
+  bodyfont=9pt,
+  margin=1em,
+  % style=\tfx\sans,
+]
+
+%%% TODO: find out if this is documented already
+%%% http://archive.contextgarden.net/message/20060523.151528.b6da35e1.en.html
+%%% http://archive.contextgarden.net/message/20111221.083957.5c85d357.en.html
+\setconstant\kindofpagetextareas\plusone
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Presenting the Interface                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usemodule  [int-load]
+\loadsetups [t-cyrillicnumbers.xml]
+\setupcolor [x11]
+
+\define\beautifyshowsetups{%
+  \unexpanded\def\setupnumfont  {\rm}%
+  \unexpanded\def\setuptxtfont  {\rm}%
+  \unexpanded\def\setupintfont  {\rm\sc\Word}%
+  \unexpanded\def\setupvarfont  {\rm\it}%
+  \unexpanded\def\setupoptfont  {\rm\it}%
+  \unexpanded\def\setupalwcolor {primarycolor}%
+  \unexpanded\def\setupoptcolor {primarycolor}%
+  \defineframedtext [setuptext] [
+    frame=off,
+    background=color,
+    backgroundcolor=gray92,
+    width=\hsize,
+    height=fit,
+    align=right,
+    offset=0.75em,
+  ]%
+}
+
+\let\Oldshowsetup\showsetup
+
+\define[1]\showsetup{% hurray for diversity
+  \bgroup\beautifyshowsetups%
+    \Oldshowsetup{#1}%
+  \egroup%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Paper                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definepapersize[LHS][
+  width=160mm,
+  height=239mm,
+]
+
+\setuppapersize[LHS][LHS]
+
+% \showframe
+\setuplayout [
+    width=122mm,
+    %textheight=199mm, % ca. 47 rows * 12pt
+    height=224mm, % text height should end up at ca. 47 rows * 12pt
+    %height=fit,
+    %
+    topspace=14mm,
+    header=12pt,
+    headerdistance=4mm,
+    top=00mm,
+    %
+    bottomspace=0mm,
+    footer=23mm,
+    bottom=0mm,
+    footerdistance=0mm,
+    %
+    backspace=16mm,
+    leftedge=0mm,
+    leftedgedistance=0mm,
+    leftmargin=16mm,
+    leftmargindistance=1em,
+    %
+    rightmargin=15mm,
+    rightmargindistance=5mm,
+    rightedge=0mm,
+    rightedgedistance=0mm,
+]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Interaction                                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setupinteraction[%
+  state=start,
+  color=primarycolor,
+  contrastcolor=primarycolor,
+  %color=,
+  %contrastcolor=,
+  style=,
+  focus=standard,
+  title={Cyrillic Numbers Module},
+  subtitle={Yet Another Number Converter},
+  author={Philipp Gesang},
+  keyword={ConTeXt, LuaTeX, cyrillic numerals},
+]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Headings                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\defineletterspace [LSchapter]
+\defineletterspace [LSsection]
+\defineletterspace [LSsubsection]
+\setupletterspace  [LSchapter]    [factor=.1,  spaceskip=.33em,suppresskern=yes]
+\setupletterspace  [LSsection]    [factor=.15, spaceskip=.40em,suppresskern=yes]
+\setupletterspace  [LSsubsection] [factor=.125,spaceskip=.33em]
+
+\def   \fontchapter#1{\setupbodyfont[10pt]\bold\WORD\LSchapter{#1}}
+\def   \fontsection#1{\setupbodyfont[10pt]\word\sc\LSsection{#1}}
+\def\fontsubsection#1{\setupbodyfont[10pt]\LSsubsection{#1}}
+
+\def   \Chapterheadfontcmd{\fontchapter}
+\def   \Sectionheadfontcmd{\fontsection}
+\def\Subsectionheadfontcmd{\fontsubsection}
+
+\def\empholdrussian#1{\russian{\italic#1}}
+
+\definecyrnum[cyrnumone][
+  command=\oldrussian,
+  titlo=mp,
+  titlomode=2,
+  dots=no,
+]
+
+\definecyrnum[cyrnumtwo][
+  command=\empholdrussian,
+  titlo=mp,
+  titlomode=7,
+  dots=no,
+]
+
+\defineconversion[cyrnumone][\cyrnumone]
+\defineconversion[cyrnumtwo][\cyrnumtwo]
+
+\definestructureconversionset[regularstructure] [numbers,cyrnumone,cyrnumtwo] [cyrnumone]
+\definestructureconversionset[regularstructure] [numbers,cyrnumone,cyrnumtwo] [cyrnumone]
+
+\setuphead [chapter] [
+  align=middle,
+  footer=text,
+  grid=yes,
+  header=empty,
+  number=yes,
+  sectionconversionset=regularstructure,
+  % numberconversion=cyrnumone,
+  page=yes,
+  style=,
+  textcommand=\Chapterheadfontcmd,
+  before={\startlinecorrection\blank[3*line,force]},
+  after={\stoplinecorrection\blank[line,force]},
+]
+
+\definetext [text] [footer] [pagenumber]
+
+\setuphead [section] [
+  align=middle,
+  number=yes,
+  page=no,
+  style=,
+  sectionconversionset=regularstructure,
+  textcommand=\Sectionheadfontcmd,
+  before={\blank[line]},
+  after={\blank[line]},
+]
+
+% \setuphead [subsection] [
+%   align=middle,
+%   number=no,
+%   page=no,
+%   style=,
+%   textcommand=\Subsectionheadfontcmd,
+%   before={\blank[line]},
+%   after={\blank[line]},
+% ]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header and Footers                                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setupfooter[text][% handy for occasional pagenumbers in footnotes at chapters
+  style=\tfx,
+]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Margins                                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% loosely based on: http://archive.contextgarden.net/message/20110804.141422.6e52d0bc.en.html
+\define[1]\marginhintbox{%
+  \toplinebox{\rotate{#1}}%
+  % \toplinebox{\rotate{\framed{#1}}}%
+}
+
+\definemargindata[marginhint][%
+  style={\tfx\tt},
+  location=outer,
+  align=outer,
+  margin=margin,
+  command=\marginhintbox,
+  stack=yes,
+]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ToC                                                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def   \tocfontchapter#1{\tfx\WORD\LSchapter{#1}}
+%\def   \tocfontsection#1{\word\sc\LSsection{#1}}
+\def   \tocfontsection#1{\tfx\slightly{#1}}
+\def\tocfontsubsection#1{\LSsubsection{#1}}
+
+\setuplist [chapter] [
+  alternative=c,
+  interaction=text,
+  textcommand=\tocfontchapter,
+]
+
+\setuplist [section] [
+  before={\blank[halfline]},
+  alternative=b,
+  interaction=text,
+  margin=2em,
+  numberstyle=,
+  textcommand=\tocfontsection,
+  textstyle=,
+  numberstyle=\tfx,
+]
+
+% \setuplist [subsection] [
+%   %after=2.5em,    % from the hack
+%   alternative=d,
+%   interaction=text,
+%   margin=3em,     % hanging
+%   textcommand=\tocfontsubsection,
+% ]
+
+\setuplistalternative[c] [
+  %distance=0em,
+  %width=0pt,
+  stretch=.5em,
+  command=\hskip.5em\phglistdots\hskip.5em\relax,
+]
+
+\def\phglistdots{\gleaders\hbox to 1em{\hss.\hss}\hfill}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Captions                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\setupcaptions[
+  location=bottom,
+  headstyle=\tfx\italic,
+  way=bytext,
+  prefixsegments=none,
+  style={\setupinterlinespace[9pt]\tfx},
+]
+
+\setupcaption [figure] [way=bytext]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bib: Setups                                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setuppublications [
+  alternative=ssa,
+  refcommand=authoryear,
+  %sorttype=bbl,
+  sort=author,
+  numbering=yes,
+  autohang=yes,
+]
+
+\setuppublicationlist [
+  artauthor=\invertedauthor,
+]
+
+\setupcite [authoryear] [compress=no]
+
+%%% Used in bibliography formatting.
+\definestartstop [bibindent] [
+  before={\startnarrower[left]%
+          \setupindenting[-\leftskip,yes,first]%
+          \clubpenalty-9000%
+          \widowpenalty-9000},
+  after=\stopnarrower,
+]
+
+\def\ctay#1{\cite[authoryear][#1]}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bib: Entries                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\startpublication [
+  k=fonts,
+  t=book, % bibtex go to hell
+  a={Hagen/Hoekwater},
+  y=2011,
+  n=1,
+  s={Fonts},
+]
+  \author[]{Hans}[]{}{Hagen}
+  \author[]{Taco}[]{}{Hoekwater}
+  \pubyear{2011}
+  \title{Fonts in \CONTEXT}
+  \city{Hasselt}
+\stoppublication
+
+\startpublication [
+  k=trunte,
+  t=inproceedings, % bibtex go to hell
+  a={Trunte},
+  y=2005,
+  n=2,
+  s={Altkirchenslavisch},
+]
+  \author[]{Nikolaos H.}[]{}{Trunte}
+  \pubyear{2005}
+  \arttitle{Altkirchenslavisch}
+  \title{\oldrussian{Словѣньскъи ѩꙁъікъ}.  Ein praktisches Lehrbuch des
+         Kirchenslavischen in 30 Lektionen. Zugleich eine
+         Einführung in die slavische Philologie}
+  \edition{3}
+  \city{München}
+\stoppublication
+
+\startpublication [
+  k=zolobov,
+  t=inproceedings,
+  a={Žolobov},
+  y=2006,
+  n=3,
+  s={Čislitelʹnye},
+]
+  \author[]{O. F.}[]{}{Žolobov}
+  \pubyear{2006}
+  \arttitle{Čislitelʹnye}
+  \title{Istoričeskaâ grammatika drevnerusskogo âzyka}
+  \pages{58--63}
+  \editor[]{S.I.}[]{}{Iordanidi}
+  \editor[]{V.B.}[]{}{Krysʹko}
+\stoppublication
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Misc                                                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clubpenalty  -7000
+\widowpenalty -7000
+
+\def\etc{{\italic\letterampersand}c}
+
+\setupindenting [yes,next,medium]
+
+% \sethyphenatedurlnormal{:=?&}
+\sethyphenatedurlbefore{?&abcdefghijklmnopqrstuvwxyz}
+% \sethyphenatedurlafter {:=}
+
+\startasciimode
+\useURL [petr]         [http://www.paratype.ru/e-zine/issue04/peter1/peter1a.htm]
+        []             [\hyphenatedurl{http://www.paratype.ru/e-zine/issue04/peter1/peter1a.htm}]
+
+\useURL [reform1917]   [http://ru.wikipedia.org/wiki/Реформа_русской_орфографии_1918_года]
+        []             [\hyphenatedurl{http://ru.wikipedia.org/wiki/Реформа_русской_орфографии_1918_года}]
+
+\useURL [wp_titlo]     [http://commons.wikimedia.org/wiki/Category:Titlo?uselang=uk]
+        []             [\hyphenatedurl{http://commons.wikimedia.org/wiki/Category:Titlo?uselang=uk}]
+\useURL [rubl’]        [http://ru.wikipedia.org/wiki/Рубль#.D0.92_.D0.98.D0.BC.D0.BF.D0.B5.D1.80.D0.B0.D1.82.D0.BE.D1.80.D1.81.D0.BA.D0.BE.D0.B9_.D0.A0.D0.BE.D1.81.D1.81.D0.B8.D0.B8]
+        []             [\hyphenatedurl{http://ru.wikipedia.org/wiki/Рубль#.D0.92_.D0.98.D0.BC.D0.BF.D0.B5.D1.80.D0.B0.D1.82.D0.BE.D1.80.D1.81.D0.BA.D0.BE.D0.B9_.D0.A0.D0.BE.D1.81.D1.81.D0.B8.D0.B8}]
+\useURL [pttypescript] [http://archive.contextgarden.net/message/20110105.204326.d0228ca7.en.html]
+
+\useURL [phg-mail]     [mailto:megas.kapaneus@gmail.com] [] [\hyphenatedurl{megas.kapaneus@gmail.com}]
+\useURL [phg-bibu]     [https://bitbucket.org/phg/]    [] []
+
+\useURL [cmu-home]     [http://cm-unicode.sourceforge.net/]             [] [\hyphenatedurl{http://cm-unicode.sourceforge.net/}]
+\useURL [cmu-debian]   [http://packages.debian.org/wheezy/fonts-cmu]    [] [\hyphenatedurl{http://packages.debian.org/wheezy/fonts-cmu}]
+\useURL [cmu-arch]     [http://aur.archlinux.org/packages.php?ID=44029] [] [\hyphenatedurl{http://aur.archlinux.org/packages.php?ID=44029}]
+\useURL [cmu-tl]       [http://tug.org/svn/texlive/trunk/Master/texmf-dist/fonts/opentype/public/cm-unicode/]
+        []             [\hyphenatedurl{http://tug.org/svn/texlive/trunk/Master/texmf-dist/fonts/opentype/public/cm-unicode/}]
+\useURL [bukyvede]     [http://kodeks.uni-bamberg.de/aksl/Schrift/BukyVede.htm]
+        []             [\hyphenatedurl{http://kodeks.uni-bamberg.de/aksl/Schrift/BukyVede.htm}]
+\useURL [romancyr]     [http://kodeks.uni-bamberg.de/aksl/Schrift/RomanCyrillicStd.htm]
+        []             [\hyphenatedurl{http://kodeks.uni-bamberg.de/aksl/Schrift/RomanCyrillicStd.htm}]
+\stopasciimode
+
+\pdfcompresslevel9
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Makeup for Front Matter                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definemakeup [FM] [standard]
+\setupmakeup [FM] [
+  width=125mm,
+  height=172.506mm,
+  location=middle,
+]
+
+\setupheadertexts [] [] [] []
+\setuppagenumbering [state=stop,location=]
+
+\startbuffer[showcase1]
+  local tab = { }
+  tab[#tab+1] = [[\placetable[right,3*hang][numval]{Number values of the Cyrillic alphabet.}{\starttabulate[|r|]]..string.rep("l|", 9).."]"
+  tab[#tab+1] = [[\NR\NC $n$]]
+  for i=1, 9 do tab[#tab+1] = [[\NC $]]..i.."$" end
+  tab[#tab+1] = [[\NC\NR\HL\NC $n · 10^0$]]
+  for i=1, 9 do tab[#tab+1] = [[\NC\normaltextcyrnum{]]..i.."}" end
+  tab[#tab+1] = [[\NC\NR\NC $n · 10^1$]]
+  for i=10, 90, 10 do  tab[#tab+1] = [[\NC\normaltextcyrnum{]]..i.."}" end
+  tab[#tab+1] = [[\NC\NR\NC $n · 10^2$]]
+  for i=100, 900, 100 do  tab[#tab+1] = [[\NC\normaltextcyrnum{]]..i.."}" end
+  tab[#tab+1] = [[\stoptabulate\blank[force,2*big]}]]
+  context(table.concat(tab))
+\stopbuffer
+
+\defineframed[showcaseframed][
+  frame=off,
+  loffset=3pt,
+  roffset=\framedparameter{loffset},
+  toffset=\framedparameter{loffset},
+  boffset=\framedparameter{loffset},
+  background=color,
+  backgroundcolor=gray92,
+]
+\startbuffer[titloshowcase]%
+% \placefigure[right,2*hang][mptitlodemo]{Titlo as a matter of taste.}{%
+% \placefigure[][mptitlodemo]{Titlo as a matter of taste.}{%
+\placefigure[top][mptitlodemo]{Titlo as a matter of taste.}{%
+  \showcaseframed[
+    width=\hsize,
+    roffset=\framedparameter{loffset},
+    toffset=6pt,
+  ]{%
+    \tfc%
+    \dorecurse{9}{\normaltextcyrnum[titlo=mp,titlocolor=primarycolor,titlomode=\recurselevel]{42}%
+                  \ifnum\recurselevel=9\else\hfill\fi}%
+  }%
+}%
+\stopbuffer
+
+\startbuffer[titlospanshowcase]%
+\placefigure[left][titlospandemo]{Different titlo spans.}{%
+  \showcaseframed[width=.333\hsize,align=left]{%
+    \type{titlospan}\hfill result\par
+    \dorecurse{6}{%
+      \recurselevel
+      \hfill
+      \normaltextcyrnum[titlo=mp,titlomode=1,titlocolor=primarycolor,titlospan=\recurselevel]{424242}%
+      \ifnum\recurselevel<6\par\fi%
+    }
+  }%
+}%
+\stopbuffer
+
+\startbuffer[penwidthshowcase]%
+\start\setuptolerance[horizontal,tolerant,stretch]%
+% \placetable[left][penwidthdemo]{Comparison of different values for the parameter \type{penwidth}.}{%
+\placetable[middle][penwidthdemo]{Comparison of different values for the parameter \type{penwidth}.}{%
+  \starttabulate[|r|r|l|r|r|l|]%% tabulate sucks hard, just try to use it with a macro that contains a numberconversion and you’ll know why
+    \let\lp\letterpercent
+    \startluacode
+      local max      = 10
+      local step     = .2
+      local dimleft  = .4
+      local f_row = [[\NC \lp d \NC \lp .3fpt \NC \cyrnum[penwidth=\lp dpt]{\lp d} \NC \lp d \NC \lp .3fpt \NC \cyrnum[penwidth=\lp dpt]{\lp d} \AR]]
+      for i=1, max do
+        dimleft = dimleft + step
+        local dimright = dimleft + max * step
+        context(string.format(f_row, i, dimleft, dimleft, i, i+4200, dimright, dimright, i+4200))
+      end
+    \stopluacode
+  \stoptabulate%
+}%
+\stop
+\stopbuffer
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\starttext                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\startfrontmatter
+\setuplayout [width=middle]
+\startFMmakeup
+  \raggedcenter
+  \vfill
+  {\tfc\italic Typesetting}\par
+  \vfill
+  % {\tfd\WORD\largecaps{Cyrillic Numerals}}\par
+  \pompoustitle{Cyrillic Numerals}\par
+  \vfill
+  {\tfc\italic with {\CONTEXT} MkIV}\par
+  \vfill
+  % {\tfa\sc \mediumcaps{A Module}}\par
+  \mediumtitle{A Module}\par
+  \vfill
+\stopFMmakeup
+
+\page
+
+% \def\cyrillicalphabet{%
+%   А,Б,В,Г,Д,Е,Ж,Ѕ,ʐ,И,І,К,Л,М,Н,О,П,Р,С,Т,ОУ,Ф,%
+%   Х,Ѡ,Ц,Ч,Ш,Щ,Ъ,Ы,Ь,Ѣ,Ю,Ι,Ѥ,Ѧ,Ѫ,Ѩ,Ѭ,Ѯ,Ѱ,Ѳ,Ѵ,%
+% }
+
+\def\showoldrussian#1{\begingroup\language[ru]\setupbodyfont[vintagecyrillic]\tfb#1\endgroup}
+\def\numbershowcase{%
+  \bgroup
+  \setupindenting[no]
+  \definecyrnum[showcasecyrnum][
+    dots=yes,
+    titlo=mp,
+    titlomode=\the\thistitlomode,
+    command=\showoldrussian,
+    titlocolor=secondarycolor,
+  ]
+  \newdimen\skipincrement \skipincrement=0.047619047619048\hsize
+  \newdimen\showskip      \showskip=\zeropoint
+  \newconditional\checker \setfalse\checker
+  \newcount\thistitlomode \thistitlomode=1
+  \startlines
+    \dorecurse{20}{%
+      \getrandomcount\thistitlomode{1}{9}%
+      \dontleavehmode\hbox to\showskip{}%
+      \ifconditional\checker
+        \setfalse\checker
+        \colored[primarycolor]{\showcasecyrnum{\recurselevel}}%
+      \else
+        \settrue\checker
+        \showcasecyrnum{\recurselevel}%
+      \fi%
+      \advance\showskip by \skipincrement
+      \crlf%
+    }
+  \stoplines
+  \egroup
+}
+
+\startstandardmakeup
+  \numbershowcase
+  \vfill\raggedright\tfx
+  © 2011--2013 {\italic Philipp Gesang}, Radebeul\par
+  The latest Version can be found at \from [phg-bibu].\par
+  Mail bugs and fixes or complaints and suggestions to \from
+  [phg-mail].\par
+\stopstandardmakeup
+\stopfrontmatter
+
+\startbodymatter
+\page [odd]
+
+\setuppagenumber [number=1]
+\setuppagenumbering [
+  state=start,
+  alternative=doublesided,
+  location={right,header},
+]
+
+\title{Content}
+
+\placelist[chapter,section][criterium=all]
+
+\def\headertextformat{\tfx\word\sc}
+
+\setupheadertexts
+  [{\headertextformat\getmarking[chapter]}] [{\headertextformat\pagenumber}]
+  [{\headertextformat\pagenumber}]          [{\headertextformat\getmarking[chapter]}]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\startchapter[title=Introduction]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \CONTEXT\ format comes with a collection of conversion
+routines for different number systems that are specified in the
+files \type{core-con.mkiv} and \type{core-con.lua}.
+\te{Cyrillic numerals}, however, are not part of this collection.
+The aim of the module at hand is to provide means of handling
+Cyrillic numbers and make them seamlessly integrate with the
+existing interface for number conversion.
+
+If you are familiar with Cyrillic numbers, you might choose to
+skip the rest of this section and instead continue in medias res
+with the description on the module’s usage in the section on
+\about[functionality].
+
+\ctxluabuffer[showcase1]
+\start\setuptolerance[horizontal,verytolerant]%% stupid float
+\indentation The Cyrillic numeral system, like the alphabet
+it is based on, originated from the Greek numerals and thus
+continues many features of the latter.\footnote{%
+  Thorough examinations of how Cyrillic numbers were used in
+  praxi are hard to find.
+  The best that the couple of bookshelfs dedicated to grammar in
+  a local department of Slavonic languages has to offer appears
+  to be \ctay{zolobov}.
+  Another work, \ctay{trunte}, although it follows a less
+  descriptive but rather instructional approach, deserves
+  mentioning as well.
+}
+As with the Roman number system, there are no dedicated glyphs
+reserved for numerals, instead numbers are represented by strings
+of letters from the ordinary alphabet, organized in a peculiar
+way.
+Both systems also have the base (10) in common.
+However, unlike the Roman system Cyrillic numbers are
+\te{positional}, meaning that the numerical value of a digit
+depends on its location relative to the other digits.
+The first nine digits, in ascending order, are:
+\dorecurse{9}{\ifnum\recurselevel=9 and \fi%
+              “\normaltextcyrnum{\recurselevel}”%
+              \ifnum\recurselevel<9, \fi}.
+As you might have noticed, this series does not correspond to the
+first nine glyphs of the Cyrillic alphabet
+(\oldrussian{а б в г д е ж ѕ з}), but rather to the order of the
+original Greek letters from which they were derived
+(\greek{α β γ δ ε ϛ ζ η θ}, with the character \greek{ϛ} at
+position №~6 representing “stigma”).
+The inherited order of numerical values was kept, essentially
+trading backward compatibility for simplicity.
+The two other sets of letters that represent multiples of ten and
+hundred are listed in \in{Table}[numval].
+The digits are written in descending order, beginning with the
+most significant one.
+The numbers from 11 to 19 follow a different rule for their order
+mimicks the spoken language, which means that the \te{less}
+significant digit \te{precedes} the more significant one
+(\dostepwiserecurse{11}{18}{1}{\normaltextcyrnum{\recurselevel}, }%
+\normaltextcyrnum{19}).
+There are no glyphs to represent zeros, so they are simply omitted.
+For example, in the Cyrillic system the number 42 is written as
+\normaltextcyrnum{42}; the lack of a distinct zero sign causes
+402 to have \te{two} digits as well, but the character
+representing the digit 4 is chosen from the hundreds set:
+\normaltextcyrnum{402}.\par
+\stop
+
+% above 10^3
+The rules so far do not allow for numbers above 999.
+To compensate for the lack of additional letters, greater numbers
+are represented by the same glyphs (their value being padded by
+1000).
+There are two ways to avoid confusion: Each digit may be prefixed
+with a special character, the thousands sign \oldrussian{҂}.
+That way, 42 is still written \normaltextcyrnum{42}, but 42~000
+becomes \normaltextcyrnum{42000}, and their sum
+\normaltextcyrnum{42042}.
+But if numbers become bigger, the high digits can take
+alternative ornate forms:
+\space\normaltextcyrnum[preferhundredk=yes]{100000} -- instead of
+\normaltextcyrnum{100000} -- for 100~000, and
+\space\normaltextcyrnum{1000000} for 1~000~000.
+
+% dots, titlo
+In an environment where punctuation was at best minimal and
+interword spacing a luxury, numbers of this kind tend to be
+confused with text.
+Therefore, a Cyrillic number can have additional markers.
+\te{Dots} are used as delimiters before and after a number:
+\normaltextcyrnum[dots=yes]{42}.
+Additionally, a number may be indicated by the \te{titlo}, which
+may span its whole length or just parts of it:
+\normaltextcyrnum[titlo=mp]{42}.
+
+The Cyrillic number module combines all the above mentioned
+aspects into one handy command generator, relying on Lua for the
+conversion routine and \METAPOST\ for the titlo placement.
+With all options in one place, it is trivial to create and
+maintain different conversion settings for different purposes.
+
+\stopchapter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\startchapter[reference=functionality,title=Functionality]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\startsection[title=Setup]
+
+The module is initialized as any other:
+
+\starttyping
+\usemodule[cyrillicnumbers]
+\stoptyping
+
+Once the module code is loaded, the \te{setup} command provides
+means to configure all the functionality it offers.
+
+\showsetup{setupcyrnum}
+
+Let’s walk through the options one by one.\marginhint{dots}
+As was hinted in the introduction a common practice is to delimit
+Cyrillic numbers with dots.
+Dot placement is enabled or disabled by setting the \type{dots}
+key to {\italic yes} or {\italic no} respectively.
+The \type{dotsymbol} key allows the user to supply a delimiter of Eir
+own choice; it defaults to the character “·” (unicode
+{\sc u+00b7}).\marginhint{dotsymbol}
+If a font doesn’t contain a glyph for this code point or for
+whatever reason another symbol is required, the solution will
+look like this: \type{\setupcyrnum[dots=yes,dotsymbol=\cdot]}.
+The result of this modification looks as follows:
+\normaltextcyrnum[dots=yes,dotsymbol=\cdot]{42}.
+As the dot can be an arbitrary symbol, it could be replaced by
+the asterisk: \normaltextcyrnum[dots=yes,dotsymbol=*]{42}, or --
+even weirder -- the hash character (“Gartenzaun”):
+\normaltextcyrnum[dots=yes,dotsymbol=\#]{42}.
+
+In order to notate the sixth decimal digit (for multiples of one
+hundred million) there are two mutually excluding
+options\marginhint{preferhundredk}: either the hundred thousands
+sign or the thousands prefix may be employed.
+Thus, the setup key \type{preferhundredk} determines which one
+will be chosen. If set to {\italic yes}, then it’s going to be
+the houndred thousands sign, else the regular thousands sign:
+\normaltextcyrnum[preferhundredk=yes]{900000} $=$
+\normaltextcyrnum[preferhundredk=no] {200000} $+$
+\normaltextcyrnum[preferhundredk=no] {700000}.
+(As is obvious from this example, the visual quality of the
+houndred thousands sign, which is a separate glyph, depends on
+the font used.)
+
+Not every font contains proper glyphs for the entire Cyrillic unicode
+range, in fact every dedicated font for a single Cyrillic alphabet --
+contemporary Russian, say -- might not contain all the characters needed
+to represent every Cyrillic numeral.\marginhint{command}
+This is the result of the historical development the respective
+scripts went through.
+This process usually lead to the elimination of several glyphs at
+different stages of the development.
+For example the Russian alphabet experienced one significant
+reduction of letters at the hand of emperor Peter~I\footnote{%
+  For an overview cf. \from[petr] or just google
+  \quotation{\russian{гражданский шрифт}}.
+}
+and another later in 1917 as a consequence of -- not only --
+the revolution.\footnote{%
+  Cf. \from[reform1917].
+}
+Thus, chances are that in order to represent Cyrillic numbers,
+which rely on a superset of the modern Russian alphabet, another
+font needs to be chosen.\footnote{%
+  Font fallbacks are another option if the substitutes match the
+  main font typographically; see \ctay{fonts}, pp. 97--99.
+}
+The Cyrillic Numbers module provides a hook for this kind of
+customization: you may define your own font switching macro and
+assign it to the \type{command} key of the setup.
+Suppose you decide to typeset your numbers using the Paratype
+Serif font.\footnote{%
+  A typescript can be found on the \CONTEXT\ mailing list:
+  \from[pttypescript]. Keep in mind that ParaType Serif itself is
+  not a particularly suitable number font as it does not contain
+  all required glyphs.
+}
+
+\starttyping
+
+%%% 1. Load the module and the font.
+\usemodule         [cyrillicnumbers]
+\usetypescriptfile [type-paratype.mkiv]
+
+%%% 2. Define the font and a command that switches to it.
+\definetypeface [numberfont] [rm]      [serif]
+                [paratype]   [default] []
+\unexpanded\define[1]\numbercommand{%
+  \begingroup
+    \language[ru]%
+    \setupbodyfont[numberfont]%
+    #1%
+  \endgroup%
+}
+
+%%% 3. Hook the command into our converter.
+\setupcyrnum [dots=yes,command=\numbercommand]
+
+%%% 4. Use as needed.
+\starttext
+Normal text \cyrnum{42} \dots
+\stoptext
+
+%%% 5. ????
+
+%%% 6. Profit!!!!!
+
+\stoptyping
+
+Naturally, the \type{command} may do anything that fits inside a
+one-argument macro, from coloring (\rednum[titlo=no]{42}) to case
+manipulation
+(\normaltextcyrnum[command=\WORD\oldrussian]{42}).
+
+The key \type{titlo} controls the placement and, if applicable,
+placement method of the
+\cyrnumdrawtitlo{\te{titlo}}.\marginhint{titlo}
+The two valid method identifiers are {\italic mp} and {\italic
+font}, everything else will be interpreted as {\italic no}, e.~g.
+the titlo will be omitted.
+The latter method, {\italic font}, takes the titlo glyph as
+supplied by the font file (code point U+483).
+The main drawback of this solution is that to my knowledge the
+font titla are designed to span a single character only.
+As the titlo belongs to the class of combining characters, in the
+stream of unicode glyphs it will be \te{appended} to the
+character above which it is placed.
+Thus, multi-digit Cyrillic numbers (i.~e. essentially any number
+with two or more non-zero digits) won’t be represented in an
+optimal way: \normaltextcyrnum[titlo=font]{42}.
+There is a further option, \type{titlolocation}, which controls
+the placement of a font specific titlo.\marginhint{titlolocation}
+The three possible values specify a position
+{\italic first}:  \normaltextcyrnum[titlo=font, titlolocation=first]{4242},
+{\italic middle}: \normaltextcyrnum[titlo=font,titlolocation=middle]{4242}, and
+{\italic final}:  \normaltextcyrnum[titlo=font, titlolocation=final]{4242}.
+(For even character counts, the {\italic middle} argument will
+pick one place to the right of the exact middle.)
+
+\getbuffer[titloshowcase]
+\getbuffer[titlospanshowcase]\indentation An alternative to the
+font titlo is provided by the {\italic mp} variant which uses
+\METAPOST\ to actually \te{draw} a titlo above the string of
+digits.
+Not only does this titlo cover the entire numeral, it also comes
+in a variety of drawing routines.
+At the moment there are nine more or less different titla you
+may choose from as demonstrated in \in{figure}[mptitlodemo].
+These can be enabled on via the \type{titlomode} key.
+(Observant users will have recognized mode 8 as the old Rubl’
+sign:
+\normaltextcyrnum[titlo=mp,titlomode=8,penwidth=.21]{42}.\footnote{%
+  Cf. \from[rubl’].
+})
+The range of digits to be covered by the titlo can be customized
+by passing the parameter \type{titlospan} an integer.
+The default value of 3 results in the titlo spanning at maximum the
+least significant three digits, because these will not be prefixed
+by a thousands sign.\marginhint{titlomode,titlospan}
+If the user wants the numeral to be covered as a whole, E can
+simply pass the value {\italic all}.
+Beware that the dimensions of the titlo are proportional to the
+width of the numeral.
+Therefore, sufficiently wide (in terms of non-zero digits)
+numbers will cause the titlo to shrink horizontally as seen in
+\in{figure}[titlospandemo].
+E.~g. for the single digit number
+\normaltextcyrnum[titlo=mp,titlomode=5]{1} the titlo even exceeds
+the character it sits on, while it does not entirely cover the
+five digits plus two thousand signs of
+\normaltextcyrnum[titlo=mp,titlospan=all,titlomode=5]{54321}.
+When using the {\italic mp} titlo the color of this element can
+be chosen separately by passing a valid color identifier to the
+\type{titlocolor} key.\marginhint{titlocolor}
+The following example code demonstrates the colorization and
+drawing facilities.
+
+\starttyping
+
+\usemodule [cyrillicnumbers]
+\setupbodyfont [computer-modern-unicode]
+\setupcyrnum [
+  titlo=mp,
+  titlocolor=blue,
+  titlospan=all,
+  titlomode=7,
+]
+
+\starttext
+\startlines
+\cyrnum                                    {42}
+\cyrnum   [titlocolor=red,titlomode=9] {141213}
+\cyrnum [titlocolor=green,titlomode=2] {271828}
+\cyrnum  [titlocolor=cyan,titlomode=4] {314159}
+\stoplines
+\stoptext
+
+\stoptyping
+
+\indentation The \METAPOST\ method also comes with a key
+\type{penwidth}\marginhint{penwidth}, which rather obviously determines
+the width of the pen that is used when drawing a titlo.
+Finding the optimal width can involve a lot of testing on the
+user’s side; as a rule, the greater the font size, the wider the
+pen should be.
+Refer to \in{table}[penwidthdemo] for a demonstration of
+different values for this parameter.
+\getbuffer[penwidthshowcase]
+
+\stopsection
+
+\startsection[title=Predefined Commands]
+
+Once the module is loaded, the commands \type{\cyrnum} and
+\type{\cyrnumdrawtitlo} will have been predefined.
+
+\showsetup{cyrnum}
+
+\type{\cyrnum} is the default Cyrillic number macro. It is
+fully functional, meaning that besides converting a nonnegative
+integer into a Cyrillic numeral, it takes a key-value set of
+options as an optional first argument.
+
+\starttyping
+\usemodule[cyrillicnumbers]
+\starttext
+
+\cyrnum{1}
+
+\cyrnum[titlo=mp,titlomode=4]{42}
+
+\cyrnum{15}
+
+\stoptext
+\stoptyping
+
+Any of the abovementioned settings can be specified in the first
+argument.
+As customary with \CONTEXT\ macros, these additional settings are
+local to one instance.
+Further calls to the macro won’t be affected, unless they are
+explicitly applied via \type{\setupcyrnum},
+
+The use of \te{titla} is not restricted to indicating numerals.
+In addition it is often employed as a kind of emphasis in
+handwritten text where it is not easy to achieve visual
+distinction by font switching.
+Also, the titlo serves as a default marker for abbreviations as
+in  \oldrussian{благодѣть} \rightarrow\space
+\oldrussian{\cyrnumdrawtitlo{блг}одѣть}.
+
+\showsetup{cyrnumdrawtitlo}
+
+This is where the macro \type{\cyrnumdrawtitlo} comes into play.
+For instance, designations of things considered “sacred” are
+highlighted by default in some texts.
+Because they appear very frequently, they were shortened as
+well, like \oldrussian{господь}
+\rightarrow\space\oldrussian{\cyrnumdrawtitlo{гь}}.\footnote{%
+  Examples taken from \from[wp_titlo].
+}
+
+\starttyping
+господь   ->\cyrnumdrawtitlo{гь}
+
+благодѣть -> \cyrnumdrawtitlo{блг}одѣть
+\stoptyping
+
+\stopsection
+
+\startsection[title=Command Derivation]
+
+There is no need to reconfigure the \type{\cyrnum} macro whenever
+you intend to deviate from the presets.
+Instead, special purpose commands can be defined via
+\type{\definecyrnum}.
+
+\showsetup{definecyrnum}
+
+All the options that can be passed to \type{\definecyrnum} are
+also valid for derived macros; they inherit the setups of
+the macros they are derived from.
+A full example to play with is given in below listing:
+
+\starttyping
+\usemodule[cyrillicnumbers]
+\setupbodyfont[computer-modern-unicode]
+
+\definecyrnum[mynumone][titlo=no,dots=no]
+
+\definecyrnum[mynumtwo][mynumone]
+\setupcyrnum [mynumtwo][titlo=mp,titlomode=2,titlocolor=red]
+
+\definecyrnum[mynumthree][mynumtwo]
+\setupcyrnum [mynumthree][titlomode=4,dots=yes]
+
+\starttext
+
+\mynumone{42}
+\mynumtwo{42}
+\mynumthree{42}
+
+\stoptext \endinput
+\stoptyping
+
+\start
+  \definecyrnum[mynumone][titlo=no,dots=no]
+
+  \definecyrnum[mynumtwo][mynumone]
+  \setupcyrnum [mynumtwo][titlo=mp,titlomode=2,titlocolor=red]
+
+  \definecyrnum[mynumthree][mynumtwo]
+  \setupcyrnum [mynumthree][titlomode=4,dots=yes]
+
+  \noindentation Which results in:
+  \mynumone{42}
+  \mynumtwo{42}
+  \mynumthree{42}.
+\stop
+
+\stopsection
+
+\stopchapter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\startchapter[reference=usage,title=Usage and Precautions]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\startsection[title=Counters]
+The macros created by \type{\definecyrnum} are generic conversion
+commands.
+As such, they can be hooked into any functionality that outputs
+integers of some sort: document structure elements, page numbers
+{\italic\letterampersand}c.
+In order to have \CONTEXT\ recognize your personal Cyrillic
+number macro as a converter you need the macro
+\type{\defineconversion}.
+
+\starttyping
+\usemodule [cyrillicnumbers]
+\setupbodyfont [computer-modern-unicode]
+
+%%% 1. Define a number converter.
+\definecyrnum [neatsections] [
+  dots=yes,
+  titlo=mp,
+  titlomode=7,
+]
+
+%%% 2. Register the converter.
+\defineconversion [my_section_conversion] [\neatsections]
+
+%%% 3. Insert it into a structure set.
+\definestructureconversionset [my_section_set]
+  [numbers,my_section_conversion] [my_section_conversion]
+
+%%% 4. Use the set in your chapter command.
+\definehead [mychapter] [chapter]
+\setuphead  [mychapter] [
+  sectionconversionset=my_section_set,
+  page=no,
+]
+
+\starttext
+
+\dorecurse{10}{%
+  \startmychapter[title=foo]
+    \input knuth
+  \stopmychapter
+}
+
+\stoptext \endinput
+\stoptyping
+
+\stopsection
+
+% \startsection[title=The Titlo]
+% \stopsection
+
+\startsection[title=Font Issues]
+
+Although not the entire Cyrillic alphabet is needed to represent
+the numerals, they involve certain characters which are uncommon
+in contemporary languages.
+Therefore they are usually omitted in Cyrillic fonts, which leads
+to the problem of finding an adequate font.
+A matching superset of Knuth’s typeface is {\italic Computer Modern
+Unicode} which is part of \TEX Live and packaged for many
+distributions.\footnote{%
+  Home:       \from[cmu-home];
+  \TEX Live:  \from[cmu-tl];
+  Arch:       \from[cmu-arch];
+  Debian:     \from[cmu-debian].
+}
+CMU is SIL-OpenFont licensed; it has been used in some of the
+above examples.
+
+There are alternatives offering glyph shapes that resemble the
+hand written script of Old Slavonic codices.
+One of them is the beautiful {\italic BukyVede} which has been
+used as the main Cyrillic font throughout the text.
+It was created by the Codex project of the Bamberg
+University\footnote{%
+  Home: \from[bukyvede].
+}
+but unfortunately the licensing terms are imprecise (non-free).
+Its authors offer another font matching the popular Times
+typeface under a yet more restrictive license.\footnote{%
+  Home: \from[romancyr].
+}
+
+\stopsection
+
+\stopchapter
+
+\stopbodymatter
+
+\startbackmatter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\startchapter[title=License]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Copyright 2011--2013 \te{Philipp Gesang}. All rights reserved.
+
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the following
+conditions are met:
+
+\startitemize[n]
+  \item Redistributions of source code must retain the above
+    copyright notice, this list of conditions and the following
+    disclaimer.
+  \item Redistributions in binary form must reproduce the
+    above copyright notice, this list of conditions and the
+    following disclaimer in the documentation and/or other
+    materials provided with the distribution.
+\stopitemize
+
+\begingroup
+\setuptolerance [horizontal,strict]
+\startalignment [right,nothyphenated]
+\noindentation\sc\startsmallcaps
+  this software is provided by the copyright
+  holder “as is” and any express or implied warranties,
+  including, but not limited to, the implied warranties of
+  merchantability and fitness for a particular purpose are
+  disclaimed. in no event shall the copyright holder or
+  contributors be liable for any direct, indirect, incidental,
+  special, exemplary, or consequential damages (including, but
+  not limited to, procurement of substitute goods or services;
+  loss of use, data, or profits; or business interruption)
+  however caused and on any theory of liability, whether in
+  contract, strict liability, or tort (including negligence or
+  otherwise) arising in any way out of the use of this software,
+  even if advised of the possibility of such damage.
+\stopsmallcaps\endgraf
+\stopalignment
+\endgroup
+
+\stopchapter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\startchapter[title=References]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\startbibindent
+  \placepublications[criterium=all]
+\stopbibindent
+
+\stopchapter
+
+\stopbackmatter
+
+\stoptext

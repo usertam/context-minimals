@@ -1,0 +1,68 @@
+%D \module
+%D   [     file=type-imp-verajja,
+%D      version=2010.09.14,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Verajja Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [verajja]
+
+\starttypescript [\s!serif] [verajja]
+    \definefontsynonym [VerajjaSerif-Regular]    [\s!file:verajjaserifregular]    [\s!features=\s!default]
+    \definefontsynonym [VerajjaSerif-Italic]     [\s!file:verajjaserifitalic]     [\s!features=\s!default]
+    \definefontsynonym [VerajjaSerif-Bold]       [\s!file:verajjaserifbold]       [\s!features=\s!default]
+    \definefontsynonym [VerajjaSerif-BoldItalic] [\s!file:verajjaserifbolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [verajja]
+    \setups[\s!font:\s!fallback:\s!serif]
+    \definefontsynonym [\s!Serif]           [VerajjaSerif-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SerifItalic]     [VerajjaSerif-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold]       [VerajjaSerif-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBoldItalic] [VerajjaSerif-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [verajja]
+    \definefontsynonym [VerajjaSans-Regular]    [\s!file:verajjaregular]    [\s!features=\s!default]
+    \definefontsynonym [VerajjaSans-Italic]     [\s!file:verajjaitalic]     [\s!features=\s!default]
+    \definefontsynonym [VerajjaSans-Bold]       [\s!file:verajjabold]       [\s!features=\s!default]
+    \definefontsynonym [VerajjaSans-BoldItalic] [\s!file:verajjabolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [verajja]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [VerajjaSans-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]     [VerajjaSans-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [VerajjaSans-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [VerajjaSans-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [verajja]
+    \definetypeface [verajja] [rm] [\s!serif] [verajja] [\s!default]
+    \definetypeface [verajja] [ss] [\s!sans]  [verajja] [\s!default]
+    \definetypeface [verajja] [tt] [\s!mono]  [modern]  [\s!default]
+    \definetypeface [verajja] [mm] [\s!math]  [modern]  [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

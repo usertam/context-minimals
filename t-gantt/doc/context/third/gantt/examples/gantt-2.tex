@@ -1,0 +1,25 @@
+\usemodule[gantt]
+%\usemodule[gantt][alternative=mp]
+%\usemodule[gantt][alternative=tikz]
+\setuppagenumbering[location=]
+
+\starttext
+  \startgantt{3}{12}
+    \startganttitle
+      \titleelement{Jan}{1}
+      \titleelement{Feb}{1}
+      \titleelement{Mar}{1}
+      \titleelement{Apr}{1}
+      \titleelement{May}{1}
+      \titleelement{Jun}{1}
+      \titleelement{Jul}{1}
+      \titleelement{Aug}{1}
+      \titleelement{Sep}{1}
+      \titleelement{Oct}{1}
+      \titleelement{Nov}{1}
+      \titleelement{Dec}{1}
+    \stopganttitle
+    \ganttbar{Task 1}{0}{2}
+    \ganttbarcon{a consecutive task}{2}{4}
+  \stopgantt
+\stoptext

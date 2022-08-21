@@ -1,0 +1,341 @@
+%D \module
+%D   [     file=s-cor-03,
+%D      version=2012.12.13,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Resume,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\unprotect
+
+\startmodule[resume]
+
+\usemodule[cor-00]
+
+\setupmodule
+  [\c!style=]
+
+% Namespaces
+
+\installnamespace {resumelayerrenderings}
+\installnamespace {resumesectionrenderings}
+
+% Commands
+
+\definecorrespondence[\v!resume]
+
+\def\defineresumelayer                {\dodoubleargument\correspondence_layer_define                 [\v!resume]}
+\def\defineresumesection              {\dodoubleargument\correspondence_section_define               [\v!resume]}
+\def\defineresumedescription          {\dodoubleargument\correspondence_description_define           [\v!resume]}
+\def\defineresumehead                 {\dodoubleargument\correspondence_head_define                  [\v!resume]}
+\def\defineresumeparagraph            {\dodoubleargument\correspondence_paragraph_define             [\v!resume]}
+
+\def\defineresumelayeralternative     {\doquadrupleempty\correspondence_layer_alternative_define     [\v!resume]}
+\def\defineresumesectionalternative   {\doquadrupleempty\correspondence_section_alternative_define   [\v!resume]}
+\def\defineresumeheadalternative      {\doquadrupleempty\correspondence_head_alternative_define      [\v!resume]}
+\def\defineresumeparagraphalternative {\doquadrupleempty\correspondence_paragraph_alternative_define [\v!resume]}
+
+\def\defineresumeelements             {\dotripleargument\correspondence_elements_define              [\v!resume]}
+\def\setupresumeelements              {\dotripleargument\correspondence_elements_define              [\v!resume]}
+
+\def\setupresumestyle                 {\dotripleargument\correspondence_style_setup                  [\v!resume]}
+\def\setupresumelayer                 {\dotripleargument\correspondence_layer_setup                  [\v!resume]}
+\def\setupresumeframe                 {\dotripleargument\correspondence_frame_setup                  [\v!resume]}
+\def\setupresumelayout                {\dotripleargument\correspondence_layout_setup                 [\v!resume]}
+\def\setupresumesection               {\dotripleargument\correspondence_section_setup                [\v!resume]}
+\def\setupresumedescription           {\dotripleargument\correspondence_description_setup            [\v!resume]}
+\def\setupresumehead                  {\dotripleargument\correspondence_head_setup                   [\v!resume]}
+\def\setupresumeparagraph             {\dotripleargument\correspondence_paragraph_setup              [\v!resume]}
+\def\setupresumeoptions               {\dodoubleargument\correspondence_option_setup                 [\v!resume]}
+
+\def\setupresumelayeralternative      {\dotripleargument\correspondence_layer_alternative_setup      [\v!resume]}
+\def\setupresumesectionalternative    {\dotripleargument\correspondence_section_alternative_setup    [\v!resume]}
+\def\setupresumeheadalternative       {\dotripleargument\correspondence_head_alternative_setup       [\v!resume]}
+\def\setupresumeparagraphalternative  {\dotripleargument\correspondence_paragraph_alternative_setup  [\v!resume]}
+
+\def\useresumestyle                   {\dodoubleargument\correspondence_file_load                    [\v!resume]}
+
+\def\defineresumeelement              {\doquadrupleargument\correspondence_element_define            [\v!resume]}
+\def\resumeelement                    {\doquadrupleargument\correspondence_element_place             [\v!resume]}
+
+\def\namedresumelayerparameter    #element{\namedcorrespondencelayerparameter    {\v!resume:#element}}
+\def\namedresumeframeparameter    #element{\namedcorrespondenceframeparameter    {\v!resume:#element}}
+\def\namedresumesectionparameter  #element{\namedcorrespondencesectionparameter  {\v!resume:#element}}
+\def\namedresumeparagraphparameter#element{\namedcorrespondenceparagraphparameter{\v!resume:#element}}
+
+% Heading
+
+\defineresumehead [\v!resume\v!section]
+\defineresumehead [\v!resume\v!subsection]
+
+% Paragraphs
+
+\defineresumeparagraph [\v!resume\v!paragraph]
+\defineresumeparagraph [\v!two\v!columns]
+\defineresumeparagraph [\v!three\v!columns]
+
+% Layers
+
+\defineresumelayer [\v!head]
+\defineresumelayer [\v!nexthead]
+\defineresumelayer [\v!lefthead]
+\defineresumelayer [\v!righthead]
+
+\defineresumelayer [\v!foot]
+\defineresumelayer [\v!nextfoot]
+\defineresumelayer [\v!leftfoot]
+\defineresumelayer [\v!rightfoot]
+
+\defineresumelayer [\v!topmark]
+\defineresumelayer [\v!botmark]
+\defineresumelayer [\v!cutmark]
+\defineresumelayer [\v!endmark]
+\defineresumelayer [\v!usermark]
+
+\defineresumelayer [\v!resumemain]
+\defineresumelayer [\v!resumenext]
+
+% Section
+
+\defineresumesection [\v!head]
+\defineresumesection [\v!content]
+\defineresumesection [\v!closing]
+
+% Setups
+
+% layer: head
+
+% setups -> see s-cor-00.mkvi
+
+% layer: nexthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: lefthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: righthead
+
+% setups -> see s-cor-00.mkvi
+
+% layer: foot
+
+\defineresumelayeralternative[\v!foot:\v!casual][\c!renderingsetup=\????resumelayerrenderings:\v!foot:\v!casual]
+
+\def\resumefootalternativecasual[#1][#2]% Can I make a generic version?
+  {\bgroup
+   \def\resumefootalternativecasual##1%
+     {\doifresumevalue{##1}{\advance\scratchcounter\plusone}}%
+   \def\doresumefootsingleelement##1%
+     {\doifresumevalue{##1}{\attributedresumevalue{#1}}}%
+   \def\doresumefootmultipleelement##1%
+     {\doifresumevalue{##1}
+        {\advance\scratchcounter\plusone
+         \attributedresumevalue{##1}
+         \unless\ifnum\scratchcounter=\resumefootvalues
+           #2%
+         \fi}}%
+   \scratchcounter\zerocount
+   \processcommalist[#1]\resumefootalternativecasual
+   \edef\resumefootvalues{\number\scratchcounter}%
+   \scratchcounter\zerocount
+   \ifnum\resumefootvalues>0
+     \ifnum\resumefootvalues=1
+       \processcommalist[#1]\doresumefootsingleelement
+     \else
+       \processcommalist[#1]\doresumefootmultipleelement
+     \fi
+   \fi
+   \egroup}
+
+\def\m_correspondence_resume_foot_casual#element%
+  {\ifvoid\scratchboxone
+     \doifsomething{\correspondenceparameter{#element}}{\setbox\scratchboxone\hbox{\formattedcorrespondenceparameter{#element}}}%
+   \else
+     \doifsomething{\correspondenceparameter{#element}}
+       {\setbox\scratchboxtwo\box\scratchboxone
+        \setbox\scratchboxone\hbox{\copy\scratchboxtwo \quad\color[resume:separator]{\symbol[bullet]}\quad \formattedcorrespondenceparameter{#element}}%
+        \ifdim\wd\scratchboxone>\hsize
+          \unhbox\scratchboxtwo\endgraf
+          \setbox\scratchboxone\hbox{\formattedcorrespondenceparameter{#element}}%
+        \fi}%
+    \fi}
+
+\startsetups[\????resumelayerrenderings:\v!foot:\v!casual]
+  \doifsomething{\correspondenceparameter{street}}
+    {\formattedcorrespondenceparameter{street}
+     \doifsomething{\correspondenceparameter{town}}{\quad\color[resume:separator]{\symbol[dash]}\quad}}
+  \doifsomething{\correspondenceparameter{town}}{\formattedcorrespondenceparameter{town}}
+  \par
+  \setbox\scratchboxone\box\voidbox
+ %\processcommalist[mobile,phone,fax,email,info]\m_correspondence_resume_foot_casual
+  \processcommacommand[\correspondencelayerparameter\c!list]\m_correspondence_resume_foot_casual
+  \unhbox\scratchboxone
+\stopsetups
+
+% layer: nextfoot
+
+\defineresumelayeralternative[\v!nextfoot:\v!casual ][\c!renderingsetup=\????resumelayerrenderings:\v!nextfoot:\v!casual ]
+\defineresumelayeralternative[\v!nextfoot:\v!classic][\c!renderingsetup=\????resumelayerrenderings:\v!nextfoot:\v!classic]
+
+\startsetups[\????resumelayerrenderings:\v!nextfoot:\v!casual]
+  \color[resume:address]{\it\subpagenumber/\lastsubpagenumber}
+\stopsetups
+
+\startsetups[\????resumelayerrenderings:\v!nextfoot:\v!classic]
+  \color[resume:quote]{\it\subpagenumber/\lastsubpagenumber}
+\stopsetups
+
+% layer: topmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: botmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: cutmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: endmark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: usermark
+
+% setups -> see s-cor-00.mkvi
+
+% layer: resumemain
+
+% setups -> see s-cor-00.mkvi
+
+% layer: resumenext
+
+% setups -> see s-cor-00.mkvi
+
+% section: head
+
+\defineresumesectionalternative[\v!head:\s!default][\c!renderingsetup=\????resumesectionrenderings:\v!head:\s!default]
+
+\startsetups[\????resumesectionrenderings:\v!head:\s!default]
+  \def\\{\correspondencesectionparameter\c!separator}
+  \correspondenceparameter\c!fromaddress
+\stopsetups
+
+\defineresumesectionalternative[\v!head:\v!casual][\c!renderingsetup=\????resumesectionrenderings:\v!head:\v!casual]
+
+\startsetups[\????resumesectionrenderings:\v!head:\v!casual]
+  \hbox to\hsize\bgroup
+    \doifsomething{\correspondenceparameter{image}}
+      {\framed[\c!offset=2\points,\c!strut=\v!no,\c!framecolor=resume:forename]{\correspondenceparameter{image}}}
+    \hfill
+    \hbox\bgroup
+      \formattedcorrespondenceparameter{firstname}
+      \space
+      \formattedcorrespondenceparameter{familyname}
+    \egroup
+  \egroup
+  \vskip-\baselineskip
+  \blank[\v!medium]
+  \blackrule[\c!height=2\linewidth,\c!width=\hsize,\c!color=resume:1]
+  \doifsomething{\correspondenceparameter{quote}}
+    {\blank[\v!line]
+     \midaligned{\formattedcorrespondenceparameter{quote}}}
+\stopsetups
+
+\defineresumesectionalternative[\v!head:\v!classic][\c!renderingsetup=\????resumesectionrenderings:\v!head:\v!classic]
+
+\startsetups[\????resumesectionrenderings:\v!head:\v!classic]
+  \hbox to \hsize\bgroup
+    \vbox\bgroup
+      \hbox{\formattedcorrespondenceparameter{firstname}\space\formattedcorrespondenceparameter{familyname}}
+      \doifsomething{\correspondenceparameter{title}}
+        {\blank[\v!medium]
+         \hbox{\formattedcorrespondenceparameter{title}}}
+    \egroup
+    \hfill
+    \startframed[\c!location=\v!bottom,\c!align=\v!left,\c!width=\v!fit,\c!frame=\v!off]
+      \doifsomething{\correspondenceparameter{street}}{\formattedcorrespondenceparameter{street}\\}
+      \doifsomething{\correspondenceparameter  {town}}{\formattedcorrespondenceparameter  {town}\\}
+      \doifsomething{\correspondenceparameter{mobile}}{\formattedcorrespondenceparameter{mobile}\\}
+      \doifsomething{\correspondenceparameter {phone}}{\formattedcorrespondenceparameter {phone}\\}
+      \doifsomething{\correspondenceparameter   {fax}}{\formattedcorrespondenceparameter   {fax}\\}
+      \doifsomething{\correspondenceparameter {email}}{\formattedcorrespondenceparameter {email}\\}
+      \doifsomething{\correspondenceparameter  {info}}{\formattedcorrespondenceparameter  {info}\\}
+    \stopframed
+    \doifsomething{\correspondenceparameter{image}}
+      {\quad
+       \framed[\c!offset=2\points,\c!strut=\v!no]{\correspondenceparameter{image}}}
+  \egroup
+\stopsetups
+
+% section: content
+
+\defineresumesectionalternative[\v!content:\s!default][\c!renderingsetup=\????resumesectionrenderings:\v!content:\s!default]
+
+\startsetups[\????resumesectionrenderings:\v!content:\s!default]
+  \getbufferdata[\????correspondencebuffer\v!resume]
+\stopsetups
+
+% section: closing
+
+% setups -> see s-cor-00.mkvi
+
+% paragraph:
+
+
+
+% Extras
+
+\appendtoks
+  \ifx\currentcorrespondence\v!resume
+    \doif{\correspondenceoptionparameter\c!marking}\v!no{\setupresumelayer[\v!topmark,\v!botmark,\v!cutmark,\v!endmark,\v!usermark][\c!state=\v!stop]}%
+  \fi
+\to \t_correspondence_before
+
+\appendtoks
+  \ifx\currentcorrespondence\v!resume
+    \edef\p_correspondence_option_position{\correspondenceoptionparameter\c!position}%
+    \ifx\p_correspondence_option_position\v!yes % low level code, I need a better solution for this!
+      \setbox\scratchbox\vbox
+        {\edef\currentcorrespondencelayer      {\v!resume:\v!head}%
+         \edef\currentcorrespondenceenvironment{\v!resume}%
+         \correspondence_layer_alternative_place}%
+      \normalexpanded
+        {\setupresumelayout
+           [\v!firstpage]
+           [\c!topspace=\dimexpr\namedresumelayerparameter\v!head\c!y+\ht\scratchbox+\namedresumelayerparameter\v!head\c!distance\relax]}%
+    \fi
+  \fi
+\to \t_correspondence_before
+
+% Labels
+
+\definelabelclass[resume]
+
+% Files
+
+\useresumestyle[default,\currentmoduleparameter\c!style]
+
+\stopmodule
+
+\protect \endinput

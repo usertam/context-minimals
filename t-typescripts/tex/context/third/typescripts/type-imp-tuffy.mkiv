@@ -1,0 +1,50 @@
+%D \module
+%D   [     file=type-imp-tuffy,
+%D      version=2010.09.15,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Tuffy Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [tuffy]
+
+\starttypescript [\s!sans] [tuffy]
+    \definefontsynonym [Tuffy-Regular]    [\s!file:tuffy]           [\s!features=\s!default]
+    \definefontsynonym [Tuffy-Italic]     [\s!file:tuffyitalic]     [\s!features=\s!default]
+    \definefontsynonym [Tuffy-Bold]       [\s!file:tuffybold]       [\s!features=\s!default]
+    \definefontsynonym [Tuffy-BoldItalic] [\s!file:tuffybolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [tuffy]
+    \setup[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [Tuffy-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]     [Tuffy-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [Tuffy-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [Tuffy-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [tuffy]
+    \definetypeface [tuffy] [ss] [\s!sans] [tuffy] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

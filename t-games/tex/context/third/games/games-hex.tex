@@ -1,0 +1,119 @@
+%D \module
+%D   [       file=games-hex,
+%D        version=2008.10.29,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Hex,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D          email=schuster.wolfgang@googlemail.com,
+%D      copyright=Wolfgang Schuster]
+
+\writestatus{loading}{Context User Module / Games - Hex}
+
+\unprotect
+
+\definegame[\v!hexgame][\v!hex]
+
+\def\sgfchar#1%
+  {\ifnum#1<9
+     \char\number\numexpr#1+64\relax
+   \else\ifnum#1<26
+     \char\number\numexpr#1+65\relax
+   \fi\fi}
+
+\def\hex!commands
+  {newboard,drawboard,player}
+
+\def\hex!copygamecommands
+  {\expanded{\copyparameters[][hex!][\hex!commands]}}
+
+\setvalue{\e!begin\????gm\????gm\v!hex}%
+  {\hex!copygamecommands
+   \hex!boardsize
+   \hex!gamevalues}
+
+\defineoverlay[overlay:hex][\overlaybutton{JS(Walk_Field{games!hex})}]
+
+\setvalue{\e!end\????gm\????gm\v!hex}%
+  {\doif{\gameparameter\c!interactive}\v!yes\hex!fieldstack}
+
+\def\hex!fieldstack
+  {\expanded{\definefieldstack[games!hex][\hex!list!symbols][\c!frame=\v!off]}%
+   \framed
+     [\c!frame=\v!off,
+      \c!background={foreground,overlay:hex},
+      \c!offset=\v!overlay]
+     {\fieldstack[games!hex]}}
+
+\def\hex!boardsize % what are common values for hex
+  {\assignvalue{\gameparameter\c!nx}\hex!board!nx{11}{14}{19}%
+   \assignvalue{\gameparameter\c!ny}\hex!board!ny{11}{14}{19}%
+   \ctxlua{thirddata.games.hex.setup.nx = \number\hex!board!nx }%
+   \ctxlua{thirddata.games.hex.setup.ny = \number\hex!board!ny }}
+
+\def\hex!gamevalues
+  {\startlua
+   thirddata.games.hex.setup.size     = \number\dimexpr\gameparameter\c!stonesize\relax     ;
+   thirddata.games.hex.setup.dx       = \number\dimexpr\gameparameter\c!dx\relax            ;
+   thirddata.games.hex.setup.dy       = \number\dimexpr\gameparameter\c!dy\relax            ;
+   thirddata.games.hex.setup.offset   = \number\dimexpr\gameparameter\c!frameoffset\relax   ;
+   thirddata.games.hex.setup.distance = \number\dimexpr\gameparameter\c!labeldistance\relax ;
+   \stoplua}
+
+%D User commands
+
+\def\hex!newboard
+  {\ctxlua{thirddata.games.hex.board_new()}}
+
+\def\hex!drawboard
+  {\doifnot{\gameparameter\c!interactive}\v!yes
+     {\hex!setboard{0}%
+      \hex!getboard{0}}}
+
+\def\hex!setboard#1%
+  {\ctxlua{thirddata.games.hex.board_draw("games:hex:#1")}}
+
+\def\hex!getboard#1%
+  {\uniqueMPgraphic{games:hex:#1}}
+
+\def\hex!player[#1]#2#3%
+  {\bgroup
+   \processaction
+     [#1]
+     [ \v!red=>\chardef\stonecolor\plusone,
+      \v!blue=>\chardef\stonecolor\plustwo]%
+   \ctxlua{thirddata.games.hex.field[#2][#3] = { color = \number\stonecolor }}%
+   \egroup
+   \doif{\gameparameter\c!interactive}\v!yes\hex!symbol}
+
+\newcount\hex!count!symbols
+
+\let\hex!list!symbols\empty
+
+\def\hex!symbol
+  {\expanded{\advance\hex!count!symbols\plusone}%
+   \expanded{\hex!setboard{\number\hex!count!symbols}}%
+   \expanded{\definesymbol[hex!symbol!\number\hex!count!symbols][\noexpand\hex!getboard{\number\hex!count!symbols}]}%
+   \expanded{\appendtocommalist{hex!symbol!\number\hex!count!symbols}}\hex!list!symbols}
+
+%D Lua functions
+
+\ctxloadluafile{games-hex}{}
+
+%D Default values
+
+\setupgame
+  [\v!hex]
+  [\c!size=\v!small,
+   \c!nx=\gameparameter\c!size,
+   \c!ny=\gameparameter\c!size,
+   \c!stonesize=\bodyfontsize,
+   \c!dx=\gameparameter\c!stonesize,
+   \c!dy=\gameparameter\c!dx,
+   \c!frameoffset=0pt,
+   \c!labeldistance=0pt,
+   \c!labelstyle=\tx,
+   \c!labelcolor=,
+   \c!interaction=\v!no]
+
+\protect \endinput

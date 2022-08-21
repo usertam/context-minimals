@@ -1,0 +1,163 @@
+%D \enableregime[utf]
+%D \module
+%D   [      file=t-degrade,
+%D        version=2006.09.12,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Degrading JPEG images,
+%D         author=Peter Münster,
+%D           date=\currentdate,
+%D      copyright={Peter Münster}]
+%C This module is copyrighted by Peter Münster.
+%C Please send any comments to pmrb at free.fr.
+
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; either version 2
+% of the License, or (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but without any warranty; without even the implied warranty of
+% merchantability or fitness for a particular purpose.  See the
+% GNU General Public License for more details.
+
+\writestatus{loading}{Degrading JPEG images on the fly}
+
+\unprotect
+
+%D In this module we suppose, that original figures are either eps or jpg.
+%D When creating pdf, eps is converted to pdf, and when creating dvi,
+%D jpg is converted to eps.
+%D Furthermore, jpg-images can be degraded to a given resolution, to get
+%D smaller documents.
+
+%D When
+%D \type{http://context.literatesolutions.com/collector/63}
+%D is solved, we can make it better using \type{\appliedfigurefilename},
+%D \type{\figurewidth} etc, and without redefining \type{\externalfigure}.
+
+%D \macros{setupDegrade}
+%D Sets the resolution, the directory for degraded images and the
+%D directory, where the original images can be found (source directory).
+%D
+%D Default setup:
+%D
+%D \starttyping
+%D \setupDegrade[Res=100,Dir=degrade,SDir=.]
+%D \stoptyping
+%D
+%D Example:
+%D
+%D \starttyping
+%D \setupDegrade[Res=600,Dir=degraded-images,SDir=/home/peter/jpegs]
+%D \stoptyping
+
+\def\setupDegrade[#1]{\getparameters[Deg][#1]}
+\setupDegrade[Res=100,Dir=degrade,SDir=.]
+
+%D In order to use this module, you must use \type{\externalfigure}
+%D in the following way: \type{\externalfigure[file-prefix][options]},
+%D where \type{options} must contain the width or the height.
+%D Furthermore, \type{\write18} must be enabled.
+%D The shell-script is in a buffer, just to keep this module in only
+%D one file.
+
+\startbuffer[degrade-script]
+#!/bin/bash
+
+# We consider, that original figures are either eps or jpg.
+
+# Arguments:
+# $1 = filename
+# $2 = eps or pdf
+# $3 = w or h
+# $4 = resolution
+# $5 = dimension of image
+# $6 = source directory
+# $7 = destination directory
+
+for i in jpeg2ps convert identify bc; do
+	if ! type $i &>/dev/null; then
+		echo Error: $i is not installed.
+		exit 1
+	fi
+done
+
+EPSTOPDF=epstopdf
+
+if ! type epstopdf &>/dev/null; then
+	if type texmfstart &>/dev/null; then
+		EPSTOPDF="texmfstart newpstopdf"
+	else
+		EPSTOPDF="texutil --figures --epstopdf"
+	fi
+fi
+
+if [ -s "$1.jpg" ]; then
+	if [ "$2" = eps ] && [ "$1.jpg" -nt "$1.eps" ]; then
+		jpeg2ps "$1.jpg" >"$1.eps"
+	fi
+else
+	if [ "$2" = pdf ] && [ "$1.eps" -nt "$1.pdf" ]; then
+		$EPSTOPDF "$1.eps"
+	fi
+fi
+
+X=
+[ $3 = h ] && X=x
+FORMAT="%$3"
+FILE="$6/$1.jpg"
+DFILE="$7/$1.jpg"
+DFILE_EPS="$7/$1.eps"
+DPI="$4"
+IW="$5"
+MODE="$2"
+INCH=72.27
+
+mkdir -p $7
+
+if [ -s "$FILE" ]; then
+	W=`identify -format "$FORMAT" "$FILE"`
+else
+	rm -f "$DFILE"
+	exit 0
+fi
+
+NW=`echo "$DPI * $IW / $INCH" | bc`
+
+if [ $NW -ge $W ]; then
+	rm -f "$DFILE"
+else
+	if [ -s "$DFILE" ] && \
+		[ `identify -format "$FORMAT" "$DFILE"` -eq $NW ]; then
+		exit 0
+	else
+		convert -verbose -resize $X$NW "$FILE" "$DFILE"
+		[ $MODE = eps ] && jpeg2ps "$DFILE" >"$DFILE_EPS"
+	fi
+fi
+\stopbuffer
+
+\def\Command{\immediate\write18}
+\let\externalfigureO=\externalfigure
+\def\externalfigure[#1][#2]{%
+  \getparameters[Deg][height=,#2]%
+  \processaction[\Degheight][%
+    \s!default =>\scratchdimen=\Degwidth  \def\Deg@WH{w},
+    \s!unknown =>\scratchdimen=\Degheight \def\Deg@WH{h}]%
+  \Command{bash ./\jobname-degrade-script.tmp #1 \ifcase\pdfoutput eps\else
+    pdf\fi\space\Deg@WH\space\DegRes\space\withoutpt\the\scratchdimen\space
+    \DegSDir\space\DegDir}%
+  \doiffileexistselse{\DegDir/#1.jpg}{\def\Deg@File{\DegDir/#1}}{%
+    \def\Deg@File{#1}}%
+  \externalfigureO[\Deg@File][#2]}
+
+\protect
+
+\doifnotmode{demo}{\endinput}
+
+%D Usage example:
+%\usemodule[degrade]
+% \setupDegrade[Res=200] Here you can adjust the resolution (unit = dpi).
+\starttext
+\externalfigure[hacker][width=0.2\textwidth]
+\stoptext

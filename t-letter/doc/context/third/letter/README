@@ -1,0 +1,33 @@
+Modulename : Correspondence (t-letter and t-memo)
+Author     : Wolfgang Schuster
+License    : GNU General Public License
+
+Description
+===========
+
+The correspondence package for ConTeXt consists of a module
+to write letters and memos. Both modules work with MkII and
+MkIV but the letter and memo modules for MkIV requires
+a installation from 15 December 2011 or newer while the MkII
+version of both modules work also with older installations.
+
+Usage
+=====
+
+Letters
+-------
+
+\usemodule[letter]
+
+\startletter
+...
+\stopletter
+
+Memos
+-----
+
+\usemodule[memo]
+
+\startmemo
+...
+\stopmemo

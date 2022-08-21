@@ -1,0 +1,163 @@
+%D \module
+%D   [       file=t-lettri,
+%D        version=2009.01.20,
+%D          title=\CONTEXT\ Lettrines,
+%D       subtitle=Funny stuff,
+%D         author=Taco Hoekwater,
+%D           date=\currentdate,
+%D      copyright=Public Domain]
+%C
+%C Donated to the public domain.
+
+%D This is just a quick and dirty conversion of the LaTeX package
+%D
+%D \ProvidesFile{lettrine.sty}[2004/05/22 v1.6 (D. Flipo)]
+%D
+%D Errors are likely mine, credit is due to Daniel.Flipo@univ-lille1.fr
+%D
+%D If enough people like it, I may even clean this mess up sometime. The
+%D current version is just a (c)rude conversion of the low-level LaTeX
+%D stuff to sometimes even lower-level ConTeXt.
+%D
+%D Changes:
+%D 2005.08.29: support use within \startframedtext ..\stop
+%D 2006.01.27: support use within \startnarrower..\stop
+%D 2009.01.20: fix indentation after indented dropcaps
+
+\unprotect
+
+\newbox\Lettrinelbox
+\newbox\Lettrinetbox
+
+\newcount\Lettrinelines
+
+\newdimen\LettrineHeight
+\newdimen\Lettrinefirst
+\newdimen\Lettrinenext
+\newdimen\Lettrineraise
+
+\newdimen\Lettrinepindent
+\newdimen\Lettrinefindent
+\newdimen\Lettrinenindent
+
+\getparameters[LettrineDefault]
+              [Lines=2,
+               Hang=0,
+               Oversize=0,
+               Raise=0,
+               Findent=0pt,
+               Nindent=0.5em,
+               Slope=0pt,
+               Ante=,
+               FontHook=,
+               TextFont=\sc,
+               Image=\v!no]
+
+\def\setuplettrine{\dodoubleempty\dosetuplettrine}
+
+\def\dosetuplettrine[#1][#2]{%
+  \doifassignmentelse{#1}{%
+    \dodosetuplettrine[][#1]%
+  }{%
+    \def\ascii{}%
+    \doifsomething{#1}{\convertargument#1\to\ascii }%
+    \expandafter\dodosetuplettrine\expandafter[\ascii][#2]%
+  }%
+}
+
+
+\def\dodosetuplettrine[#1][#2]{%
+   \getparameters[LettrineDefault#1][#2]
+}
+
+\def\doLettrineHeight{%
+   \LettrineHeight =\Lettrinelines\baselineskip\relax
+   \ifnum\Lettrinelines>1
+      \advance\LettrineHeight -\baselineskip
+   \fi
+   \setbox\Lettrinetbox\hbox{{\LettrineTextFont x}}%
+   \LettrineHeight = \dimexpr \LettrineHeight+  \ht\Lettrinetbox +
+                              \LettrineOversize\LettrineHeight \relax
+}
+
+\def\doLettrineEPS#1{%
+   \doLettrineHeight\LettrineFontHook
+   \externalfigure[#1][\c!height=\LettrineHeight]}
+
+\def\doLettrineFont{%
+   \doLettrineHeight
+   \definefontsynonym[LettrineFont][Serif]%
+   \setbox\Lettrinetbox=\hbox{{\LettrineFontHook
+                        \definedfont[LettrineFont at \the\LettrineHeight] X}}%
+   \scratchcounter = \numexpr (100*\LettrineHeight)/(\ht\Lettrinetbox/100) - 9999\relax
+   \ifnum\scratchcounter>0
+     \def\tempa{1.\the\scratchcounter}%
+   \else
+     \def\tempa{1}%
+   \fi
+   \LettrineFontHook
+   \!!dimena = \tempa\LettrineHeight
+   \definedfont[LettrineFont at \the\!!dimena]%
+}%
+
+\def\lettrine{\dosingleempty\dolettrine}
+
+\def\dolettrine[#1]#2#3{%
+  \convertargument#2\to\ascii
+  \def\lettrgetparam##1{%
+     \ifcsname LettrineDefault\ascii##1\endcsname
+        \setevalue{Lettrine##1}{\csname LettrineDefault\ascii##1\endcsname}%
+     \else
+        \setevalue{Lettrine##1}{\csname LettrineDefault##1\endcsname}%
+     \fi}%
+  \processcommalist
+     [Lines,Hang,Oversize,Raise,Findent,Nindent,Slope,Ante,FontHook,TextFont,Image]\lettrgetparam
+  \getparameters[Lettrine][#1]%
+  \Lettrinenindent=\LettrineNindent\relax
+  \Lettrinefindent=\LettrineFindent\relax
+  \Lettrinelines  =\LettrineLines\relax
+  \setbox\Lettrinelbox\hbox{{\ifx\LettrineImage\v!yes\doLettrineEPS{#2}\else
+                             \ifx\LettrineImage\v!true\doLettrineEPS{#2}\else
+                             \doLettrineFont #2\fi\fi}}%
+  \setbox\Lettrinetbox\hbox{{\LettrineTextFont{#3}}}%
+  \ifnum\Lettrinelines=1
+    \Lettrinefirst = \dimexpr \ht\Lettrinelbox-\ht\Lettrinetbox \relax
+    \Lettrineraise=0pt
+  \else
+    \setbox\scratchbox\hbox{{\LettrineTextFont x}}%
+    \Lettrinefirst = \dimexpr -\Lettrinelines\baselineskip + \baselineskip
+                              -\ht\scratchbox \relax
+    \Lettrineraise = \dimexpr\LettrineRaise\Lettrinefirst \relax
+    \Lettrineraise = -\Lettrineraise  \relax
+    \Lettrinefirst = \dimexpr\Lettrinefirst+\Lettrineraise+\ht\Lettrinelbox \relax
+    \Lettrineraise = \dimexpr\Lettrineraise-\Lettrinelines\baselineskip +\baselineskip \relax
+  \fi
+  \par
+  \ifdim\Lettrinefirst>0.2pt\vskip\Lettrinefirst\fi
+  \setbox\scratchbox= \hbox{\LettrineAnte}%
+  \setlocalhsize
+  \Lettrinepindent= \dimexpr \wd\Lettrinelbox  -\LettrineHang\wd\Lettrinelbox +
+                              \wd\scratchbox + \Lettrinefindent \relax
+  \Lettrinefirst=\dimexpr \localhsize  -\Lettrinepindent +\rightskip+\leftskip\relax
+  \advance\Lettrinenindent \Lettrinepindent
+  \Lettrinenext=\dimexpr \localhsize  -\Lettrinenindent +\rightskip+\leftskip\relax
+  \def\Lparshape{\the\numexpr\Lettrinelines+1\relax\space \the\Lettrinepindent\space \the\Lettrinefirst}%
+  \dorecurse{\numexpr \Lettrinelines - 1 \relax}{%
+     \edef\Lparshape{\Lparshape\space \the\Lettrinenindent\space \the\Lettrinenext}%
+     \advance\Lettrinenindent\LettrineSlope
+     \advance\Lettrinenext -\LettrineSlope
+  }%
+  \edef\Lparshape{\Lparshape\space 0pt\space \the\localhsize}%
+  \setbox\scratchbox = \hbox{\hbox{\LettrineAnte}\raise \Lettrineraise \hbox{\box\Lettrinelbox }}%
+  \scratchdimen = \dimexpr \dp\scratchbox + \ht\strutbox + 1pt\relax
+  \vskip\scratchdimen \penalty0\vskip-\scratchdimen
+  \noindent
+  \scratchdimen = \leftskip   \leftskip=\scratchdimen
+  \scratchdimen = \rightskip  \rightskip=\scratchdimen
+  \parshape=\Lparshape
+  \smash{\llap{\box\scratchbox \hskip \the\Lettrinefindent}}%
+  \box\Lettrinetbox
+}
+
+\protect
+\endinput

@@ -1,0 +1,46 @@
+%D \module
+%D   [     file=type-imp-fertigo,
+%D      version=2010.10.27,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Fertigo Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [fertigo]
+
+\starttypescript [\s!sans] [fertigo]
+    \definefontsynonym [FertigoPro-Regular] [\s!file:fertigopro]       [\s!features=\s!default]
+    \definefontsynonym [FertigoPro-Italic]  [\s!file:Fertigoproitalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [fertigo]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]       [FertigoPro-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic] [FertigoPro-Italic]  [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [fertigo]
+    \definetypeface [fertigo] [ss] [\s!sans] [fertigo] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

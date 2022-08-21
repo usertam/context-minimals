@@ -1,0 +1,37 @@
+Wolfgang wrote this in http://news.gmane.org/find-root.php?message_id=%3cloom.20090331T223114%2d61%40post.gmane.org%3e
+
+
+== Installing Typescripts ==
+
+Put the typescript in 
+
+texmf-local/tex/context/third/typescrips/
+
+or in the current directory.
+
+
+== Updating Typescripts ==
+
+
+
+== Installing Fonts ==
+
+Put the fonts in 
+
+~/.fonts/
+
+or in the current directory.
+
+
+== Usage ==
+
+\usetypescriptfile[type-...] % load the typescript file
+\usetypescript[...] % load the typescript
+\setupbodyfont[...] 
+
+
+== Example ==
+
+\usetypescriptfile[type-asana]
+\usetypescript[asana]
+\setupbodyfont[asana,11pt]

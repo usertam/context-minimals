@@ -1,0 +1,363 @@
+%D \module
+%D   [     file=t-animation,
+%D      version=2013.04.07,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Animations,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% begin info
+%
+% title   : animations
+% comment : simple interface to generate animations which are based on the fieldstack mechanism
+% status  : useable in documents and modules
+%
+% end info
+
+%M \loadsetups[t-animation.xml]
+
+%D \showsetup{startanimation}
+%D \showsetup{defineanimation}
+%D \showsetup{setupanimation}
+
+\unprotect
+
+\startinterface all
+  \setinterfacevariable {animation} {animation}
+\stopinterface
+
+\startinterface all
+  \setinterfaceconstant {menustyle} {menustyle}
+  \setinterfaceconstant {menucolor} {menucolor}
+  \setinterfaceconstant {framerate} {framerate}
+\stopinterface
+
+\installnamespace {animation}
+\installnamespace {animationmenu}
+\installnamespace {animationrenderings}
+
+\installframedcommandhandler \????animation     {animation}     \????animation
+\installcommandhandler       \????animationmenu {animationmenu} \????animationmenu
+
+\appendtoks
+  \setuevalue{\e!start\currentanimation}{\animation_beg{\currentanimation}}%
+  \setuevalue{\e!stop \currentanimation}{\animation_end                   }%
+\to \everydefineanimation
+
+\newcount\animation_current
+\newcount\animation_frame
+
+\edef\m_animation_signal_pause{+}
+
+\ifdefined\s!repeat         \else \def\s!repeat        {repeat}         \fi
+\ifdefined\s!once           \else \def\s!once          {once}           \fi
+\ifdefined\s!pause          \else \def\s!pause         {pause}          \fi
+\ifdefined\s!FirstFrame     \else \def\s!FirstFrame    {FirstFrame}     \fi
+\ifdefined\s!PreviousFrame  \else \def\s!PreviousFrame {PreviousFrame}  \fi
+\ifdefined\s!StartAnimation \else \def\s!StartAnimation{StartAnimation} \fi
+\ifdefined\s!StopAnimation  \else \def\s!StopAnimation {StopAnimation}  \fi
+\ifdefined\s!NextFrame      \else \def\s!NextFrame     {NextFrame}      \fi
+\ifdefined\s!LastFrame      \else \def\s!LastFrame     {LastFrame}      \fi
+
+\unexpanded\def\animation_beg#environment%
+  {\begingroup
+   \edef\currentanimation{#environment}%
+   \dodoubleempty\animation_beg_parameters}
+
+\def\animation_beg_parameters
+  {\iffirstargument
+     \ifsecondargument
+       \doubleexpandafter\animation_beg_parameters_two
+     \else
+       \doubleexpandafter\animation_beg_parameters_one
+     \fi
+   \else
+     \expandafter\animation_beg_parameters_zero
+   \fi}
+
+\def\animation_beg_parameters_zero[#name][#parameters]%
+  {\global\advance\animation_current\plusone
+   \animation_beg_parameters_two[\number\animation_current][]}
+
+\def\animation_beg_parameters_one[#name][#parameters]%
+  {\doifassignmentelse{#name}
+     {\global\advance\animation_current\plusone
+      \animation_beg_parameters_two[\number\animation_current][#name]}
+     {\animation_beg_parameters_two[#name][]}}
+
+\def\animation_beg_parameters_two[#name][#parameters]%
+  {\edef\animation_name{\currentanimation:#name}%
+   \setupcurrentanimation
+     [#parameters,
+      \c!align=\v!middle,
+      \c!background={\v!foreground,\animation_name},
+      \c!offset=\v!overlay]%
+   \animation_initialize
+   \animation_symbols
+   \doifnextbgroupelse\animation_frame_grouped\donothing}
+
+\def\animation_symbols
+  {\definesymbol[\s!FirstFrame    ][\symbol\v!firstpage   ]%
+   \definesymbol[\s!PreviousFrame ][\symbol\v!PreviousJump]%
+   \definesymbol[\s!StartAnimation][\symbol\v!StartMovie  ]%
+   \definesymbol[\s!StopAnimation ][\symbol\v!StopMovie   ]%
+   \definesymbol[\s!NextFrame     ][\symbol\v!NextJump    ]%
+   \definesymbol[\s!LastFrame     ][\symbol\v!lastpage    ]}
+
+\def\animation_initialize
+  {\animation_frame\zerocount
+   \let\m_animation_symbols\empty
+   \let\m_animation_pause  \empty
+   \let\startframe\animation_frame_start
+   \let\stopframe \relax
+   \let\frame     \animation_frame_direct}
+
+\unexpanded\def\animation_end
+  {\normalexpanded{\definefieldstack[\animation_name][\m_animation_symbols][]}%
+   %
+   \edef\p_animation_repeat{\animationparameter\c!repeat}%
+   \ifx\p_animation_repeat\v!no
+     \let\p_animation_repeat\s!once
+   \else
+     \let\p_animation_repeat\s!repeat
+   \fi
+   %
+   \edef\p_animation_list{\animationparameter\c!list}%
+   \ifx\m_animation_pause\empty \else
+     \let\p_animation_list\m_animation_pause
+   \fi
+   %
+   \edef\currentanimationmenu{\animationparameter\c!menu}%
+   \edef\p_animation_renderingsetup{\animationmenuparameter\c!renderingsetup}%
+   \doifsetupselse\p_animation_renderingsetup
+     {\texsetup\p_animation_renderingsetup}
+     {\texsetup{\????animationrenderings:\v!no}}%
+   \endgroup}
+
+%D \extras
+%D   {menu}
+%D
+%D \subject{Control buttons}
+%D
+%D Animations are useless without any method to enable them, one way
+%D is to use \tex{goto} command (e.g. \type{\goto{...}[JS(Walk_Field{<NAME>})]})
+%D where you go to the next frame with each click. A different way to control
+%D the animation is the menu, which can be a row with buttons below the animation
+%D or a link above the graphic.
+%D
+%D The module provides for this the following values for the menu key:
+%D
+%D \startitemize[packed]
+%D \startitem no (usefull when you use the \tex{goto} command) \stopitem
+%D \startitem yes (places a row with buttons below the animation) \stopitem
+%D \startitem overlay (creates a button over the animation) \stopitem
+%D \stopitemize
+
+\defineanimationmenu[\v!yes    ][\c!renderingsetup=\????animationrenderings:\v!yes    ]
+\defineanimationmenu[\v!no     ][\c!renderingsetup=\????animationrenderings:\v!no     ]
+\defineanimationmenu[\v!overlay][\c!renderingsetup=\????animationrenderings:\v!overlay]
+
+\startsetups[\????animationrenderings:\v!yes]
+
+  \defineviewerlayer[\animation_name:\v!start][\c!state=\v!start]
+  \defineviewerlayer[\animation_name:\v!stop ][\c!state=\v!stop ]
+
+  \inheritedanimationframed\bgroup
+
+    \fieldstack[\animation_name]
+
+    \blank[\v!medium]% \animationparameter\c!inbetween
+
+    \dontleavehmode\hbox\bgroup
+
+      \setupinteraction[\c!style=,\c!color=,\c!contrastcolor=]% Use only "menustyle" and "menucolor"!
+      \useanimationstyleandcolor\c!menustyle\c!menucolor
+
+      \setupsymbolset[\animationparameter\c!symbolset]
+
+      \gotobox
+        {\symbol\s!FirstFrame}
+        [JS(Reset_Walk_Field{\animation_name}),
+                   HideLayer{\animation_name:\v!stop },
+                   VideLayer{\animation_name:\v!start}]
+
+      \dotfskip{\animationparameter\c!distance}
+
+      \gotobox
+        {\symbol\s!PreviousFrame}
+        [JS(Previous_Walk_Field{\animation_name}),
+                        HideLayer{\animation_name:\v!stop },
+                        VideLayer{\animation_name:\v!start}]
+
+      \dotfskip{\animationparameter\c!distance}
+
+      \ifx\p_animation_list\empty
+      
+        \gotobox
+          {\setbox\scratchbox\hbox{\symbol\s!StopAnimation}
+           \startoverlay
+             {\startviewerlayer[\animation_name:\v!stop]
+              \hbox to \wd\scratchbox{\symbol\s!StopAnimation}
+              \stopviewerlayer}
+             {\startviewerlayer[\animation_name:\v!start]
+              \hbox to \wd\scratchbox{\hss\symbol\s!StartAnimation\hss}
+              \stopviewerlayer}
+           \stopoverlay}
+          [JS(Start_Pause_Walk_Field{\animation_name,\cldcontext{math.round(1000/\number\animationparameter\c!framerate)},\p_animation_repeat}),
+                         ToggleLayer{\animation_name:\v!stop },
+                         ToggleLayer{\animation_name:\v!start}]
+
+      \else
+
+        \gotobox
+          {\symbol\s!StartAnimation}
+          [JS(Start_Pause_Walk_Field{\animation_name,\cldcontext{math.round(1000/\number\animationparameter\c!framerate)},\s!pause,\p_animation_list}),
+                         ToggleLayer{\animation_name:\v!stop },
+                         ToggleLayer{\animation_name:\v!start}]
+
+      \fi
+
+      \dotfskip{\animationparameter\c!distance}
+
+      \gotobox
+        {\symbol\s!NextFrame}
+        [JS(Next_Walk_Field{\animation_name}),
+                  HideLayer{\animation_name:\v!stop },
+                  VideLayer{\animation_name:\v!start}]
+
+      \dotfskip{\animationparameter\c!distance}
+
+      \gotobox
+        {\symbol\s!LastFrame}
+        [JS(Stop_Walk_Field{\animation_name}),
+               JS(Set_Field{\animation_name,\number\animation_frame}),
+                  HideLayer{\animation_name:\v!stop },
+                  VideLayer{\animation_name:\v!start}]%
+
+    \egroup
+
+  \egroup
+
+\stopsetups
+
+\startsetups[\????animationrenderings:\v!no]
+
+  \inheritedanimationframed{\fieldstack[\animation_name]}
+
+\stopsetups
+
+\startsetups[\????animationrenderings:\v!overlay]
+
+  \defineoverlay[\animation_name][\overlaybutton{Walk{\animation_name}}]
+
+  \inheritedanimationframed{\fieldstack[\animation_name]}
+
+\stopsetups
+
+%D \macros
+%D   {frame,startframe}
+%D
+%D The content for each frame can be set with two methods, the first is to
+%D enclose the code in brackets like you do in the overlay environment.
+%D
+%D \starttyping
+%D \startanimation
+%D   {FRAME 1}
+%D   {FRAME 2}
+%D \stopanimation
+%D \stoptyping
+%D
+%D The second method is the modern variant with start/stop-tags to enclose
+%D each frame, you can either you use \tex{frame} command which takes
+%D a argument, e.g.
+%D
+%D \starttyping
+%D \startanimation
+%D   \frame{FRAME 1}
+%D   \frame{FRAME 2}
+%D \stopanimation
+%D \stoptyping
+%D
+%D or you use the \type{frame} environment which delimits each frame
+%D by the start and stop tags.
+%D
+%D \starttyping
+%D \startanimation
+%D   \startframe FRAME 1 \stopframe
+%D   \startframe FRAME 2 \stopframe
+%D \stopanimation
+%D \stoptyping
+
+\unexpanded\def\animation_frame_grouped#content%
+  {\advance\animation_frame\plusone
+   \edef\animation_currentframe{\animation_name:\number\animation_frame}%
+   \appendtocommalist\animation_currentframe\m_animation_symbols
+   \definesymbol[\animation_currentframe][{#content}]%
+   \doifnextbgroupelse\animation_frame_grouped\donothing}
+
+\unexpanded\def\animation_frame_direct
+  {\dosingleempty\animation_frame_direct_indeed}
+
+\def\animation_frame_direct_indeed[#signal]#content%
+  {\advance\animation_frame\plusone
+   \edef\m_animation_signal{#signal}%
+   \ifx\m_animation_signal\m_animation_signal_pause
+     \appendtocommalist{\number\animation_frame}\m_animation_pause
+   \fi
+   \edef\animation_currentframe{\animation_name:\number\animation_frame}%
+   \appendtocommalist\animation_currentframe\m_animation_symbols
+   \definesymbol[\animation_currentframe][{#content}]}
+
+\unexpanded\def\animation_frame_start
+  {\dosingleempty\animation_frame_start_indeed}
+
+\def\animation_frame_start_indeed[#signal]#content\stopframe
+  {\advance\animation_frame\plusone
+   \edef\m_animation_signal{#signal}%
+   \ifx\m_animation_signal\m_animation_signal_pause
+     \appendtocommalist{\number\animation_frame}\m_animation_pause
+   \fi
+   \edef\animation_currentframe{\animation_name:\number\animation_frame}%
+   \appendtocommalist\animation_currentframe\m_animation_symbols
+   \definesymbol[\animation_currentframe][{#content}]}
+
+%D To use the module one has to create a new animation environment,
+%D to prevent the user from creating one first before he can use the module
+%D one environment would be always available. The name of this predefined
+%D environment is \tex{startenvironment}, to ensure it can be also by other
+%D modules when a non english interface is used it is ensured you can always
+%D use it with two commands \tex{startanimation} and \tex{stopanimation}.
+
+\defineanimation[\v!animation]
+
+\ifdefined\startanimation \else
+  \def\startanimation{\animation_beg\v!animation}%
+  \def\stopanimation {\animation_end            }%
+\fi
+
+\setupanimation
+  [    \c!frame=\v!off,
+      \c!offset=\v!overlay,
+        \c!menu=\v!overlay,
+    \c!distance=\spaceamount,
+   \c!framerate=\plusone,
+   \c!symbolset=navigation 1]
+
+\protect \endinput

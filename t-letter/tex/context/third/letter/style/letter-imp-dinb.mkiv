@@ -1,0 +1,139 @@
+%D \module
+%D   [     file=letter-imp-dinb,
+%D      version=2011.10.29,
+%D        title=\CONTEXT\ Letter Style,
+%D     subtitle=DIN 676 B,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\useletterstyle[default]
+
+\setupletterlayout
+  [\v!firstpage,\v!secondpage]
+  [\c!topspace=114.3mm,
+   \c!bottomspace=30mm, % unknown value!
+   \c!backspace=24.1mm,
+   \c!header=0mm,
+   \c!footer=0mm,       % unknown value!
+   \c!width=\v!middle,
+   \c!height=\v!middle]
+
+\setupletterlayout
+  [\v!secondpage]
+  [\c!topspace=20mm,
+   \c!bottomspace=20mm,
+   \c!header=10mm,
+   \c!footer=10mm]
+
+\setuplettersection
+  [\v!title,\v!subject,\v!opening,\v!appendices]
+  [\c!spacebefore=,
+   \c!spaceafter=\v!line]
+
+\setuplettersection
+  [\v!title]
+  [\c!align=\v!middle,
+   \c!style=\v!bold]
+
+\setuplettersection
+  [\v!subject]
+  [\c!spaceafter={2*\v!line},
+   \c!style=\v!bold]
+
+\setuplettersection
+  [\v!content]
+  [\c!spaceafter={\v!samepage,\v!line}]
+
+\setuplettersection
+  [\v!closing]
+  [\c!spaceafter={3*\v!line}]
+
+\setupletterlayer
+  [\v!topmark,\v!botmark,\v!cutmark]
+  [\c!state=\v!start,
+   \c!x=5mm,
+   \c!symbol=\v!cutmark]
+
+\setupletterframe
+  [\v!topmark,\v!botmark,\v!cutmark]
+  [\c!strut=\v!no]
+
+\setupletterlayer
+  [\v!topmark]
+  [\c!y=105mm]
+
+\setupletterlayer
+  [\v!botmark]
+  [\c!y=210mm]
+
+\setupletterlayer
+  [\v!cutmark]
+  [\c!y=.5\paperheight]
+
+\setupletterlayer
+  [\v!head,\v!nexthead,\v!lefthead,\v!righthead]
+  [\c!x=\backspace,
+   \c!y=16.9mm]
+
+\setupletterframe
+  [\v!head,\v!nexthead,\v!lefthead,\v!righthead]
+  [\c!width=\textwidth,
+   \c!height=28.1mm]
+
+\setupletterlayer
+  [\v!foot,\v!nextfoot,\v!leftfoot,\v!rightfoot]
+  [\c!y=20mm]
+
+\setupletterframe
+  [\v!foot,\v!nextfoot,\v!leftfoot,\v!rightfoot]
+  [\c!height=10mm]
+
+\setupletterlayer
+  [\v!address]
+  [\c!x=\backspace,
+   \c!y=50mm]
+
+\setupletterframe
+  [\v!address]
+  [\c!width=85mm,
+   \c!height=40mm]
+
+\setupletterlayer
+  [\v!backaddress]
+  [\c!x=\backspace,
+   \c!y=\dimexpr\namedletterlayerparameter\v!address\c!y-\namedletterframeparameter\v!backaddress\c!height\relax,
+   \c!style=\tfxx]
+
+\setupletterframe
+  [\v!backaddress]
+  [\c!height=5mm,
+   \c!width=85mm]
+
+\setupletterlayer
+  [\v!reference]
+  [\c!x=\backspace,
+   \c!y=93.2mm]
+
+\setupletterframe
+  [\v!reference]
+  [\c!width=\textwidth,
+   \c!height=8.4mm]
+
+\endinput

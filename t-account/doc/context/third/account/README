@@ -1,0 +1,13 @@
+ConTeXt module to create T-Accounts
+
+To use the module you could use the two predefined environment
+'TACCOUNT' and 'TKONTO' or you could define your own with
+the command \defineACCOUNT.
+
+The background is drawn from TeX but it is possible to draw
+a more fancy layout with MetaPost, the module itself comes
+with the style 'account' you could use as a example for your
+own graphic.
+
+The module is copyrighted by Wolfgang Schuster and publishes
+under public domain.

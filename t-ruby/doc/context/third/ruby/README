@@ -1,0 +1,43 @@
+Modulename : t-ruby
+Author     : Wolfgang Schuster
+License    : Public Domain
+
+
+Description
+-----------
+
+The 'ruby' module allows users to write ruby annotations in ConTeXt.
+
+
+Usage
+-----
+
+The module is loaded with the command:
+
+  \usemodule[ruby]
+
+Ruby text can be set with the command:
+
+  \ruby{base text}{ruy text}
+
+The layout of the base and ruby text could be changed with:
+
+  \setupruby
+    [basestyle=...,
+     basecolor=...,
+     textstyle=...,
+     textcolor=...]
+
+Whether ruby text overlaps with the surrounding text or not can be configured with:
+
+  \setupruby
+    [overhang=auto|start|end|none] % default: yes
+
+The last option is the distance between the ruby and the base text:
+
+  \setupruby
+    [inbetween=...] % default: \blank[small]
+
+All of these parameters can also be changed for a single ruby command:
+
+  \ruby[..,..=..,..]{...}{...}

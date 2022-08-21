@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2011.12.29">
+
+<cd:command name="definememoelement" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="definememoelement"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="layer"/>
+            <cd:constant type="section"/>
+        </cd:keywords>
+        <cd:keywords n="2">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="3">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:content n="4"/>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="memoelement" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="memoelement"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="layer"/>
+            <cd:constant type="section"/>
+        </cd:keywords>
+        <cd:keywords n="2">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="3">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemo" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemo"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes">
+            <cd:parameter name="KEY">
+                <cd:constant type="VALUE"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemodescription" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemodescription"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="spacebefore">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceafter">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceinbetween">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="before">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="after">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="headstyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="headcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <!--
+            <cd:parameter name="textstyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="textcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            -->
+            <cd:parameter name="width">
+                <cd:constant type="fit" default="yes"/>
+                <cd:constant type="broad"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="distance">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="location">
+                <cd:constant type="left" default="yes"/>
+                <cd:constant type="top"/>
+                <cd:constant type="text"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemoelements" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemoelements"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="2" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemoframe" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemoframe"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:inherit name="setupframe" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemolayer" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemolayer"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="x">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="y">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="preset">
+                <cd:constant type="lefttop"/>
+                <cd:constant type="righttop"/>
+                <cd:constant type="leftbottom"/>
+                <cd:constant type="rightbottom"/>
+                <cd:constant type="middle"/>
+                <cd:constant type="middletop"/>
+                <cd:constant type="middlebottom"/>
+                <cd:constant type="middleleft"/>
+                <cd:constant type="middleright"/>
+            </cd:parameter>
+            <cd:parameter name="state">
+                <cd:constant type="start"/>
+                <cd:constant type="stop"/>
+                <cd:constant type="next"/>
+                <cd:constant type="repeat"/>
+                <cd:constant type="left"/>
+                <cd:constant type="right"/>
+                <cd:constant type="even"/>
+                <cd:constant type="odd"/>
+            </cd:parameter>
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="leftmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="rightmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="symbol">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="distance">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="alternative">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="list">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="separator">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemolayout" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemolayout"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:inherit name="setuplayout" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemooptions" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemooptions"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes">
+            <cd:parameter name="bodyfont">
+                <cd:inherit name="setupbodyfont"/>
+            </cd:parameter>
+            <cd:parameter name="whitespace">
+                <cd:inherit name="setupwhitespace"/>
+            </cd:parameter>
+            <cd:parameter name="backgroundcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="backgroundimage">
+                <cd:constant type="cd:file"/>
+            </cd:parameter>
+            <cd:parameter name="background">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="indenting">
+                <cd:inherit name="setupindenting"/>
+            </cd:parameter>
+            <cd:parameter name="marking">
+                <cd:constant type="yes" default="yes"/>
+                <cd:constant type="no"/>
+            </cd:parameter>
+            <cd:parameter name="option">
+                <cd:constant type="test"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemosection" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemosection"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="spacebefore">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceafter">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="spaceinbetween">
+                <cd:inherit name="blank" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="leftmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="rightmargin">
+                <cd:constant type="standard"/>
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+            <cd:parameter name="before">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="after">
+                <cd:constant type="cd:command"/>
+            </cd:parameter>
+            <cd:parameter name="align">
+                <cd:inherit name="setupalign" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="indenting">
+                <cd:inherit name="setupindenting" n="1"/>
+            </cd:parameter>
+            <cd:parameter name="alternative">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="separator">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupmemostyle" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="setupmemostyle"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes">
+            <cd:parameter name="style">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="color">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="titlestyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="titlecolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="textstyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="textcolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:parameter name="separator">
+                <cd:constant type="cd:text"/>
+            </cd:parameter>
+            <cd:parameter name="width">
+                <cd:constant type="cd:dimension"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="memo" type="environment" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="memo"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes" optional="yes">
+            <cd:inherit name="setupmemo" n="1"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="usememostyle" file="s-cor-02.mkvi">
+    <cd:sequence>
+        <cd:string value="usememostyle"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" list="yes">
+            <cd:constant type="cd:file"/>
+        </cd:keywords>
+    </cd:arguments>
+</cd:command>
+
+</cd:interface>

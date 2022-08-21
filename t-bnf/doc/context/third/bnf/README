@@ -1,0 +1,39 @@
+
+
+                               BNF Module README
+
+
+INTRODUCTION
+
+
+  The t-bnf module implements a way to easily write BNF grammars in CONTEXT.
+  Let's look at an example BNF grammar in a document:
+
+  \starttext
+
+  Here's a \BNF\ grammar.  Enjoy. 
+
+  \placebnfgrammar
+    [here]
+    [bnf:test]
+    {A test of the \BNF\ module}
+    {\startbnfgrammar[]
+      <S>: a<S>b
+      <S>: $\epsilon$
+    \stopbnfgrammar}
+
+  Which will match the language $L = \{\,a^nb^n \mid n \geq 0\,\}$.
+
+  \stoptext
+
+  You may try to generate module documenation embedded in t-bnf.tex with texexec
+  as well:
+
+  % texexec --interface=en --module --pdf t-bnf.tex
+
+  If you have any issues with creating the documentation this may be a result
+  of lacking the proper language format.  You can look up the proper
+  information for generating these formats in minstall.pdf at PRAGMA-ADEs site
+  (http://www.pragma-ade.com/).
+
+  Enjoy!

@@ -1,0 +1,42 @@
+\usemodule[rst][test=yes]
+\setuphead[chapter][page=no,style=bold]
+
+\def\RSTCTX{{\em rst}\kern.5pt\CONTEXT}
+\def\reST{{\rm re}{\ss Structured}{\rm Text}}
+
+\starttext
+
+\chapter{\RSTCTX\ Hybrid Documents}
+
+This example demonstrates the macro \type{\RST} which can be used
+to process \reST\ markup directly in a normal \CONTEXT\ document.
+
+\RST{
+-------------
+This Chapter,
+-------------
+
+… for instance, was given entirely in *reST* markup. Naturally,
+there are some :bold:`drawbacks` to expect when mixing markups:
+directives and hyperlink targets that have already been specified
+somewhere above the current section will *stay* accessible in
+later passages until you redefine them. Also, certain letters
+need to be thoroughly escaped in order for them to make it
+through to the *reST*-parser, e.g. *\\\{* (<left brace>), and
+you’ll have to be inventive to make a backslash
+(*\\letterbackslash*) pass through the parser.
+
+}
+
+\startRST
+
+-------------
+Alternatively
+-------------
+you may always use the matching environment ``\\[start|stop]RST``
+if you prefer.
+
+\stopRST
+
+
+\stoptext

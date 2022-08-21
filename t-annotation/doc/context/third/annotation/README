@@ -1,0 +1,35 @@
+Modulename : t-annotation
+Author     : Wolfgang Schuster
+License    : GNU General Public License
+
+Description
+-----------
+
+Annotate text blocks.
+
+Usage
+-----
+
+\usemodule[annotation]
+
+\starttext
+... \annotation{...} ...
+
+... \startannotation ...\stopannotation ...
+\stoptext
+
+Options
+-------
+
+- alternative
+- before
+- after
+- inbetween
+- headstyle
+- headcolor
+- command
+- text
+- title
+- number
+- next
+- ...

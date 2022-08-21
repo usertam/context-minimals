@@ -1,0 +1,58 @@
+%D \module
+%D   [     file=type-imp-miso,
+%D      version=2011.09.21,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Miso Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+%D MISO is an architectural lettering font by Mårten Nettelbladt. It is
+%D available in three weights (light, regular, bold) and can be downloaded from
+%D \hyphenatedurl{http://www.fontsquirrel.com/fonts/Miso}
+
+\starttypescriptcollection [miso]
+
+\starttypescript [\s!sans] [miso-light,miso]
+    \definefontsynonym [Miso-Light]   [\s!file:misolight] [\s!features=\s!default]
+    \definefontsynonym [Miso-Regular] [\s!file:miso]      [\s!features=\s!default]
+    \definefontsynonym [Miso-Bold]    [\s!file:misobold]  [\s!features=\s!default]
+\stoptypescript
+
+
+\starttypescript [\s!sans] [miso-light]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [Miso-Light]   [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [Miso-Regular] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [miso]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [Miso-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [Miso-Bold]    [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [miso-light,miso]
+    \definetypeface [\typescriptone] [ss] [\s!sans] [\typescriptone] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

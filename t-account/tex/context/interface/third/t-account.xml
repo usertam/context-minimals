@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2006.07.14">
+
+<cd:command name="debits" type="environment" file="wolf-mis">
+  <cd:sequence>
+    <cd:string value="DEBITS"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:assignments list="yes">
+      <cd:parameter name="color">
+        <cd:constant type="cd:name"/>
+      </cd:parameter>
+    </cd:assignments>
+  </cd:arguments>
+</cd:command>
+
+<cd:command name="debit" file="wolf-mis.tex">
+  <cd:sequence>
+    <cd:string value="debit"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:keywords optional="yes">
+      <cd:constant type="cd:text"/>
+    </cd:keywords>
+    <cd:content/>
+  </cd:arguments>
+</cd:command>
+
+<cd:command name="credits" type="environment" file="wolf-mis">
+  <cd:sequence>
+    <cd:string value="CREDITS"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:assignments list="yes">
+      <cd:parameter name="color">
+        <cd:constant type="cd:name"/>
+      </cd:parameter>
+    </cd:assignments>
+  </cd:arguments>
+</cd:command>
+
+<cd:command name="credit" file="wolf-mis.tex">
+  <cd:sequence>
+    <cd:string value="credit"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:keywords optional="yes">
+      <cd:constant type="cd:text"/>
+    </cd:keywords>
+    <cd:content/>
+  </cd:arguments>
+</cd:command>
+
+<cd:command name="account" type="environment" file="wolf-mis">
+  <cd:sequence>
+    <cd:string value="ACCOUNT"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:keywords>
+      <cd:constant type="cd:name"/>
+    </cd:keywords>
+    <cd:assignments optional="yes" list="yes">
+      <cd:inherit name="setupACCOUNT"/>
+    </cd:assignments>
+  </cd:arguments>
+</cd:command>
+
+<cd:command name="setupaccount" file="wolf-mis.tex">
+  <cd:sequence>
+    <cd:string value="setupACCOUNT" />
+  </cd:sequence>
+  <cd:arguments>
+    <cd:keywords>
+      <cd:constant type="cd:name"/>
+    </cd:keywords>
+    <cd:assignments list="yes">
+      <cd:parameter name="frame">
+        <cd:constant type="on"/>
+        <cd:constant type="off" default="yes"/>
+        <cd:constant type="none"/>
+        <cd:constant type="overlay"/>
+      </cd:parameter>
+      <cd:parameter name="background">
+        <cd:constant type="screen"/>
+        <cd:constant type="color"/>
+        <cd:constant type="none"/>
+        <cd:constant type="foreground"/>
+        <cd:constant type="cd:name"/>
+      </cd:parameter>
+      <cd:parameter name="backgroundscreen">
+        <cd:constant type="cd:number"/>
+      </cd:parameter>
+      <cd:parameter name="backgroundcolor">
+        <cd:constant type="cd:name"/>
+      </cd:parameter>
+      <cd:parameter name="backgroundoffset">
+        <cd:constant type="frame"/>
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="rulethickness">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="framecolor">
+        <cd:constant type="cd:name"/>
+      </cd:parameter>
+      <cd:parameter name="offset">
+        <cd:constant type="none"/>
+        <cd:constant type="overlay"/>
+        <cd:constant type="default"/>
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="width">
+        <cd:constant type="fit" default="yes"/>
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="left">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="middle">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="right">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="distance">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+    </cd:assignments>
+  </cd:arguments>
+</cd:command>
+
+<cd:command name="defineaccount" file="wolf-mis.tex">
+  <cd:sequence>
+    <cd:string value="defineACCOUNT"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:keywords>
+      <cd:constant type="cd:name"/>
+    </cd:keywords>
+    <cd:assignments optional="yes" list="yes">
+      <cd:inherit name="setupACCOUNT"/>
+    </cd:assignments>
+  </cd:arguments>
+</cd:command>
+
+</cd:interface>

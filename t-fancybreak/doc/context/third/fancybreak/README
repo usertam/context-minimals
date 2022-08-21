@@ -1,0 +1,35 @@
+Modulename : t-fancybreak
+Author     : Wolfgang Schuster
+License    : GNU General Public License
+
+Description
+-----------
+
+Fanycbreak is a module for ConTeXt to insert thought
+breaks in texts.  With parameters one can adjust the
+spacing around the content and set a default symbol.
+
+Usage
+-----
+
+\usemodule[fancybreak]
+
+\starttext
+\input knuth\par
+\fancybreak{$* * *$}
+\input zapf\par
+\fancybreak{+++++++}
+\input ward\par
+\stoptext
+
+Options
+-------
+
+- spacebefore
+- spaceafter
+- spaceinbetween
+- align
+- style
+- color
+- symbol
+- indentnext

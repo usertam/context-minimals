@@ -1,0 +1,42 @@
+%D \useregime[il9]
+%D \enableregime[il9]
+%D \module
+%D   [      file=t-cmscbf,
+%D        version=2006.09.12,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Bold Small Caps for Computer/Latin Modern,
+%D         author=Peter Münster,
+%D           date=\currentdate,
+%D      copyright={Peter Münster}]
+%C This module is copyrighted by Peter Münster.
+%C Please send any comments to pmrb at free.fr.
+
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; either version 2
+% of the License, or (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but without any warranty; without even the implied warranty of
+% merchantability or fitness for a particular purpose.  See the
+% GNU General Public License for more details.
+
+\writestatus{loading}{Bold Small Caps for Computer/Latin Modern}
+
+\definebodyfont[15pt,14pt,13pt,12pt,11pt,10pt,9pt,8pt,7pt,6pt,5pt]
+    [sc] [bf=cmbcsc10 sa 1, tf=cmcsc10 sa 1]
+
+%D Hint: when producing PDF, adjust your resolution with
+%D \type{\pdfpkresolution=xxx}
+
+\doifnotmode{demo}{\endinput}
+
+%D Usage example:
+\usemodule[cmscbf]
+\useregime[il9]
+\enableregime[il9]
+\pdfpkresolution=1200
+\starttext
+{\sc Normal and \bf bold Small Caps.}
+{\sc Äö¤½æ¼Æ \bf Äö¤½æ¼Æ}
+\stoptext

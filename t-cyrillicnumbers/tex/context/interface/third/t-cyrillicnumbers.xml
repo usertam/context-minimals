@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- versions:
+
+     comment  : user interface definitions of the Cyrillic Numbers module
+
+     authors  : Philipp Gesang
+
+     versions : 2013-03-27 23:57:55+0100 (mercurial tip)
+
+-->
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands"
+              name="context"
+              language="en"
+              version="2013-03-27 23:57:58+0100">
+
+  <cd:command name="setupcyrnum" file="t-cyrillicnumbers.mkvi">
+    <cd:sequence>
+      <cd:string value="setupcyrnum"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:keywords n="1" optional="yes">
+        <cd:constant type="cd:name"/>
+      </cd:keywords>
+      <cd:assignments n="2" list="yes" optional="no">
+        <cd:parameter name="command">
+          <cd:constant type="cd:oneargument"/>
+        </cd:parameter>
+        <cd:parameter name="dots">
+          <cd:constant type="no"/>
+          <cd:constant type="yes" default="yes"/>
+        </cd:parameter>
+        <cd:parameter name="dotsymbol">
+          <cd:constant type="cd:text" default="·"/>
+        </cd:parameter>
+        <cd:parameter name="penwidth">
+          <cd:constant type="cd:dimension" default=".66pt"/>
+        </cd:parameter>
+        <cd:parameter name="preferhundredk">
+          <cd:constant type="no" default="yes"/>
+          <cd:constant type="yes"/>
+        </cd:parameter>
+        <cd:parameter name="titlo">
+          <cd:constant type="mp"   default="yes"/>
+          <cd:constant type="font"/>
+        </cd:parameter>
+        <cd:parameter name="titlocolor">
+          <cd:constant type="cd:name" default="black"/>
+        </cd:parameter>
+        <cd:parameter name="titlolocation">
+          <cd:constant type="middle" default="yes"/>
+          <cd:constant type="final"/>
+          <cd:constant type="first"/>
+        </cd:parameter>
+        <cd:parameter name="titlomode">
+          <cd:constant type="cd:number" default="5"/>
+        </cd:parameter>
+        <cd:parameter name="titlospan">
+          <cd:constant type="cd:number" default="3"/>
+        </cd:parameter>
+      </cd:assignments>
+    </cd:arguments>
+  </cd:command>
+
+  <cd:command name="definecyrnum" file="t-cyrillicnumbers.mkvi">
+      <cd:sequence>
+          <cd:string value="definecyrnum"/>
+      </cd:sequence>
+      <cd:arguments>
+          <cd:keywords n="1" optional="no">
+              <cd:constant type="cd:name"/>
+          </cd:keywords>
+          <cd:assignments n="2" list="yes" optional="yes">
+              <cd:inherit name="setupcyrnum" n="2"/>
+          </cd:assignments>
+      </cd:arguments>
+  </cd:command>
+
+  <cd:command name="cyrnum" generated="yes" file="t-cyrillicnumbers.mkvi">
+    <cd:sequence>
+      <cd:variable value="cyrnum"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:assignments n="1" list="yes" optional="yes">
+        <cd:inherit name="setupcyrnum"/>
+      </cd:assignments>
+      <cd:content n="2" optional="no"/>
+    </cd:arguments>
+  </cd:command>
+
+  <cd:command name="cyrnumdrawtitlo" generated="yes" file="t-cyrillicnumbers.mkvi">
+    <cd:sequence>
+      <cd:variable value="cyrnumdrawtitlo"/>
+    </cd:sequence>
+    <cd:arguments>
+      <cd:content n="1" optional="no"/>
+    </cd:arguments>
+  </cd:command>
+
+</cd:interface>
+
+<!-- vim:sw=2:ts=2
+-->

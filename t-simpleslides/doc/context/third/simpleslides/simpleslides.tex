@@ -1,0 +1,1133 @@
+\setupcolors     [state=start]
+\setupinteraction[state=start,style=normal]
+
+%% Layout : <<<
+\setuplayout[
+                   width=middle,
+                  height=middle,
+                %location=middle,
+                topspace=0.5in,
+             bottomspace=.75in,
+          bottomdistance=.25in,
+                  bottom=.25in,
+               backspace=1.0in,
+                cutspace=1.0in,
+              leftmargin=0.55in,
+             rightmargin=0.55in,
+      leftmargindistance=0.1in,
+     rightmargindistance=0.1in,
+                  header=0.25in,
+                  footer=0.5in,
+           headerdistace=0.25in,
+          footerdistance=0.25in,
+                 marking=on,
+%                   grid=yes,
+    ]
+
+\setuppagenumbering [location=footer]
+
+%% >>>
+%% Typescripts : <<<
+
+\setupbodyfontenvironment[default][em=italic]
+
+\setupbodyfont[dejavu,10pt]
+
+%% >>>
+%% Logos: <<<
+\logo [TEX]      {Tex}
+\logo [LATEX]    {Latex}
+\logo [CONTEXT]  {Context}
+\logo [PDFTEX]   {pdftex}
+\logo [LUATEX]   {Luatex}
+\logo [XETEX]    {Xetex}
+\logo [MKII]     {MkII}
+\logo [MKIV]     {MkIV}
+
+\setupsorting[logo][style=normal]
+
+%% >>>
+
+\definetype[typeTEX][option=tex, style=type]
+\definetype[command][color=darkred, style=type]
+\definetype[options][color=darkblue, style=type]
+\definetyping[TEX][option=tex, before=\startEXAMPLE,after=\stopEXAMPLE]
+\definetyping[SIMPLETEX][option=tex]
+
+\setupindenting[medium,yes]
+\setupwhitespace[medium]
+
+\setuphead[title][alternative=middle, textstyle=\ss\bf] 
+\setuphead[section,subsubject,subsection]
+          [numberstyle=\ss\bf,textstyle=\ss\bf]
+
+\setuplistalternative[a]
+    [distance=0pt,width=1em,stretch=10em,
+     command=\hskip0.5em\ldots\hskip0.5em\relax]
+
+\setuplist  [section]
+            [margin=10em, alternative=a]
+
+\useURL[practex][http://www.tug.org/pracjourn/2006-2/schmitz/]
+
+\setupitemize[1][autointro]
+\setupitemize[indenting=no]
+
+
+%% Frames and Backgrounds : <<<
+\definetextbackground
+    [EXAMPLE]
+    [           mp=background:random,
+          location=paragraph,
+     rulethickness=1pt,
+        framecolor=darkred,
+             width=broad,
+            height=fit,
+        leftoffset=1em,
+       rightoffset=1em,
+            before={\testpage[3]\blank[2*big]},
+             after={\blank},
+    ]
+
+\startuseMPgraphic{background:random}
+   path p;
+   for i = 1 upto nofmultipars :
+    p = (multipars[i]
+     topenlarged 8pt
+     bottomenlarged 4pt) randomized 4pt ;
+   fill p withcolor lightgray ;
+   draw p withcolor \MPvar{linecolor}
+    withpen pencircle scaled \MPvar{linewidth};
+   endfor;
+\stopuseMPgraphic
+
+\defineframedtext
+    [EXAMPLEframe]
+    [rulethickness=1pt,
+        framecolor=darkred,
+            height=6.55cm,
+             width=broad,
+        background=color,
+   backgroundcolor=gray,
+    ]
+
+\defineoverlay[randomframe]
+              [\useMPgraphic{background:random:frame}]
+
+\startuseMPgraphic{background:random:frame}
+   path p;
+    p = (OverlayBox 
+     topenlarged 10pt
+     bottomenlarged 10pt) randomized 4pt ;
+   fill p withcolor lightgray ;
+   draw p withcolor \MPvar{linecolor}
+    withpen pencircle scaled \MPvar{linewidth};
+   endfor;
+\stopuseMPgraphic
+\setupexternalfigures[location={local,global,default}] 
+
+%% >>>
+%% Interface <<<
+
+\definecolor [colorprettyone]   [r=.6,g=.0,b=.0]  % red
+\definecolor [colorprettytwo]   [r=.0,g=.6,b=.0]  % green
+\definecolor [colorprettythree] [r=.0,g=.0,b=.6]  % blue
+\definecolor[colorprettyfour][orange]
+
+\usemodule[int-load]
+\loadsetups[cont-en.xml]
+\loadsetups[t-simpleslides.xml]
+\definetextbackground
+    [setuptext]
+    [           mp=background:random,
+          location=paragraph,
+     rulethickness=1pt,
+        framecolor=darkgreen,
+             width=broad,
+        leftoffset=1em,
+       rightoffset=1em,
+             align=right,
+            before={\testpage[3]\blank[2*big]},
+             after={\blank\testpage[2]},
+    ]
+
+%% There gotta be a better way to configure this!
+
+\unprotected\def\showSETUPrecord
+  {\getvalue{\e!start setuptext}
+     \tttf
+     \nohyphens
+     \veryraggedright
+     \startXMLmapping [one]
+       \doglobal\newcounter\currentSETUPargument
+       \global\let\maximumSETUPargument\currentSETUPargument
+       \bgroup
+         \doif{\XMLpar{cd:command}{generated}{}}{yes}{\ttsl}%
+         \doifelseXMLop{type}{environment}
+           {\tex{\e!start}}{\startcolor[colorprettytwo]\tex{}}\ignorespaces
+           \XMLflush{cd:sequence}\stopcolor\ignorespaces
+       \egroup
+       \doifelseXMLempty{cd:arguments}
+         {}
+         {\bgroup
+            \setbox0=\hbox{\XMLflush{cd:arguments}}%
+            \global\let\maximumSETUPargument\currentSETUPargument
+            \doglobal\newcounter\currentSETUPargument
+            \ignorespaces\XMLflush{cd:arguments}%
+            \doif{\XMLpar{cd:command}{type}{}}{environment}
+              {\hskip.5em\unknown\hskip.5em
+               \doif{\XMLpar{cd:command}{generated}{}}{yes}{\ttsl}%
+               \tex{\e!stop}\ignorespaces\XMLflush{cd:sequence}}%
+            \endgraf
+          \egroup
+         %\bgroup
+         %  \tx
+         %  \doif{\XMLpar{cd:command}{interactive}{}}{yes}      {\quad INTERACTIVE}%
+         %  \doif{\XMLpar{cd:command}{interactive}{}}{exclusive}{\quad INTERACTIVE ONLY}%
+         %\egroup
+        \startXMLmapping [two]
+          \bgroup
+            \doglobal\newcounter\currentSETUPargument
+            \blank[\v!line]
+            %\switchtobodyfont[small] % kan sneller
+            \ignorespaces\XMLflush{cd:arguments}\endgraf
+            %\endgraf
+          \egroup
+        \stopXMLmapping}%
+     \stopXMLmapping
+   \getvalue{\e!stop setuptext}}
+
+\def\showSETUPnumber
+  {\doglobal\increment\currentSETUPargument
+   \hbox to 2em
+     {\startcolor[blue]
+      \ifcase\maximumSETUPargument\relax
+        \or*\else\currentSETUPargument
+      \fi\stopcolor
+      \hss}}
+
+\def\showSETUPassignment {\showSETUP
+  {{\colorprettythree[}.\lower.5ex\hbox{=}.{\colorprettythree]}}
+  {{\colorprettythree[}..,.\lower.5ex\hbox{=}.,..{\colorprettythree]}}}
+
+\def\showSETUPkeyword {\showSETUP
+  {\colorprettythree{[}...{\colorprettythree]}}
+  {\colorprettythree{[}...,...{\colorprettythree]}}}
+
+\def\showSETUPargument {\showSETUP
+  {{\colorprettyone\leftargument}..{\colorprettyone\rightargument}}
+  {{\colorprettyone\leftargument}..,...,..{\colorprettyone\rightargument}}}
+
+\def\showSETUPdisplaymath {\showSETUP
+  {\$\$...\$\$}
+  {\$\$...\$\$}}
+
+\def\showSETUPindex {\showSETUP
+  {{\colorprettyone\leftargument}...{\colorprettyone\rightargument}}
+  {{\colorprettyone\leftargument}..+...+..{\colorprettyone\rightargument}}}
+
+\def\showSETUPmath {\showSETUP
+  {\$...\$}
+  {\$...\$}}
+
+\def\showSETUPnothing {\showSETUP
+  {...}
+  {}}
+
+\def\showSETUPfile {\showSETUP
+  {~...~}
+  {}}
+
+\def\showSETUPposition {\showSETUP
+  {(...)}
+  {(...,...)}}
+
+\def\showSETUPreference {\showSETUP
+  {[...]}
+  {[...,...]}}
+
+\def\showSETUPcsname {\showSETUP
+  {{\c!setup!command!{}}}
+  {}}
+
+\def\showSETUPdestination {\showSETUP
+  {[{\colorprettyone\leftargument}..[ref]{\colorprettyone\rightargument}]}
+  {[..,{\colorprettyone\leftargument}..[ref,..]{\colorprettyone\rightargument},..]}}
+
+\def\showSETUPtriplet {\showSETUP
+  {[x:y:z=]}
+  {[x:y:z=,..]}}
+
+\def\showSETUPword {\showSETUP
+  {{\colorprettyone\leftargument}...{\colorprettyone\rightargument}}
+  {{\colorprettyone\leftargument}.. ... ..{\colorprettyone\rightargument}}}
+
+\def\showSETUPcontent {\showSETUP
+  {{\colorprettyone\leftargument}...{\colorprettyone\rightargument}}
+  {{\colorprettyone\leftargument}.. ... ..{\colorprettyone\rightargument}}}
+
+%% >>>
+
+\def\ShowStyle#1%
+  {\blank[big]
+   \midaligned{\startcombination[2*2]
+     {\externalfigure[styles/#1][page=1,width=0.55\textwidth]}
+     {Title Page}
+     {\externalfigure[styles/#1][page=2,width=0.55\textwidth]}
+     {Normal Slide}
+     {\externalfigure[styles/#1][page=3,width=0.55\textwidth]}
+     {Horizontal Picture}
+     {\externalfigure[styles/#1][page=10,width=0.55\textwidth]}
+     {Vertical Picture}
+  \stopcombination}}
+
+\starttext
+
+\title{Simple Slides \\
+  A \CONTEXT\ presentation module}
+
+\startEXAMPLE
+\placelist[section]
+\stopEXAMPLE
+
+\section{Introduction}
+
+This module provides an easy|-|to|-|use interface
+for creating simple slides/presentations in \CONTEXT. 
+The salient features of this module are:
+\startitemize
+  \item The module is meant for presentations which will be shown on a
+    digital projector. They have no interactive elements (such as buttons or
+    hyperlinks) and no navigational tools (such as table of contents).
+  \item The module comes with several predefined styles; these styles are sober
+    in appearance and meant for academic presentations. It also provides some
+    macros to help in presenting slides with both pictures and text.
+  \item Most styles allow for some degree of user|-|reconfigurability. Designing
+    a new style is also easy.
+\stopitemize
+
+This module provides a simple structure that will be suitable for beginning
+or intermediate users of \CONTEXT, or someone who does not want to spend
+too much time playing around with different configuration options for
+\CONTEXT. As such it focusses on different users than Hans's presentation
+modules that provide more and fancier features. This module also offers
+much less features than the \LATEX\ \filename{beamer} package. Its main
+strength is its ease of use; you should be able to write your first
+presentation after spending five minutes with this manual.
+
+\section{A bit of history}
+
+The idea of a module suitable for simple presentations took shape when Thomas
+started using \CONTEXT\ for preparing his course presentations. \CONTEXT\ comes
+with a bunch of modules for presentations (the files \filename{s-pre-??.tex} in
+\filename{$TEXMF/tex/context/base}) which are written by Hans Hagen. Hans
+usually creates a new presentation style whenever he gives a talk about
+\CONTEXT. As such, his presentation styles highlight the fancy and bleeding edge
+features of \CONTEXT, and are not the most suitable starting point for academic
+presentations. 
+
+\CONTEXT\ does make creating your own presentation style relatively easy. So
+Thomas wrote some presentation related macros (see the Prac\TEX\ article
+{\tt\from[practex]}). With time, he extended these macros into a collection of
+styles providing different visual effects, and later collected all of them in
+the \filename{taspresent} module. He gave a talk about the
+\filename{taspresent} module at the second \CONTEXT\ user meeting at Bohinj,
+and in the ensuing discussions, Aditya and Thomas decided to modularize and
+\quotation{\CONTEXT{ize}} some of the internals of the module, giving rise to
+the current module. Most of the code in the current release has been
+contributed by Aditya.
+
+\section{Installation}
+
+The module is installed in the usual way: simply unzip the archive
+\filename{t-simpleslides-<date>.zip} into one of your \filename{$TEXMF}
+trees, and from a terminal run \command{mktexlsr} (for \MKII) and
+\command{mtxrun --generate} (for \MKIV). 
+
+To verify that everything was installed correctly, run \command{kpsewhich t-simpleslides.tex} from a terminal (for \MKII) and \command{mtxrun --locate t-simpleslides.tex} (for \MKIV); these commands should return
+the complete path of the files that you just installed.
+
+\subsubject{A note about \TEX|-|engines}
+
+We have extensively tested this module with \PDFTEX\ and \LUATEX\ (that is,
+with \MKII\ and \MKIV). In spite of our best efforts, we have not been able to
+get this module to work reliably with \XETEX. If you are a \XETEX\ guru, and
+know how to fix some of the errors with \XETEX, we will appreciate the help.
+
+\section{Quick start}
+
+First you must tell \CONTEXT\ that you want to use this module. To do this
+simply write:
+
+\startTEX
+\usemodule[simpleslides]
+\stopTEX
+
+The module sets the paper size and font sizes to values that are suitable for
+presentations. Everything else is left like a default \CONTEXT\ document. The
+module comes with the following styles that change the visual appearance of the
+presentation.
+\startitemize[columns, three]
+  \item \options{BigNumber}
+  \item \options{BottomSquares}
+  \item \options{Boxed}
+  \item \options{Ellipse}
+  \item \options{Embossed}
+  \item \options{Framed}
+  \item \options{FramedTitle}
+  \item \options{HorizontalStripes}
+  \item \options{NarrowStripes}
+  \item \options{PlainCounter}
+  \item \options{RainbowStripe}
+  \item \options{Rounded}
+  \item \options{Shaded}
+  \item \options{SideSquares}
+  \item \options{SideToc}
+  \item \options{Split}
+  \item \options{Sunrise}
+  \item \options{Swoosh}
+  \item \options{ThickStripes}
+\stopitemize
+
+To use a style, say \options{BigNumber}, pass the \options{style=BigNumber}
+option to the \filename{simpleslides} module:
+
+\startTEX
+\usemodule[simpleslides]
+          [style=BigNumber]
+\stopTEX
+
+Some of the styles have a few variants that can be chosen using
+\options{color} and \options{alternative} keys. These are explained in \in
+{Section}[sec:styles].
+
+By default, the Latin Modern Sans font is used. The module makes it easy to
+use other fonts that come with a typical \TEX\ distribution. 
+The following fonts are provided:
+\startitemize[columns, three]
+  \item \options{LatinModern}
+  \item \options{LatinModernSans}
+  \item \options{Bookman}
+  \item \options{Chancery}
+  \item \options{Gothic}
+  \item \options{Helvetica}
+  \item \options{Palatino}
+  \item \options{Schoolbook}
+  \item \options{Times}
+\stopitemize
+
+To choose a font, say \options{Helvetica}, pass \options{font=Helvetica} option
+to the \filename{simpleslides} module as follows.
+\startTEX
+\usemodule[simpleslides]
+          [style=BigNumber,
+            font=Helvetica]
+\stopTEX
+
+The default font size is 17pt. Font size can be changed using 
+the \options{size} key.
+
+More details about the fonts, including information on how to use your own fonts
+is given in \in{Section}[sec:fonts]. 
+
+The complete setup for using this module is
+\setup{simpleslides}
+
+\subsubject{Structure of a presentation}
+
+The \filename{simpleslides} module has a very simple model of a presentation. A
+presentation consists of a title followed by a series of slides; the module
+provides macros to help create a presentation title page and slides.
+A minimal presentation is shown below. The result is shown in \in
+{Figure}[fig:example].
+
+\startEXAMPLE
+\typefile[option=tex]{example.tex}
+\stopEXAMPLE
+
+\placefigure
+  [top,bottom]
+  [fig:example]
+  {A minimal presentation}
+  \startcombination[2*2]
+    \startEXAMPLEframe[width=0.55\textwidth]
+\startSIMPLETEX
+  \usemodule[simpleslides]
+            [style=BigNumber]
+  \setupTitle[...]
+
+  \starttext
+  \SlideTitle{...}
+  ...
+  \SlideTitle{...}
+  ...
+  \stoptext
+\stopSIMPLETEX
+    \stopEXAMPLEframe
+    {A minimal example}
+    {\externalfigure[example][page=1,width=0.55\textwidth]}{Title page}
+    {\externalfigure[example][page=2,width=0.55\textwidth]}{First slide}
+    {\externalfigure[example][page=3,width=0.55\textwidth]}{Second slide}
+  \stopcombination
+
+
+
+\subsubject{Presentation title page}
+
+A presentation title page displays the title of the presentation, the names of
+the authors, and the date.
+%% TODO: Also add institution and detail.
+These can be specified using \typeTEX{\setupTitle} as follows:
+\startTEX
+\setupTitle
+  [ title={Title of the presentation},
+   author={Name of authors},
+     date={Date of presentation},
+  ]
+\stopTEX
+
+The macro \typeTEX{\placeTitle} places the title page in the presentation. It is
+possible to change the look of \typeTEX{\placeTitle} using some additional
+arguments to \typeTEX{\setupTitle}. These are explained in \in
+{Section}[sec:setuptitle].
+
+\subsubject{Presentation slide}
+
+The \filename{simpleslides} module provides a \typeTEX{\SlideTitle} macro, which
+starts a new slide (basically a new page), and typesets its argument as the
+title of the slide. It also takes care of increasing the page counters and
+progress bars, and setting up the background. The content of the slides follows
+after this command.
+
+A slide is a normal \CONTEXT\ page, so you can use any command or environment
+that you want. Each presentation style sets up a style for itemizations, and
+provides useful macros for placing pictures. These macros will be explained
+later.
+
+
+
+\section{Placing pictures}
+
+If you want to place pictures in your slides, you can always use \CONTEXT's
+\typeTEX{\externalfigure} macro. This module also provides a macro,
+\typeTEX{\IncludePicture}, for preconfigured picture layouts. Two layouts are
+provided:
+\startitemize
+  \item \options{horizontal}: the picture is placed under the title of the slide,
+    so that it fits in the available space.
+  \item \options{vertical}: the slide is divided into two columns; the picture is
+    placed on the left column and text is placed on the right column.
+\stopitemize
+These layouts are shown in \in{Figure}[fig:pictures].
+
+\placefigure
+  [top,bottom]
+  [fig:pictures]
+  {Example of \options{horizontal} and \options{vertical} options for 
+  \typeTEX{IncludePicture} macro}
+  %FIXME: Change caption to \IncludePicture ..
+  \startcombination[2*2]
+    \startEXAMPLEframe[width=0.55\textwidth]
+\startSIMPLETEX
+  \usemodule[simpleslides]
+            [...]
+  \starttext
+  ...
+  \IncludePicture
+      [horizontal]
+      [cow]
+      {A Dutch Cow}
+  ...
+  \stoptext
+\stopSIMPLETEX
+    \stopEXAMPLEframe
+    {A horizontal picture}
+    {\externalfigure[styles/BigNumber-blue]
+                    [page=3,width=0.55\textwidth]}{A horizontal picture}
+    \startEXAMPLEframe[width=0.55\textwidth]
+\startSIMPLETEX
+  \usemodule[simpleslides]
+            [...]
+  \starttext
+  ...
+  \IncludePicture
+      [vertical]
+      [mill]
+      {The windmills are an example of a green energy source} 
+  ...
+  \stoptext
+\stopSIMPLETEX
+    \stopEXAMPLEframe
+    {A vertical picture}
+    {\externalfigure[styles/BigNumber-blue]
+                    [page=10,width=0.55\textwidth]}{A vertical picture}
+\stopcombination
+
+A horizontal picture is placed as follows:
+\startTEX
+\IncludePicture
+  [horizontal]
+  [filename]  % Name of the file that contains the picture
+  {Title of the slide}
+\stopTEX
+
+while a vertical picture is placed as follows:
+\startTEX
+\IncludePicture
+  [vertical]
+  [filename]  % Name of the file that contains the picture
+  {Text that is placed on the right of the picture}
+\stopTEX
+
+It is possible to change the height and width of the pictures, or 
+highlight them with circles and arrows. These details can be found in \in
+{Section}[sec:pictures]
+
+\page
+
+\section[sec:styles]{Changing presentation styles}
+
+The \options{style} key to \typeTEX{\setupmodule[simpleslides]} determines the
+look of the presentation. Some of the styles come with variants, that can be
+chosen using \options{color} and \options{alternative} keys. The available
+styles are shown below along with the details of their variants.
+
+\subsubject{BigNumber: with \options{color=blue} (also accepts \options{color=red})}
+
+This is a style with subdued and quiet colors; its characteristic feature is the
+page number on the lower right border of the text area. This detail was inspired
+by the {\em split} style (\filename{s-pre-14}) by Hans.
+
+\ShowStyle {BigNumber-blue}
+\page
+
+\subsubject{BottomSquares}
+
+This minimalistic style is inspired by a presentation Taco gave at EuroTeX
+2006.
+
+\ShowStyle {BottomSquares}
+\page
+
+\subsubject{Boxed}
+
+This style is inspired by the screen version of the Metafun manual. Watch
+the small gray circles at the bottom!
+
+\ShowStyle {Boxed}
+\page
+
+\subsubject{Ellipse}
+
+This style is inspired by {\em funny} style (\filename{s-pre-03}) by Hans. 
+The light red stripe marks the progress.
+
+\ShowStyle {Ellipse}
+\page
+
+\subsubject{Embossed}
+
+Spread the word, don't be shy! Show your pride in using \CONTEXT. The color
+theme will probably look familiar; we copied it from the \filename{enattab}
+manual. 
+
+\ShowStyle {Embossed}
+
+If you are shy, or narcissistic, you can change the emblem by
+\startTEX
+\setuplabeltext  [simpleslidesemblem={I made this presentation}]
+\stopTEX
+
+\page
+
+\subsubject{Framed: with \options{alternative=square}}
+
+This style was inspired by the {\em green} style (\filename{s-pre-02}) by
+Hans. It has a thick blue frame around the entire slide area and a thinner
+frame around the text area. The style has two options for alternative:
+\options{alternative=stripe} will display a shaded blue area which will
+grow with each slide; \options{alternative=square} displays a row of blue
+squares at the bottom which also measure the presentation's progress.
+
+\ShowStyle {Framed-square}
+\page
+
+\subsubject{Framed: with \options{alternative=stripe}}
+\ShowStyle {Framed-stripe}
+\page
+
+\subsubject{FramedTitle}
+
+This is a style with loud titles. Its characteristic feature is the {\em scratch
+counter} at the bottom, which is derived from Section~7.2 of the Metafun
+manual.
+
+\ShowStyle {FramedTitle}
+\page
+
+\subsubject{HorizontalStripes: with \options{color=green} (also accepts
+\options{color=blue} and \options{color=red})}
+
+A sober style with an emphasis on horizontal lines, inspired by the {\em
+Szeged} theme in \LATEX's \filename{beamer} package.
+
+\ShowStyle {HorizontalStripes-green}
+\page
+
+\subsubject{NarrowStripes: with \options{color=green} (also accepts
+\options{color=blue} and \options{color=red})}
+
+A very simple and sober style, with shaded narrow stripes. 
+
+\ShowStyle {NarrowStripes-green}
+\page
+
+\subsubject{RainbowStripe}
+
+A colorful style for daring presenters. The black line which marks the
+progress is reminiscent of absorption lines in star spectra, so this style
+may be apt for astrophysical presentations?
+
+\ShowStyle {RainbowStripe}
+\page
+
+\subsubject{Rounded}
+
+This style has cool colors and lots of white space; it is probably best suited
+for presentations with relatively little text.
+
+\ShowStyle {Rounded}
+\page
+
+\subsubject{Shaded: with \options{color=blue} (also accepts
+\options{color=green} and \options{color=bluered})}
+
+The only ornament to this style is the dark shaded background. It uses
+\CONTEXT's \type{interactionbar} mechanism to show the progress of the
+presentation. It provides much space for text.
+
+\ShowStyle {Shaded-blue}
+\page
+
+\subsubject{SideSquares}
+
+This style is inspired by the colors and corporate look of Thomas's 
+university. It is very sober and offers much space for text and
+images. There is a rough progress meter built into the blue quadrangles. 
+
+\ShowStyle {SideSquares}
+\page
+
+\subsubject{SideToc}
+
+This Style has a list of Topics in its left margin; the current topic is
+automatically highlighted. To set a topic and add it to this table simple
+type \typeTEX{\Topic[TopicName]} in your source file where the new topic
+begins. 
+
+\ShowStyle {SideToc}
+\page
+
+\subsubject{Split}
+
+This style is inspired by the {\em Copenhagen} theme of the \LATEX's
+\filename{beamer} package. The narrow blue and black stripes at the top and the
+bottom of the slides display the date and slide number (top) and the title
+and author of the presentation. 
+
+\ShowStyle {Split}
+\page
+
+\subsubject{Sunrise}
+
+This style is inspired by the {\em husky} theme of the \LATEX's
+\filename{powerdot} package.
+
+\ShowStyle {Sunrise}
+\page
+
+\subsubject{Swoosh}
+
+Take a break from the right angles and straight lines. Use swooshy curves. This
+style also has a fancy page counter at the bottom.
+
+\ShowStyle {Swoosh}
+\page
+
+\subsubject{ThickStripes}
+
+This theme is inspired by the {\em Berkeley} style of the \LATEX's
+\filename{beamer} package. It has a stop watch at the bottom, which keeps track
+of the number of slides.
+
+\ShowStyle {ThickStripes}
+\page
+
+\section[sec:fonts]{Changing presentation fonts}
+
+The \options{font} and the \options{size} keys to
+\typeTEX{\setupmodule[simpleslides]} determine the font and font size for the
+main text of the presentation. The default font is Latin Modern Sans at 17pt. 
+
+\startitemize
+\item The \options{font} key can take the following values.
+
+\starttabulate[|l|p|]
+\NC \options{LatinModern}     \NC typesets in Latin Modern Serif     \NC \NR
+\NC \options{LatinModernSans} \NC typesets in Latin Modern Sans      \NC \NR
+\NC \options{Bookman}         \NC typesets in \TEX Gyre Bonum (a Bookman
+    clone)       \NC \NR
+\NC \options{Chancery}        \NC typesets in \TEX Gyre Chorus 
+    \footnote{Please be aware that Chorus is a calligraphic font. It has no
+    italic or bold.} (a Zapf Chancery clone)                        \NC \NR
+\NC \options{Gothic}          \NC typesets in \TEX Gyre Adventor (a Gothic
+    clone)   \NC \NR
+\NC \options{Helvetica}       \NC typesets in \TEX Gyre Heros (a Helvetica
+    clone)       \NC \NR
+\NC \options{Palatino}        \NC typesets in \TEX Gyre Pagella (a Palatino
+    clone)   \NC \NR
+\NC \options{Schoolbook}      \NC typesets in \TEX Gyre Schola (a Schoolbook
+    clone)     \NC \NR
+\NC \options{Times}           \NC typesets in \TEX Gyre Termes (a Times clone)
+\NC \NR
+\stoptabulate
+
+\item The \options{size} key can be any valid \TEX\ dimension.
+
+\stopitemize
+
+\subsubject{Choosing your own font}
+
+If you want to set up your own font, pick any value for the \options{font} key
+(or leave it empty). Use the \options{size} key to choose the font size. Then
+{\em after} loading the module, choose any font using the normal \CONTEXT\
+commands. Make sure to set the bodyfont at size \typeTEX{\NormalSize}. So, if
+you have your own typescript for a font, your setup will look like this:
+
+\startTEX
+\usemodule[simpleslides][...]
+....
+\usetypescriptfile[type-myfont]    % The typescript for your font
+\usetypescript[Mytypescript]       % As set in your typescript file
+\setupbodyfont[Myfont,\NormalSize] % Note the \NormalSize here
+\stopTEX
+
+Internally, the font size is stored in the macro \typeTEX{\NormalSize}. The main
+text is set at size \typeTEX{\NormalSize}; the main title is set at
+\typeTEX{\TitleSize} while the author and date on the title page, and the slide
+title are set at \typeTEX{\SlideTitleSize}. 
+
+\typeTEX{\NormalSize}, \typeTEX{\TitleSize}, and \typeTEX{\SlideTitleSize} are
+defined in terms of the dimensions \typeTEX{\simpleslidesNormalSize},
+\typeTEX{\simpleslidesTitleSize}, and \typeTEX{\simpleslidesSlideTitleSize}.
+\typeTEX{\simpleslidesNormalSize} is equal to the \options{size} option. The
+module uses some heuristics to select a reasonable value of
+\typeTEX{\simpleslidesTitleSize} and \typeTEX{\simpleslidesSlideTitleSize}. If
+you do not like the size of the title page and slide titles, you can change
+their value to whatever you like.
+
+
+\section[sec:setuptitle]{Changing the title page}
+
+It is possible to change the look of \typeTEX{\placeTitle} using
+\typeTEX{\setupTitle}. This feature is intended for authors creating a new
+style, but may also be useful for someone who likes to tweak the presentation
+style. You should normally only set the  \options{title}, \options{authors}, and
+\options{date} keys. If \options{date} is not set, then the module will default
+to \typeTEX{\currentdate}.
+
+\setup{setupTitle}
+
+\section{Changing the slide titles}
+
+It is possible to change the look of \typeTEX{\SlideTitle} using
+\typeTEX{\setupSlideTitle}. Like \typeTEX{\setupTitle}, this feature is intended
+for authors creating a new style. You can use this command to make a minor
+change in an existing style, if you want.
+
+\setup{setupSlideTitle}
+
+\section[sec:pictures]{Special macro for including pictures}
+
+As explained earlier, the \typeTEX{\IncludePicture} macro facilitates the
+placement of pictures. It takes four arguments (one of which is optional, and as
+such wasn't mentioned in the previous description).
+
+\setup{IncludePicture}
+
+As explained earlier, the first argument determines whether the picture will be
+placed in horizontal or vertical layout; for examples, see \in
+{Figure}[fig:pictures]. The second argument is the filename of the picture that
+you want to include. The third argument is an optional argument useful for
+highlighting the picture. The fourth argument (in braces) is the text
+accompanying the picture. For horizontal pictures, this text is placed as a
+\typeTEX{\SlideTitle}; for vertical pictures this text is placed opposite to the
+picture, centered horizontally and vertically. 
+
+The third argument is the most complex. It specifies picture dimensions and
+highlights. If you want all pictures to share a common value (like
+\options{color} or \options{shadow}), specify them using
+\typeTEX{\setupPicture}.
+
+\setup{setupPicture}
+
+\null\blank
+Below is a brief explanation of what the different parameters do:
+
+\startitemize[packed]
+  \item \options{width} and \options{height} \par
+    Unsurprisingly, these set the width and height of the picture. Normally, the
+    module will automatically scale your pictures to fill the available space, so
+    you only need to set one of these values if you want to override this
+    mechanism. 
+
+  \item \options{highlight} \par
+    This key determines the highlighting of the picture. If you set
+    \options{highlight=yes}, then you can use one of the three available
+    highlights: \options{circle}, \options{arrow}, and \options{focus}. These
+    highlights are shown in \in{Figure}[fig:highlight]. The specific highlight is
+    chosen using the \options{alternative} key. The location of the highlight is
+    specified using the \options{x} and \options{y} keys. The scaling and
+    rotation of the highlights is set using \options{xscale}, \options{yscale},
+    \options{length} and \options{direction}.
+
+  \item \options{alternative} \par
+    When \options{highlight=yes}, three different highlights are
+    available: \options{circle}, \options{arrow}, and \options{focus}.
+    
+\stopitemize
+
+\placefigure
+  [top,bottom]
+  [fig:highlight]
+  {Different highlight options available}
+  \startcombination[2*2]
+    {\externalfigure[styles/BigNumber-blue][page=3,width=0.55\textwidth]}
+    {Picture with \options{highlight=no} (default)}
+    {\externalfigure[styles/BigNumber-blue][page=7,width=0.55\textwidth]}
+    {Picture with \options{highlight=yes} and \options{alternative=circle}}
+    {\externalfigure[styles/BigNumber-blue][page=8,width=0.55\textwidth]}
+    {Picture with \options{highlight=yes} and \options{alternative=arrow}}
+    {\externalfigure[styles/BigNumber-blue][page=9,width=0.55\textwidth]}
+    {Picture with \options{highlight=yes} and \options{alternative=focus}}
+  \stopcombination
+
+\subsubject{Units for dimensions}
+
+All dimensions are specified relative to the width and height of the image, so
+you do not have to change the location of your highlights if you change the
+presentation style. The dimensions \options{x} and \options{y} should be a
+number between 0 and 10. The \options{x} is scaled by 1/10 times the width of
+the image; the \options{y} value is scaled by 1/10 times the height of the
+image. The easiest way to understand this is to look at a scaled grid
+superimposed on the picture, as in \in{Figure}[fig:grid]. The grid is configured
+as follows:
+
+\startitemize[packed]
+  \item \options{grid} and \options{subgrid} \par
+    These options determine whether or not to show the grid and sub-grid. The
+    \options{grid} divides the height and width of the picture into 10 sections;
+    this is helpful for determining the exact position where you want to place
+    circles and arrows. The \options{subgrid} divides the grid into a finer
+    grid. Each cell is divided into \options{steps} times \options{steps} cells.
+
+  \item \options{gridcolor} \par
+    This option determines the color in which the grid is drawn. It can be any
+    \CONTEXT\ color identifier. The default value is green.
+
+  \item \options{steps} \par
+    The number of subdivisions for the \options{subgrid}. The default value is
+    5.
+\stopitemize
+
+\placefigure
+  [top,bottom]
+  [fig:grid]
+  {Grids for help in determining the location of highlight}
+  \startcombination[2]
+    {\externalfigure[styles/BigNumber-blue][page=4,width=0.55\textwidth]}
+    {Picture with \options{highlight=yes} and \options{grid=yes}}
+    {\externalfigure[styles/BigNumber-blue][page=5,width=0.55\textwidth]}
+    {Picture with \options{highlight=yes}, \options{grid=yes} and
+    \options{subgrid=yes}}
+  \stopcombination
+
+\subsubject{Highlighting by a circle}
+
+Now lets see how different highlight alternatives are specified. Suppose we want
+to place the picture of a cow and highlight its head. To help determine the
+center of the circle, we can first superimpose a fine grid on the picture, and
+read the value for the center. From \in{Figure}[fig:grid], \options{x=1.4} and
+\options{y=8.2} seems like a good value. Next we need to decide on the radius of
+the circle. The radius can either be specified in terms of the \quotation{x
+units} (1/10th of the picture width) or \quotation{y units} (1/10th of the
+picture height). Lets try a radius of 1.5 \quotation{x units}. This can be
+specified as \options{xscale=1.5}. If we wanted something in terms of
+\quotation{y units}, we could have used \options{yscale}. If both
+\options{xscale} and \options{yscale} are specified, we will get an ellipse. 
+Thus, to draw the circle highlight shown in \in{Figure}[fig:highlight], we wrote
+
+\startTEX
+\IncludePicture
+  [horizontal]
+  [cow] % Name of the image
+  [highlight=yes,
+   alternative=circle,
+   x=1.4,
+   y=8.2,
+   xscale=1.5,
+   shadow=bottomleft]
+  {The head of a dutch cow}
+\stopTEX
+
+If \options{direction} key is specified, the circle (or the ellipse) will be
+rotated by that amount (in degrees) in the counter clockwise direction. The
+color in which the circle is drawn is specified using \options{color} key. The
+thickness of the line is determined by \options{rulethickness} key. By default,
+\options{color=orange} and \options{rulethickness} is 1/100th of the picture
+width.
+
+In summary, the different keys related to \options{alternative=circle} are:
+\startitemize[packed]
+  \item \options{highlight=yes} and \options{alternative=circle} \par
+    These are needed to specify a circle highlight.
+  \item \options{x} and \options{y} \par
+    The center of the circle in terms of scaled units. Their values should be
+    between 0 and 10.
+  \item \options{xscale} and \options{yscale} \par
+    The radius of the circle if only one option is specified. The major and
+    minor radii of the ellipse if both options are specified. 
+  \item \options{direction} \par
+    The amount by which the circle is rotated. This only makes sense if we are
+    actually drawing an ellipse.
+  \item \options{rulethickness} \par
+    The line width of the circle.
+  \item \options{color} \par
+    The color of the circle.
+\stopitemize
+
+\subsubject{Highlighting by an arrow}
+
+Suppose we want to include a picture of a cow and point out its mouth using an
+arrow. An arrow is specified by three things, the location of its tip, given by
+\options{x} and \options{y} keys; the length of the arrow, given by
+\options{length} key; and the direction of the tail, given by
+\options{direction} key. Thus, to draw the arrow highlight shown in \in
+{Figure}[fig:highlight], we wrote
+\startTEX
+\IncludePicture
+  [horizontal]
+  [cow] % Name of the image
+  [highlight=yes,
+   alternative=arrow,
+   x=0.4,
+   y=6.8,
+   direction=-90, 
+   length=3cm,
+   shadow=bottomleft]
+  {The mouth of a dutch cow}
+\stopTEX
+
+The different keys related to \options{alternative=arrow} are:
+\startitemize[packed]
+  \item \options{highlight=yes} and \options{alternative=arrow} \par
+    These are needed to specify a arrow highlight.
+  \item \options{x} and \options{y} \par
+    The tip of the arrow in terms of scaled units. Their values should be
+    between 0 and 10.
+  \item \options{length} \par
+    The length of the arrow. This is a dimension.
+  \item \options{direction} \par
+    The amount by which the arrow is rotated. 
+  \item \options{rulethickness} \par
+    The line width of the arrow. (Actually the line width of the arrow is twice
+    the given value. This is so that both arrows and circles look good with the
+    same value of rulethickness.)
+  \item \options{color} \par
+    The color of the arrow.
+\stopitemize
+
+\subsubject{Highlighting by focus}
+
+Suppose we want place the picture of a cow, focus its head, and dull out rest of
+the picture. The area to be focused is a circle (or an ellipse) and it can be
+specified using \options{x} and \options{y} to indicate the center,
+\options{xscale} and \options{yscale} to indicate the radius, and
+\options{direction} to indicate the rotation. The keys \options{rulethickness}
+and \options{color} do not have any effect. The area other than the focussed
+area is washed out with a transparent color. The degree to which it is washed
+out is determined by \options{opacity} (default value 0.5), and the color of the
+unfocussed area is determined by \options{shadowcolor} (default value black).
+Thus, to draw the focus highlight shown in \in{Figure}[fig:highlight], we wrote
+
+\startTEX
+\IncludePicture
+  [horizontal]
+  [cow] % Name of the image
+  [highlight=yes,
+   alternative=focus,
+   x=1.4,
+   y=8.2,
+   xscale=1.5]
+  {The head of a dutch cow}
+\stopTEX
+
+The different keys related to \options{alternative=focus} are:
+\startitemize[packed]
+  \item \options{highlight=yes} and \options{alternative=focus} \par
+    These are needed to specify a focus highlight.
+  \item \options{x} and \options{y} \par
+    The center of the circle in terms of scaled units. Their values should be
+    between 0 and 10.
+  \item \options{xscale} and \options{yscale} \par
+    The radius of the circle if only one options is specified. The major and
+    minor radii of the ellipse if both options are specified. 
+  \item \options{direction} \par
+    The amount by which the circle is rotated. This only makes sense if we are
+    actually drawing an ellipse.
+  \item \options{opacity} \par
+    The opacity of the unfocussed area. \options{opacity=0} is transparent,
+    while \options{opacity=1} is completely opaque.
+  \item \options{shadowcolor} \par
+    The color of the unfocused area.
+\stopitemize
+
+\subsubject{Adding shadows}
+
+When a circle or arrow highlight is used, adding a shadow to the highlight makes
+them stand out more. The key related to shadows is:
+\startitemize[packed]
+  \item \options{shadow} \par
+    This key determines whether shadows are placed or not. By default, shadows
+    are disabled. If not set to \options{no}, this key determines where the
+    shadow is placed: at \options{topleft}, \options{topright},
+    \options{bottomleft}, or \options{bottomright}. Setting this key to
+    \options{yes} puts the shadow at \options{bottomright}.
+\stopitemize
+
+\subsubject{Adding a specific page}
+
+To select a specific page from a multi-page pdf file, you can use
+\options{page=<number>} option.
+
+\subsubject{Using your own style}
+
+The module makes it easy to write your own style or to tweak one of the
+provided styles beyond the configuration options provided by the
+module. Simply copy the style which is closest in appearance to what you
+want to obtain. Give it a filename \filename{s-myownstyle.tex},
+\filename{myownstyle} being any name you like. Put this file into a
+directory where \CONTEXT\ will find it, either the directory where you will
+process your presentation or somewhere in your personal \filename{$TEXMF}
+tree. Then, let the module know that you want to use your own style:
+
+\startTEX
+\usemodule[simpleslides]
+          [style=myownstyle]
+\stopTEX
+
+The module will read your file and apply your settings.
+
+\stoptext
+
+% vim: foldmethod=marker foldmarker=<<<,>>>

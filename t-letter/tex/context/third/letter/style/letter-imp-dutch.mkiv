@@ -1,0 +1,79 @@
+%D \module
+%D   [     file=letter-imp-dutch,
+%D      version=2011.11.01,
+%D        title=\CONTEXT\ Letter Style,
+%D     subtitle=Dutch style,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\useletterstyle[dinb]
+
+\setupletterlayout
+  [\v!firstpage,\v!secondpage]
+  [\c!topspace=105mm,
+   \c!bottomspace=30mm,
+   \c!backspace=33mm,
+   \c!width=\v!middle,
+   \c!height=\v!middle]
+
+\setupletterlayout
+  [\v!secondpage]
+  [\c!topspace=20mm,
+   \c!header=15mm,
+   \c!headerdistance=15mm,
+   \c!height=\v!middle]
+
+\setupletterlayer
+  [\v!topmark,\v!cutmark]
+  [\c!state=\v!repeat,
+   \c!x=3.5mm]
+
+\setuplettersection
+  [\v!subject]
+  [\c!spaceafter=\v!line]
+
+\setuplettersection
+  [\v!closing]
+  [\c!spaceinbetween=\v!line]
+
+\setupletterlayer
+  [\v!address]
+  [\c!y=55mm]
+
+\setupletterframe
+  [\v!address]
+  [\c!height=35mm,
+   \c!width=80mm]
+
+\setupletterlayer
+  [\v!backaddress]
+  [\c!y=50mm]
+
+\setupletterframe
+  [\v!backaddress]
+  [\c!width=80mm,
+   \c!height=5mm,
+   \c!bottomframe=\v!on]
+
+\setupletterlayer
+  [\v!botmark]
+  [\c!state=\v!stop]
+
+\endinput

@@ -1,0 +1,400 @@
+%D \module
+%D   [     file=t-simplefonts,
+%D      version=2009.11.08,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Simplefonts,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=Public Domain]
+
+\writestatus{loading}{ConTeXt User Module / Simplefonts}
+
+\unprotect
+
+\startmodule[simplefonts]
+
+%D Constants and variables
+
+\startinterface all
+  \setinterfaceconstant {regular}                 {regular}
+  \setinterfaceconstant {italic}                  {italic}
+  \setinterfaceconstant {slanted}                 {slanted}
+  \setinterfaceconstant {bold}                    {bold}
+  \setinterfaceconstant {bolditalic}              {bolditalic}
+  \setinterfaceconstant {boldslanted}             {boldslanted}
+  \setinterfaceconstant {caps}                    {caps}
+  \setinterfaceconstant {scale}                   {scale}
+  \setinterfaceconstant {features}                {features}
+  \setinterfaceconstant {regularfont}             {regularfont}
+  \setinterfaceconstant {italicfont}              {italicfont}
+  \setinterfaceconstant {slantedfont}             {slantedfont}
+  \setinterfaceconstant {boldfont}                {boldfont}
+  \setinterfaceconstant {bolditalicfont}          {bolditalicfont}
+  \setinterfaceconstant {boldslantedfont}         {boldslantedfont}
+  \setinterfaceconstant {capsfont}                {capsfont}
+  \setinterfaceconstant {regularfeatures}         {regularfeatures}
+  \setinterfaceconstant {italicfeatures}          {italicfeatures}
+  \setinterfaceconstant {slantedfeatures}         {slantedfeatures}
+  \setinterfaceconstant {boldfeatures}            {boldfeatures}
+  \setinterfaceconstant {bolditalicfeatures}      {bolditalicfeatures}
+  \setinterfaceconstant {boldslantedfeatures}     {boldslantedfeatures}
+  \setinterfaceconstant {smallcapsfeatures}       {smallcapsfeatures}
+  \setinterfaceconstant {capsfeatures}            {capsfeatures}
+  \setinterfaceconstant {typeface}                {typeface}
+\stopinterface
+
+\startinterface all
+  \setinterfacevariable {simplefonts}             {simplefonts}
+  \setinterfacevariable {simplefont}              {simplefont}
+  \setinterfacevariable {style}                   {style}
+  \setinterfacevariable {suffix}                  {suffix}
+  \setinterfacevariable {serif}                   {serif}
+  \setinterfacevariable {sans}                    {sans}
+  \setinterfacevariable {mono}                    {mono}
+  \setinterfacevariable {math}                    {math}
+  \setinterfacevariable {mainfont}                {mainfont}
+  \setinterfacevariable {sansfont}                {sansfont}
+  \setinterfacevariable {monofont}                {monofont}
+  \setinterfacevariable {mathfont}                {mathfont}
+  \setinterfacevariable {handwritingfont}         {handwritingfont}
+  \setinterfacevariable {calligraphicfont}        {calligraphicfont}
+  \setinterfacevariable {handwriting}             {handwriting}
+  \setinterfacevariable {calligraphy}             {calligraphy}
+  \setinterfacevariable {fontfamily}              {fontfamily}
+  \setinterfacevariable {alternative}             {alternative}
+\stopinterface
+
+\startinterface all
+  \setinterfaceelement  {set}                     {set}
+\stopinterface
+
+%D System constants
+
+\definesystemconstant {Handwriting}
+\definesystemconstant {Calligraphy}
+
+%D Module setup
+
+\setupmodule
+  [\c!size=\!!twelvepoint,
+   \c!style=\c!rm]
+
+%D Namespace
+
+\def\????sf{@@@@sf}
+
+%D Counter
+
+\newcounter\simplefonts!typeface
+\newcounter\simplefonts!fontfamily
+
+%D Boolean
+
+\newif\if!!donesimplefonts
+
+%D Comma value lists
+
+\def\simplefonts!commands
+  {\v!mainfont,\v!sansfont,\v!monofont,\v!mathfont,\v!handwritingfont,\v!calligraphicfont}
+
+\def\simplefonts!alternative
+  {\c!regular,\c!italic,\c!slanted,\c!bold,\c!bolditalic,\c!boldslanted,\c!caps}
+
+%D \macros
+%D   {simplefontparameter,namedsimplefontparameter,
+%D    setupsimplefonts,presetsimplefonts}
+%D
+%D Internal helper macros
+
+\def\simplefontparameter       #1{\csname\????sf\currentsimplefont#1\endcsname}
+\def\namedsimplefontparameter#1#2{\csname\????sf                #1#2\endcsname}
+
+\def\setupsimplefonts
+  {\dosingleempty\dosetupsimplefonts}
+
+\def\dosetupsimplefonts[#1]% first argument is optional
+  {\iffirstargument\getparameters[\????sf][#1]\fi
+   \if!!donesimplefonts\simplefonts@bodyfont\fi}
+
+\def\presetsimplefonts[#1]%
+  {\getparameters
+     [#1]
+     [\c!regularfont=,
+      \c!italicfont=,
+      \c!slantedfont=,
+      \c!boldfont=,
+      \c!bolditalicfont=,
+      \c!boldslantedfont=,
+      \c!capsfont=,
+      \c!features=\@@@@sffeatures,
+      \c!regularfeatures=\simplefontparameter\c!features,
+      \c!italicfeatures=\simplefontparameter\c!features,
+      \c!slantedfeatures=\simplefontparameter\c!features,
+      \c!boldfeatures=\simplefontparameter\c!features,
+      \c!bolditalicfeatures=\simplefontparameter\c!features,
+      \c!boldslantedfeatures=\simplefontparameter\c!features,
+      \c!smallcapsfeatures=\@@@@sfsmallcapsfeatures,
+      \c!capsfeatures=\simplefontparameter\c!smallcapsfeatures,
+      \c!scale=1.0]}
+
+\letvalue{\????sf:\v!style :\v!serif      }\c!rm
+\letvalue{\????sf:\v!style :\v!sans       }\c!ss
+\letvalue{\????sf:\v!style :\v!mono       }\c!tt
+\letvalue{\????sf:\v!style :\v!math       }\c!mm
+\letvalue{\????sf:\v!style :\v!handwriting}\c!hw
+\letvalue{\????sf:\v!style :\v!calligraphy}\c!cg
+
+\letvalue{\????sf:\v!suffix:\v!serif      }\s!Serif
+\letvalue{\????sf:\v!suffix:\v!sans       }\s!Sans
+\letvalue{\????sf:\v!suffix:\v!mono       }\s!Mono
+\letvalue{\????sf:\v!suffix:\v!handwriting}\s!Handwriting
+\letvalue{\????sf:\v!suffix:\v!calligraphy}\s!Calligraphy
+
+\setvalue{\????sf:\v!alternative:\c!regular    }{}
+\setvalue{\????sf:\v!alternative:\c!italic     }{/I}
+\setvalue{\????sf:\v!alternative:\c!slanted    }{/I}
+\setvalue{\????sf:\v!alternative:\c!bold       }{/B}
+\setvalue{\????sf:\v!alternative:\c!bolditalic }{/BI}
+\setvalue{\????sf:\v!alternative:\c!boldslanted}{/BI}
+\setvalue{\????sf:\v!alternative:\c!caps       }{}
+
+\definetypescriptsynonym[latinmodernmath][latin-modern] % do I need more of them
+
+\def\sf@style      #1{\csname\????sf:\v!style      :#1\endcsname}
+\def\sf@suffix     #1{\csname\????sf:\v!suffix     :#1\endcsname}
+\def\sf@alternative#1{\csname\????sf:\v!alternative:#1\endcsname}
+
+\starttexdefinition simplefonts@typeface #1#2#3
+
+    \definetypeface
+        [#1]
+        [\sf@style{\namedsimplefontparameter{#3}\c!style}]
+        [\namedsimplefontparameter{#3}\c!style]
+        [#2]
+        [\s!default]
+        [rscale=\namedsimplefontparameter{#3}\c!scale]
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@family #1
+
+    \simplefonts@typeface{#1}{\v!mainfont                                    }{\v!mainfont        }
+    \simplefonts@typeface{#1}{\v!sansfont                                    }{\v!sansfont        }
+    \simplefonts@typeface{#1}{\v!monofont                                    }{\v!monofont        }
+    \simplefonts@typeface{#1}{\namedsimplefontparameter\v!mathfont\c!typeface}{\v!mathfont        }
+    \simplefonts@typeface{#1}{\v!handwritingfont                             }{\v!handwritingfont }
+    \simplefonts@typeface{#1}{\v!calligraphicfont                            }{\v!calligraphicfont}
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@typescript #1#2
+
+    \startexpanded
+
+        \@NX\starttypescript[#1][#2]
+
+            \simplefonts@fontsynonym{\sf@suffix{#1}\empty        }{\c!regular    }
+            \simplefonts@fontsynonym{\sf@suffix{#1}\s!Italic     }{\c!italic     }
+            \simplefonts@fontsynonym{\sf@suffix{#1}\s!Slanted    }{\c!slanted    }
+            \simplefonts@fontsynonym{\sf@suffix{#1}\s!Bold       }{\c!bold       }
+            \simplefonts@fontsynonym{\sf@suffix{#1}\s!BoldItalic }{\c!bolditalic }
+            \simplefonts@fontsynonym{\sf@suffix{#1}\s!BoldSlanted}{\c!boldslanted}    
+            \simplefonts@fontsynonym{\sf@suffix{#1}\s!Caps       }{\c!caps       }
+
+        \@NX\stoptypescript
+
+    \stopexpanded
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@scripttypescript #1#2
+
+    \startexpanded
+
+        \@NX\starttypescript[#1][#2]
+
+            \simplefonts@fontsynonym{\sf@suffix{#1}}{\c!regular}
+
+        \@NX\stoptypescript
+
+    \stopexpanded
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@fontsynonym #1#2
+
+    \@NX\definefontsynonym
+        [#1]
+        [\simplefontparameter{#2}]
+        [\s!features=\simplefontparameter{#2\s!features}]
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@bodyfont
+
+    \doglobal\increment\simplefonts!typeface
+
+    \simplefonts@family{\v!simplefonts:\simplefonts!typeface}
+
+    \setupbodyfont[\v!simplefonts:\simplefonts!typeface,\@@@@sfstyle,\@@@@sfsize]
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@definetextfont [#1][#2][#3][#4]
+
+    \edef\currentsimplefont{#1}\edef\currenttypeface{#2}
+
+    \presetsimplefonts[\????sf\currentsimplefont]
+
+    \getparameters[\????sf\currentsimplefont][#4]
+
+    \startprocesscommacommand[\simplefonts!alternative]
+
+        \doifsomethingelse{\simplefontparameter{##1\s!font}}
+            {\doifinstringelse{*}{\simplefontparameter{##1\s!font}}
+                {\setevalue{\????sf#1##1}{name:#3\@EAEAEA\gobbleoneargument\csname\????sf\currentsimplefont##1\s!font\endcsname}}
+                {\setevalue{\????sf#1##1}{name:\simplefontparameter{##1\s!font}}}}
+            {\setevalue{\????sf#1##1}{name:#3\sf@alternative{##1}}}
+
+    \stopprocesscommacommand
+
+    \simplefonts@typescript{\simplefontparameter\c!style}{#1}
+
+    \ifx\currenttypeface\v!simplefonts
+
+        % don't create a typeface and set bodyfont when the module is loaded
+
+        \if!!donesimplefonts\simplefonts@bodyfont\fi
+
+    \else
+
+        \simplefonts@typeface{#2}{#1}{#1}
+
+    \fi
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@definescriptfont [#1][#2][#3][#4]
+
+    \edef\currentsimplefont{#1}\edef\currenttypeface{#2}
+
+    \presetsimplefonts[\????sf\currentsimplefont]
+
+    \getparameters[\????sf\currentsimplefont][#4]
+
+    \startprocesscommacommand[\c!regular]
+
+        \setvalue{\????sf#1##1}{name:#3}
+
+    \stopprocesscommacommand
+
+    \simplefonts@scripttypescript{\simplefontparameter\c!style}{#1}
+
+    \ifx\currenttypeface\v!simplefonts
+
+        % don't create a typeface and set bodyfont when the module is loaded
+
+        \if!!donesimplefonts\simplefonts@bodyfont\fi
+
+    \else
+
+        \simplefonts@typeface{#2}{#1}{#1}
+
+    \fi
+
+\stoptexdefinition
+
+\starttexdefinition simplefonts@definemathfont [#1][#2][#3][#4]
+
+    \edef\currentsimplefont{#1}\edef\currenttypeface{#2}
+
+    \presetsimplefonts[\????sf\currentsimplefont]
+
+    \getparameters[\????sf\currentsimplefont][#4]
+
+    \lowercase{\unspacestring#3\to\!!simplefont}
+
+    \letvalue{\????sf\currentsimplefont\c!typeface}\!!simplefont
+
+    \ifx\currenttypeface\v!simplefonts
+
+        % don't create a typeface and set bodyfont when the module is loaded
+
+        \if!!donesimplefonts\simplefonts@bodyfont\fi
+
+    \else
+
+        \simplefonts@typeface{#2}{#1}{#1}
+
+    \fi
+
+\stoptexdefinition
+
+%D \macros
+%D   {definefontcommand}
+
+\def\definefontcommand
+  {\dotripleempty\dodefinefontcommand}
+
+\def\dodefinefontcommand[#1][#2][#3]%
+  {\getparameters[\????sf#1][\c!style=\v!serif,#3]%
+   \processaction
+     [\namedsimplefontparameter{#1}\c!style]
+     [      \v!serif=>\setvalue{\e!set#1}{\doquadrupleempty\simplefonts@definetextfont  [#1][#2]},
+             \v!sans=>\setvalue{\e!set#1}{\doquadrupleempty\simplefonts@definetextfont  [#1][#2]},
+             \v!mono=>\setvalue{\e!set#1}{\doquadrupleempty\simplefonts@definetextfont  [#1][#2]},
+             \v!math=>\setvalue{\e!set#1}{\doquadrupleempty\simplefonts@definemathfont  [#1][#2]},
+      \v!handwriting=>\setvalue{\e!set#1}{\doquadrupleempty\simplefonts@definescriptfont[#1][#2]},
+      \v!calligraphy=>\setvalue{\e!set#1}{\doquadrupleempty\simplefonts@definescriptfont[#1][#2]},
+          \s!unknown=>\setvalue{\e!set#1}{\doquadrupleempty\simplefonts@definetextfont  [#1][#2]}]}
+
+\definefontcommand[\v!mainfont        ][\v!simplefonts][\c!style=\v!serif      ]
+\definefontcommand[\v!sansfont        ][\v!simplefonts][\c!style=\v!sans       ]
+\definefontcommand[\v!monofont        ][\v!simplefonts][\c!style=\v!mono       ]
+\definefontcommand[\v!mathfont        ][\v!simplefonts][\c!style=\v!math       ]
+\definefontcommand[\v!handwritingfont ][\v!simplefonts][\c!style=\v!handwriting]
+\definefontcommand[\v!calligraphicfont][\v!simplefonts][\c!style=\v!calligraphy]
+
+%D \macros
+%D   {definesimplefonttypeface}
+
+\def\definesimplefonttypeface
+  {\dotripleempty\dodefinesimplefonttypeface}
+
+\def\dodefinesimplefonttypeface[#1][#2][#3]%
+  {\getparameters[\????sf#1][\c!style=\v!serif,#3]%
+   \processaction
+     [\namedsimplefontparameter{#1}\c!style]
+     [      \v!serif=>{\simplefonts@definetextfont  [#1][#1][#2][#3]},
+             \v!sans=>{\simplefonts@definetextfont  [#1][#1][#2][#3]},
+             \v!mono=>{\simplefonts@definetextfont  [#1][#1][#2][#3]},
+             \v!math=>{\simplefonts@definemathfont  [#1][#1][#2][#3]},
+             \v!math=>{\simplefonts@definemathfont  [#1][#1][#2][#3]},
+      \v!handwriting=>{\simplefonts@definescriptfont[#1][#1][#2][#3]},
+      \v!calligraphy=>{\simplefonts@definescriptfont[#1][#1][#2][#3]},
+          \s!unknown=>{\simplefonts@definetextfont  [#1][#1][#2][#3]}]}
+
+%D Default setup
+
+\setupsimplefonts
+  [\c!size=\moduleparameter\v!simplefonts\c!size,
+   \c!style=\moduleparameter\v!simplefonts\c!style,
+   \c!features=\v!default,
+   \c!smallcapsfeatures=\v!smallcaps]
+
+%D Default fonts
+
+\setmainfont        [Latin Modern Roman]
+\setsansfont        [Latin Modern Sans]
+\setmonofont        [Latin Modern Mono]
+\setmathfont        [Latin Modern Math]
+\sethandwritingfont [Latin Modern Roman] % neither handwritten nor calligraphic are available
+\setcalligraphicfont[Latin Modern Roman] % for Latin Modern but I need a default font for them
+
+\!!donesimplefontstrue
+
+\stopmodule
+
+\protect \endinput

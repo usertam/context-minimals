@@ -1,0 +1,383 @@
+%D \module
+%D   [       file=games-go,
+%D        version=2008.01.10,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Go,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+\writestatus{loading}{Context User Module / Games - Go}
+
+\unprotect
+
+%D The \type{\definegame} command creates the new goban environment, it is
+%D important to use the goban environment in a document and not the game
+%D environment itself because in sgf mode the content untill \type{\stopgoban}
+%D is read and \type{\endgame} is executed at the end of the parsing process.
+
+\definegame[\v!goban][\v!go] % not final
+%\definegame[\v!weiqi][\v!go]
+%\definegame[\v!baduk][\v!go]
+
+%D Convert number into labels for the board, could be replaced with \type{\ifcase} solution (faster?)
+
+\def\sgfchar#1%
+  {\ifnum#1<9
+     \char\number\numexpr#1+64\relax
+   \else\ifnum#1<26
+     \char\number\numexpr#1+65\relax
+   \fi\fi}
+
+%D List with the commands for the user interface
+
+\def\go!commands
+  {newboard,saveboard,useboard,drawboard,marker,stone,move,line,arrow}
+
+\def\go!copygamecommands
+  {\expanded{\copyparameters[][go!][\go!commands]}}
+
+\setvalue{\e!begin\????gm\????gm\v!go}%
+  {\go!copygamecommands
+   \go!backgroundcolor
+   \go!backgroundimage
+   \go!boardsize % should I set the size with \newboard?
+   \go!boardvalues
+   \go!inputtype} % input has to be the last command
+
+\def\go!inputtype
+  {\doif{\gameparameter\c!option}\v!sgf\go!inputtype!sgf}
+
+\def\go!inputtype!sgf
+  {\grabuntil{\if!!gameenvironment\e!stop\currentname\else\s!do\e!stop\v!game\fi}\dogo!inputtype!sgf}
+
+\def\dogo!inputtype!sgf#1%
+  {\newboard
+   \parsesgf{#1}%
+   \drawboard
+   \dostopgame}
+
+\defineoverlay[overlay:go][\overlaybutton{JS(Walk_Field{games!go})}]
+
+\setvalue{\e!end\????gm\????gm\v!go}%
+  {\doif{\gameparameter\c!interactive}\v!yes\go!fieldstack}
+
+\def\go!fieldstack
+  {\expanded{\definefieldstack[games!go][\go!list!symbols][\c!frame=\v!off]}%
+   \framed
+     [\c!frame=\v!off,
+      \c!background={foreground,overlay:go},
+      \c!offset=\v!overlay]
+     {\fieldstack[games!go]}}
+
+\def\go!backgroundcolor
+  {\doifsomethingelse{\gameparameter\c!backgroundcolor}
+    {\ctxlua{thirddata.games.go.setup['backgroundcolor'] = '\gameparameter\c!backgroundcolor' }}%
+    {\ctxlua{thirddata.games.go.setup['backgroundcolor'] = nil }}}
+
+\def\go!backgroundimage % use groups to keep the dimensions local
+  {\doifsomethingelse{\gameparameter\c!backgroundimage}
+     {\ctxlua{thirddata.games.go.setup['backgroundimage'] = '\gameparameter\c!backgroundimage' }%
+      \getfiguredimensions[\gameparameter\c!backgroundimage][scale=500]% I need a scale parameter
+      \ctxlua{thirddata.games.go.setup.figurewidth  = \number\dimexpr\figurewidth \relax }%
+      \ctxlua{thirddata.games.go.setup.figureheight = \number\dimexpr\figureheight\relax }}%
+    {\ctxlua{thirddata.games.go.setup.backgroundimage = nil }}}
+
+\def\go!boardsize
+  {\assignvalue{\gameparameter\c!size}\go!board!size{9}{13}{19}% size is only used for hoshi points
+   \assignvalue{\gameparameter\c!nx  }\go!board!nx  {9}{13}{19}%
+   \assignvalue{\gameparameter\c!ny  }\go!board!ny  {9}{13}{19}%
+   \ctxlua{thirddata.games.go.setup.board = \number\go!board!size }%
+   \ctxlua{thirddata.games.go.setup.nx    = \number\go!board!nx   }%
+   \ctxlua{thirddata.games.go.setup.ny    = \number\go!board!ny   }}
+
+\def\go!boardvalues
+  {\startlua
+   thirddata.games.go.setup.dx            = \number\dimexpr\gameparameter\c!dx\relax            ;
+   thirddata.games.go.setup.dy            = \number\dimexpr\gameparameter\c!dy\relax            ;
+   thirddata.games.go.setup.offset        = \number\dimexpr\gameparameter\c!frameoffset\relax   ;
+   thirddata.games.go.setup.labeldistance = \number\dimexpr\gameparameter\c!labeldistance\relax ;
+   thirddata.games.go.setup.stonesize     = \number\dimexpr\gameparameter\c!stonesize\relax     ;
+   thirddata.games.go.setup.symbolset     = '\gameparameter\c!symbolset'                        ;
+   thirddata.games.go.setup.alternative   = '\gameparameter\c!alternative'                      ;
+   \stoplua}
+
+%D User command with protected names
+
+\def\go!newboard
+  {\ctxlua{thirddata.games.go.board_new()}%
+   \doif{\gameparameter\c!interactive}\v!yes\go!symbol} % too early, I should take care of \stone
+
+\def\go!saveboard#1%
+  {\ctxlua{thirddata.games.go.board_copy( 0, '#1' )}}
+
+\def\go!useboard#1%
+  {\ctxlua{thirddata.games.go.board_copy( '#1', 0 )}}
+
+\def\go!drawboard
+  {\doifnot{\gameparameter\c!interactive}\v!yes
+     {\go!setboard{0}%
+      \go!getboard{0}}}
+
+\def\go!setboard#1%
+  {\ctxlua{thirddata.games.go.board_draw("games:go:#1")}}
+
+\def\go!getboard#1%
+  {\useMPgraphic{games:go:#1}}
+
+\def\go!marker
+  {\dodoubleempty\dogo!marker}
+
+\def\dogo!marker[#1][#2]#3#4%
+  {\ifsecondargument % needed for labels
+     \ctxlua{thirddata.games.go.field[0][#3][#4]['label'] = '#2' }%
+   \fi
+   \ctxlua{thirddata.games.go.field[0][#3][#4]['marker'] = '#1' }}
+
+\def\go!stone[#1]#2#3%
+  {\bgroup % keep \stonecolor as local command, this is no problem because Lua calls are global
+   \processaction
+     [#1]
+     [\v!black=>\chardef\stonecolor\plusone,
+      \v!white=>\chardef\stonecolor\plustwo]%
+   \ctxlua{thirddata.games.go.field[0][#2][#3]['color'] = \number\stonecolor }%
+   \ctxlua{thirddata.games.go.lastcolor                 = \number\stonecolor }%
+   \doif{\gameparameter\c!calculate}\v!yes{\ctxlua{thirddata.games.go.deadstone.processtones()}}%
+   \egroup}
+
+\def\go!move
+  {\dosingleempty\dogo!move}
+
+\def\dogo!move[#1]#2#3%
+  {\iffirstargument
+     \go!stone[#1]{#2}{#3}%
+   \fi
+   \doif{\gameparameter\c!interactive}\v!yes\go!symbol}
+
+\newcount\go!count!symbols
+
+\let\go!list!symbols\empty
+
+\def\go!symbol
+  {\expanded{\advance\go!count!symbols\plusone}%
+   \expanded{\go!setboard{\number\go!count!symbols}}%
+   \expanded{\definesymbol[go!symbol!\number\go!count!symbols][\noexpand\go!getboard{\number\go!count!symbols}]}%
+   \expanded{\appendtocommalist{go!symbol!\number\go!count!symbols}}\go!list!symbols}
+
+\def\go!line#1#2#3#4%
+  {\ctxlua{thirddata.games.go.line(#1,#2,#3,#4)}}
+
+\def\go!arrow#1#2#3#4%
+  {\ctxlua{thirddata.games.go.arrow(#1,#2,#3,#4)}}
+
+%D Stones
+
+% simple/pure style
+
+\starttexdefinition go:stone:pure:black #1#2#3
+    fill fullcircle scaled #1 shifted (#2,#3) ;
+    draw fullcircle scaled #1 shifted (#2,#3) ;
+\stoptexdefinition
+
+\starttexdefinition go:stone:pure:white #1#2#3
+    fill fullcircle scaled (#1-.2) shifted (#2,#3) withcolor white ;
+    draw fullcircle scaled (#1-.2) shifted (#2,#3) ;
+\stoptexdefinition
+
+% complex/shade style
+
+\starttexdefinition go:stone:shade:black #1#2#3
+    circular_shade ( fullcircle scaled (#1+.4) shifted (#2,#3) , 4 , .8white , black ) ;
+\stoptexdefinition
+
+\starttexdefinition go:stone:shade:white #1#2#3
+    circular_shade ( fullcircle scaled (#1+.4) shifted (#2,#3) , 2 , .8white , white ) ;
+\stoptexdefinition
+
+%D Marker
+
+% #1 = nx
+% #2 = ny
+% #3 = dx
+% #4 = dy
+% #5 = stonesize
+% #6 = hoffset
+% #7 = voffset
+% #8 = frameoffset
+
+\starttexdefinition go:marker:circle #1#2#3#4#5#6#7#8
+    draw fullcircle scaled (0.6*#5) shifted (#6,#7) ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:square #1#2#3#4#5#6#7#8
+    draw fullsquare scaled (sqrt(2)*(#5-.4)/2) shifted (#6,#7) ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:cross #1#2#3#4#5#6#7#8
+    draw (((-(#5-.4)/2,0)--((#5-.4)/2,0)) rotated -45) shifted (#6,#7) ;
+    draw (((-(#5-.4)/2,0)--((#5-.4)/2,0)) rotated +45) shifted (#6,#7) ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:triangle #1#2#3#4#5#6#7#8
+    draw (origin--((3*(#5-.4))/(2*sqrt(3)),0)--((3*(#5-.4))/(2*sqrt(3)),0) rotated 60--cycle) shifted (#6-(3*(#5-.4))/(2*sqrt(3))/2,#7-(#5-.4)/4) ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:select #1#2#3#4#5#6#7#8
+    width  := #1*#2+2*#8 ; % I have to do this
+    height := #2*#4+2*#8 ; % in a better way
+    board := currentpicture ;
+    currentpicture := nullpicture ;
+    mine := unitsquare xyscaled (width,height) shifted (-#8,-#8) -- reverse %
+            fullsquare scaled sqrt(5*4mm) shifted (#6,#7)--cycle ;
+    clip board to mine ;
+    currentpicture := board ;
+    fill fullsquare scaled sqrt(2.5*4mm) shifted (#6,#7) ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:hash #1#2#3#4#5#6#7#8
+    % make a hole in the board, should only be done if no stone is on this position
+    width  := #1*#3+2*#8 ; % I have to do this
+    height := #2*#4+2*#8 ; % in a better way
+    board := currentpicture ;
+    currentpicture := nullpicture ;
+    mine := unitsquare xyscaled (width,height) shifted (-#8,-#8) -- reverse %
+            fullsquare scaled sqrt(5*4mm) shifted (#6,#7) -- cycle ;
+    clip board to mine ;
+    currentpicture := board ;
+    % draw the pattern
+    board := currentpicture ;
+    currentpicture := nullpicture ;
+    for i=-5 upto 5:
+        draw ((sqrt((#2**2)/2)*i*.25,-5mm)--(sqrt((#2**2)/2)*i*.25,5mm)) rotated - 45 shifted (#6,#7) ;
+    endfor ; % why do I need a simikolon here, it worked in MPdrawing without them (related to obeylines in texdefintion?)
+    clip currentpicture to fullsquare xyscaled (#2,#4) shifted (#6,#7) ;
+    addto board also currentpicture ;
+    currentpicture := board ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:label #1#2#3
+    label(textext("\doattributes{\????gm\currentgame}{style}{color}{#1}"),(#2,#3)) ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:label #1#2#3
+    label(textext("\doattributes{\????gm\currentgame}{style}{color}{#1}"),(#2,#3)) ;
+\stoptexdefinition
+
+\starttexdefinition go:marker:hoshi #1#2#3
+    fill fullcircle scaled #1 shifted (#2,#3) ;
+\stoptexdefinition
+
+%D Hoshi points
+
+\def\definehoshi #1 #2 #3
+  {\resetvalue{go:hoshi:#2:#3:#1}}
+
+% #1 = boardsize
+% #1 = column
+% #3 = row
+
+%D small board: 9
+
+\definehoshi 9 3 3
+\definehoshi 9 3 7
+\definehoshi 9 5 5
+\definehoshi 9 7 3
+\definehoshi 9 7 7
+
+%D medium board: 13
+
+\definehoshi 13  4  4
+\definehoshi 13  4 10
+\definehoshi 13  7  7
+\definehoshi 13 10  4
+\definehoshi 13 10 10
+
+%D big board: 19
+
+\definehoshi 19  4  4
+\definehoshi 19  4 10
+\definehoshi 19  4 16
+\definehoshi 19 10  4
+\definehoshi 19 10 10
+\definehoshi 19 10 16
+\definehoshi 19 16  4
+\definehoshi 19 16 10
+\definehoshi 19 16 16
+
+%D Mapping from SGF code to TeX commands
+
+\def\sgfflush#1{\ctxlua{thirddata.games.sgf.parse("#1")}}
+
+\def\sgfnumber#1%
+  {\ifnum`#1>105
+     \number\numexpr`#1-97\relax
+   \else\ifnum`#1>96
+     \number\numexpr`#1-96\relax
+   \else\ifnum`#1<73
+     \number\numexpr`#1-39\relax
+   \else
+     \number\numexpr`#1-40\relax
+   \fi\fi\fi}
+
+\def\convertsgfnumber#1#2\relax
+  {\edef\valuea{\sgfnumber{#1}}%
+   \edef\valueb{\sgfnumber{#1}}}
+
+\starttexdefinition parsesgf #1
+    \sgfflush{#1}
+\stoptexdefinition
+
+\starttexdefinition sgf!node #1
+    \sgfflush{#1}
+\stoptexdefinition
+
+\starttexdefinition sgf!white #1
+    \expandafter\convertsgfnumber#1\relax
+    \move[white]\valuea\valueb
+\stoptexdefinition
+
+\starttexdefinition sgf!black #1
+    \expandafter\convertsgfnumber#1\relax
+    \move[black]\valuea\valueb
+\stoptexdefinition
+
+\starttexdefinition sgf!addwhite #1
+    \expandafter\convertsgfnumber#1\relax
+    \stone[white]\valuea\valueb
+\stoptexdefinition
+
+\starttexdefinition sgf!comment #1
+    % no output
+\stoptexdefinition
+
+%D Lua functions are saved in a separate file
+
+\ctxloadluafile{games-go}{}
+
+%D Setup for the default values
+
+\setupgame % \setupgame[go] == \setupgoban
+  [\v!go]
+  [\c!size=\v!medium,
+   \c!stonesize=.92\bodyfontsize,
+   \c!nx=\gameparameter\c!size,
+   \c!ny=\gameparameter\c!size,
+   \c!dx=\bodyfontsize,
+   \c!dy=\gameparameter\c!dx,
+   \c!style=\txx,
+   \c!color=,
+   \c!labelstyle=\txx,
+   \c!labelcolor=,
+   \c!symbolset=\v!pure, % \v!shade
+   \c!labeldistance=.25\bodyfontsize,
+   \c!frameoffset=2\bodyfontsize,
+   \c!interactive=\v!no,
+   \c!calculate=\v!no,
+   \c!option=\v!tex,
+   \c!alternative=\v!b,
+   \c!backgroundcolor=,
+   \c!backgroundimage=]
+
+\protect \endinput

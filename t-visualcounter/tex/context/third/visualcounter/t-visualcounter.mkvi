@@ -1,0 +1,497 @@
+%D \module
+%D   [     file=t-visualcounter,
+%D      version=2013.04.01,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Visual Counter,
+%D       author=Aditya Mahajan,
+%D         date=\currentdate,
+%D    copyright=Aditya Mahajan,
+%D        email=adityam <at> ieee <dot> org,
+%D      license=Simplified BSD License]
+
+\writestatus{loading}{Visual Counter (ver: 2013.04.01)}
+
+\startmodule [visualcounter]
+
+\unprotect
+
+\startinterface all
+  \setinterfaceconstant {palette}       {palette} 
+  \setinterfaceconstant {path}          {path} 
+\stopinterface
+
+%D \section{Color Palettes}
+%D
+%D The color of the visual counters is control using color palettes. 
+
+\definepalet
+  [visualcounter:bright]
+  [active=orange,
+     past=blue,
+   future=gray]
+
+
+\definenamespace
+  [visualcounter]
+  [   \c!type=module,
+      \c!name=visualcounter,
+   \c!command=\v!yes,
+        setup=\v!list,
+     \c!style=\v!yes,
+    \s!parent=visualcounter,
+  ]
+
+\setupvisualcounter
+  [      \s!counter=,
+               \c!n={\rawcountervalue[\visualcounterparameter\s!counter]},
+            \c!text={\convertedcounter[\visualcounterparameter\s!counter]},
+      \c!max\c!text={\lastcounter[\visualcounterparameter\s!counter]},
+            \c!last={\lastcountervalue[\visualcounterparameter\s!counter]},
+           \c!style=,
+           \c!color=,
+         \c!palette=visualcounter:bright,
+              \c!mp=visualcounter::countdown,
+           \c!width=1EmWidth,
+          \c!height=1ExHeight,
+   \c!rulethickness=1bp,
+        \c!distance=0.5EmWidth,
+        % Parameters passed to scale
+        \c!maxwidth=\maxdimen,
+       \c!maxheight=\maxdimen,
+  ]
+
+%% TODO: shaded=yes|no randomized=yes|no
+
+%D \section {MP instance}
+%D
+%D To prevent interference with other MP commands, we define a separate metapost
+%D instance
+
+
+\defineMPinstance
+    [visualcounter]
+    [\s!format=metafun, \s!extensions=\v!no, \s!initializations=\v!yes]
+
+\setupMPinstance
+    [visualcounter]
+    [\c!textcolor=\visualcounterparameter\c!color,
+     \c!textstyle=\visualcounterparameter\c!style]
+     
+
+%D \section {usevisualcounter}
+
+\unexpanded\def\usevisualcounter
+    {\dosingleargument\usevisualcounter_indeed}
+
+\def\usevisualcounter_indeed[#options]#name%
+    {\bgroup
+     \edef\currentvisualcounter{#name}%
+     \setupvisualcounter[#name][#options]%
+     \setuppalet[\visualcounterparameter\c!palette]%
+     \scale
+         [
+            \c!maxwidth=\visualcounterparameter\c!maxwidth,
+           \c!maxheight=\visualcounterparameter\c!maxheight,
+         ]{\expanded{\useMPgraphic{\visualcounterparameter\c!mp}}}%
+     \egroup}
+
+\startuseMPgraphic{visualcounter::initialization}
+  newnumeric current_counter, last_counter;
+  current_counter := \visualcounterparameter\c!n;
+  last_counter    := max(\visualcounterparameter\c!last, 1);
+
+  newnumeric width    ; width    := \visualcounterparameter\c!width;
+  newnumeric height   ; height   := \visualcounterparameter\c!height;
+  newnumeric distance ; distance := \visualcounterparameter\c!distance;
+
+  newnumeric rulethickness; 
+  rulethickness := \visualcounterparameter\c!rulethickness; 
+
+  newcolor past_color;   past_color   := \MPcolor{past};
+  newcolor active_color; active_color := \MPcolor{active};
+  newcolor future_color; future_color := \MPcolor{future};
+
+\stopuseMPgraphic
+  
+
+
+%D \section {The counters}
+%D
+%D \subsection {markers}
+
+\definevisualcounter
+   [markers]
+   [       \c!mp=visualcounter::markers,
+        \c!width=1EmWidth,
+     \c!distance=\visualcounterparameter\c!width/4,
+  \c!mp\c!setups=visualcounter::markers:circle,
+   ]
+
+\startuseMPgraphic{visualcounter::markers:circle}
+  def show_past_marker(expr shift) =
+      fill fullcircle xyscaled(width, width) shifted (shift, 0) withcolor past_color
+  enddef;
+
+  def show_active_marker(expr shift) =
+      fill fullcircle xyscaled(width, width) shifted (shift, 0) withcolor active_color
+  enddef;
+
+  def show_future_marker(expr shift) =
+      fill fullcircle xyscaled(width, width) shifted (shift, 0) withcolor future_color
+  enddef;
+\stopuseMPgraphic
+
+\startuseMPgraphic{visualcounter::markers:square}
+  def show_past_marker(expr shift) =
+      fill fullsquare xyscaled(width, width) shifted (shift, 0) withcolor past_color
+  enddef;
+
+  def show_active_marker(expr shift) =
+      fill fullsquare xyscaled(width, width) shifted (shift, 0) withcolor active_color
+  enddef;
+
+  def show_future_marker(expr shift) =
+      fill fullsquare xyscaled(width, width) shifted (shift, 0) withcolor future_color
+  enddef;
+\stopuseMPgraphic
+
+\startuseMPgraphic{visualcounter::markers:star}
+% Copied from http://tug.org/pracjourn/2012-1/hefferon.html
+def fullstar = 
+  hide (
+    z0  = origin; 
+    z1  = (x0, 0.5); 
+    z2  = ((z1 - z0) rotated (  360/5)) + z0 ;
+    z3  = ((z1 - z0) rotated (2*360/5)) + z0 ;
+    z4  = ((z1 - z0) rotated (3*360/5)) + z0 ; 
+    z5  = ((z1 - z0) rotated (4*360/5)) + z0 ;
+    z6  = whatever[z1, z3] = whatever[z2, z5];
+    z7  = whatever[z1, z3] = whatever[z2, z4];
+    z8  = whatever[z2, z4] = whatever[z3, z5];
+    z9  = whatever[z1, z4] = whatever[z3, z5];
+    z10 = whatever[z1, z4] = whatever[z2, z5];
+  ) 
+  (z1 -- z6 -- z2 -- z7 -- z3 -- z8 -- z4 
+      -- z9 -- z5 -- z10 -- cycle)
+enddef;
+
+def show_star(expr shift, fill_color) = 
+  newpath p;
+  p := fullstar xyscaled(width, width) shifted (shift, 0);
+
+  fill p withcolor fill_color;
+  draw p withcolor 0.5*fill_color;
+enddef;
+
+def show_past_marker(expr shift) = 
+    show_star(shift, past_color);
+  enddef;
+
+def show_active_marker(expr shift) = 
+    show_star(shift, active_color);
+enddef;
+
+def show_future_marker(expr shift) = 
+    show_star(shift, future_color);
+enddef;
+\stopuseMPgraphic
+
+\startuseMPgraphic{visualcounter::markers}
+  begingroup ;
+
+  \includeMPgraphic{visualcounter::initialization}
+  \includeMPgraphic{\visualcounterparameter{\c!mp\c!setups}}
+
+  pickup pencircle scaled \visualcounterparameter\c!rulethickness ;
+
+  for i := 1 upto last_counter :
+    if i < current_counter :
+         show_past_marker(i*(width + distance));
+    elseif i > current_counter :
+         show_future_marker(i*(width + distance))
+    fi ;
+  endfor ;
+
+  %%  Write the current marker at the end (incase the markers overlay each other)
+  show_active_marker(current_counter*(width + distance))
+\stopuseMPgraphic
+
+%D \subsection {countdown}
+
+\definevisualcounter
+  [countdown]
+  [      \c!mp=visualcounter::countdown,
+      \c!width=1EmWidth,
+     \c!height=1ExHeight,
+   \c!distance=3EmWidth,
+  ]
+
+\startuseMPgraphic{visualcounter::countdown}
+  begingroup ;
+
+  \includeMPgraphic{visualcounter::initialization}
+
+  % label
+  newpicture countertext     ; countertext     := textext("\visualcounterparameter\c!text");
+  newpicture max_countertext ; max_countertext := textext("\visualcounterparameter{\c!max\c!text}");
+
+  newnumeric inner_diameter, outer_diameter ;
+  inner_diameter := 1.5 * max(bbwidth(max_countertext), bbheight(max_countertext));
+  outer_diameter := inner_diameter + 
+          max(\visualcounterparameter\c!width, \visualcounterparameter\c!height) ;
+
+  newpath inner_circle, outer_circle ;
+  % make the circle start at 12 o'clock and go clockwise 
+  inner_circle := reverse (fullcircle scaled inner_diameter) rotated 90;
+  outer_circle := reverse (fullcircle scaled outer_diameter) rotated 90;
+
+  % boundary distance
+  newnumeric inner_boundary, outer_boundary ;
+  inner_boundary := \visualcounterparameter\c!distance/last_counter * (inner_diameter)/(outer_diameter) ;
+  outer_boundary := \visualcounterparameter\c!distance/last_counter ;
+
+  % step size
+  newnumeric inner_time, outer_time ;
+  inner_time := arclength (inner_circle)/last_counter ;
+  outer_time := arclength (outer_circle)/last_counter ;
+
+  newpath slice ;
+
+  newpair pt_inner_left, pt_inner_right ;
+  newpair pt_outer_left, pt_outer_right ;
+
+  for i = 1 upto last_counter : 
+    pt_inner_left  := point ((i-1)*inner_time)               on inner_circle ;
+    pt_inner_right := point (i*inner_time - inner_boundary)  on inner_circle ;
+
+    pt_outer_left  := point ((i-1)*outer_time)               on outer_circle ;
+    pt_outer_right := point (i*outer_time - outer_boundary)  on outer_circle ;
+
+    slice := inner_circle cutbefore pt_inner_left cutafter pt_inner_right 
+       --- reverse (outer_circle cutbefore pt_outer_left cutafter pt_outer_right ) 
+       --- cycle ;
+
+    fill slice withcolor 
+      if i < current_counter     : past_color 
+      elseif i = current_counter : active_color
+      else                       : future_color
+      fi ;
+
+  endfor ;
+
+  label (countertext, origin) ;
+
+  endgroup ;
+
+\stopuseMPgraphic
+
+%D \subsection {pulseline}
+
+\definevisualcounter
+  [pulseline]
+  [           \c!mp=visualcounter::pulseline,
+            \c!path={origin -- (((current_counter-1)*width, 0) .. ((current_counter-0.5)*width, -0.2height) 
+                      -- (current_counter*width, height) -- ((current_counter+0.5)*width, -0.2height) 
+                      .. ((current_counter+1)*width,0))  -- ((last_counter+1)*width, 0) 
+                      randomized 0.3width},
+           \c!width=0.5EmWidth,
+          \c!height=3ExHeight,
+   \c!rulethickness=1bp,
+  ]
+
+
+\startuseMPgraphic{visualcounter::pulseline}
+  begingroup ;
+
+  \includeMPgraphic{visualcounter::initialization}
+
+  newpath pulse ;
+  pulse := \visualcounterparameter\c!path ;
+
+  newpath helper_line ;
+  helper_line := (0,-height) -- (0,height) ;
+
+  newpair start_pulse, stop_pulse ;
+  start_pulse := pulse intersectionpoint (helper_line shifted ((current_counter-1)*width, 0)) ;
+  stop_pulse  := pulse intersectionpoint (helper_line shifted ((current_counter+1)*width, 0)) ;
+
+  
+  newpath past_pulse, active_pulse, future_pulse ;
+  past_pulse    := pulse cutafter  start_pulse ;
+  active_pulse  := pulse cutbefore start_pulse cutafter stop_pulse ;
+  future_pulse  := pulse cutbefore stop_pulse ;
+
+  pickup pencircle scaled \visualcounterparameter\c!rulethickness ;
+  draw past_pulse   withcolor past_color   ;
+  draw active_pulse withcolor active_color ;
+  draw future_pulse withcolor future_color ;
+
+  endgroup ;
+\stopuseMPgraphic
+
+%D \subsection {scratchmarks}
+
+\definevisualcounter
+  [scratchmarks]
+  [           \c!mp=visualcounter::scratchmarks,
+           \c!width=3bp,
+          \c!height=3ExHeight,
+        \c!distance=0.5EmWidth,
+              angle=75,
+  ]
+
+\startuseMPgraphic{visualcounter::scratchmarks}
+  begingroup ;
+
+  \includeMPgraphic{visualcounter::initialization}
+
+  linecap := rounded ;
+
+  newnumeric theta     ; theta     := \visualcounterparameter{angle} ;
+
+  newpath left_marker, right_marker ;
+  left_marker   := origin -- height*dir(theta) ;
+  right_marker  := (-4*distance, height*sind(theta)) -- origin ;
+
+  save marker ;
+  def marker (expr i) =
+    (if i mod 5 = 0 : right_marker else : left_marker fi) 
+        shifted (i*distance, 0) 
+        withcolor
+            if i < current_counter     : past_color 
+            elseif i = current_counter : active_color
+            else                       : future_color
+            fi ;
+  enddef ;
+
+  pickup pencircle scaled \visualcounterparameter\c!width ;
+
+  for i := last_counter downto 1 :
+      draw marker(i) ;
+  endfor ;
+
+  draw marker(current_counter) ;
+
+  endgroup ;
+\stopuseMPgraphic
+
+%D \subsection {mayanumbers}
+
+\definevisualcounter
+  [mayanumbers]
+  [           \c!mp=visualcounter::mayanumbers,
+           \c!width=1EmWidth,
+          \c!height=1ExHeight,
+          \c!distance=\visualcounterparameter\c!width/4,
+  ]
+
+\startuseMPgraphic{visualcounter::mayanumbers}
+  begingroup ;
+
+  \includeMPgraphic{visualcounter::initialization}
+
+  newnumeric linewidth    ; linewidth    := 4width + 5distance ;
+  newnumeric linedistance ; linedistance := 2distance ;
+
+  newpath marker; 
+  marker := ((0,0.5height) .. (0.5width,-0.1height) .. (0.5width, -0.4height) 
+         .. (0,-0.8height) 
+         .. (-0.5width,-0.4height) .. (-0.5width, -0.1height) .. cycle) ;
+
+  newpath line ;
+  line   := (-0.5width - distance, 0) .. (0.1width,0.8height) 
+        --- (3.1width + 3distance,  0.8height) .. (3.5width + 4distance, 0) .. (3.1width + 3distance, -0.8height)
+        --- (0.1width, -0.8height) .. cycle ;
+
+  newnumeric total_lines;       total_lines := floor(last_counter/5);
+  newnumeric remaining_markers; remaining_markers := last_counter - total_lines*5;
+  
+  newnumeric start_offset; start_offset := linewidth - 0.5distance;
+  newnumeric total_width;  total_width  := total_lines*(linewidth+linedistance) + remaining_markers*(width+distance);
+  newpath boundary ;
+  boundary := (0, 0.9height) 
+           -- (total_width, 0.9height) 
+           -- (total_width, -0.9height)
+           -- (0, -0.9height) 
+           -- cycle;
+  boundary := boundary shifted (start_offset, 0);
+
+  % Draw the filled solid lines
+  newnumeric linecount ; linecount := floor ((current_counter - 1) / 5) ;
+
+  for i = 1 upto linecount :
+    fill line shifted (i*(linewidth + linedistance), 0)
+         withcolor past_color  ;
+  endfor
+
+  % Draw the filled dots
+  newnumeric offset ; offset := (linecount + 1)*(linewidth + linedistance) ;
+
+  newnumeric markercount ; markercount := current_counter - linecount*5 ;
+  if markercount = 5 :
+      fill line shifted (offset,0)
+         withcolor active_color  ;
+  else : for i = 1 upto markercount :
+      fill marker shifted (offset + (i-1)*(width+distance), 0 ) 
+         withcolor 
+         if i = markercount :
+           active_color  ;
+         else :
+           past_color  ;
+         fi
+  endfor fi
+
+  % Draw the empty dots
+  newnumeric markermax ; markermax := min(last_counter - linecount*5, 4) ;
+  if markercount < 4 :
+    for i = markercount + 1 upto markermax : 
+        fill marker shifted (offset + (i-1)*(width+distance),0)
+          withcolor future_color  ;
+    endfor
+  fi
+
+  for blockcount = linecount + 1 upto ceiling(last_counter/5) :
+    offset := (blockcount + 1)*(linewidth + linedistance) ;
+    markercount := min(4, last_counter - blockcount*5) ;
+    for i = 1 upto markercount :
+      fill marker shifted (offset + (i-1)*(width+distance),0)
+        withcolor future_color ;
+    endfor
+  endfor
+
+  setbounds currentpicture to boundary ;
+
+  endgroup ;
+\stopuseMPgraphic
+
+%D \section {progressbar}
+
+\definevisualcounter
+  [progressbar]
+  [     \c!mp=visualcounter::progressbar,
+     \c!width=\the\dimexpr\textwidth/2\relax,
+    \c!height=2ExHeight,
+  ]
+
+\startuseMPgraphic {visualcounter::progressbar}
+  begingroup;
+
+  \includeMPgraphic{visualcounter::initialization}
+
+  newpath boundary;
+  boundary := unitsquare xyscaled (width, height);
+
+  newpath progressbar;
+  progressbar := unitsquare xyscaled (current_counter*width/last_counter, height);
+
+  fill boundary    withcolor future_color;
+  fill progressbar withcolor past_color;
+  setbounds currentpicture to boundary ;
+
+  endgroup;
+\stopuseMPgraphic
+
+\protect
+
+\stopmodule
+

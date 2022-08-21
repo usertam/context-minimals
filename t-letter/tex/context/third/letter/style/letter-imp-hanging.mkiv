@@ -1,0 +1,61 @@
+%D \module
+%D   [     file=letter-imp-hanging,
+%D      version=2011.12.24,
+%D        title=\CONTEXT\ Letter Style,
+%D     subtitle=Hanging indented style,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\useletterstyle[blockstyle]
+
+\setupletterlayout
+  [\v!firstpage,\v!secondpage]
+  [\c!backspace=1in,
+   \c!width=\v!middle,
+   \c!topspace=1in,
+   \c!header=0in,
+   \c!footer=0in,
+   \c!height=\v!fit]
+
+\setupletterlayout
+  [\v!secondpage]
+  [\c!header=1in]
+
+\setuplettersection
+  [\v!head,\v!reference,\v!date,\v!specialnotation,\v!closing]
+  [\c!leftmargin=.5\textwidth]
+
+\setuplettersection
+  [\v!content]
+  [\c!leftmargin=1.5em,
+   \c!indenting={\v!yes,-1.5em}]
+
+\setuplettersection
+  [\v!closing]
+  [\c!spaceafter={2*\v!line}]
+
+\setupletterlayer
+  [\v!nexthead]
+  [\c!alternative=\v!hanging]
+
+\setupletteroptions
+  [\c!whitespace=\v!line]
+
+\endinput

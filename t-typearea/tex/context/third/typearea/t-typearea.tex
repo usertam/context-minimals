@@ -1,0 +1,99 @@
+%D \module
+%D   [      file=t-typearea,
+%D        version=2008.04.05,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Something like KOMA-TypeArea,
+%D         author=Peter Münster,
+%D           date=\currentdate,
+%D      copyright={Peter Münster}]
+%C This module is copyrighted by Peter Münster.
+%C Please send any comments to pmrb at free.fr.
+
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; either version 2
+% of the License, or (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but without any warranty; without even the implied warranty of
+% merchantability or fitness for a particular purpose.  See the
+% GNU General Public License for more details.
+
+\writestatus{loading}{Something like KOMA-TypeArea}
+
+\unprotect
+
+%D \macros{setupTypeArea}
+%D Setting up some values.
+%D
+%D Default setup:
+%D
+%D \starttyping
+%D \setupTypeArea[bcor=0pt,oneside=no,alphabets=2.6]
+%D \stoptyping
+%D
+%D Example:
+%D
+%D \starttyping
+%D \setupTypeArea[bcor=3mm,oneside=yes,alphabets=3.1]
+%D \stoptyping
+\def\setupTypeArea[#1]{\getparameters[TA@][#1]\doTypeArea}
+
+%D Some internal dimensions:
+\newdimen\PageWidth \newdimen\Back
+\doifundefined{Width}{\newdimen\Width}
+\doifundefined{Height}{\newdimen\Height}
+
+%D This internal macro does the whole work:
+\def\doTypeArea{
+
+%D Set visible page width:
+\PageWidth=\dimexpr\paperwidth-\TA@bcor\relax
+
+%D Determine the paper aspect ratio:
+\edef\Ratio{\withoutpt{\the\dimexpr2\paperheight/(\PageWidth/32768)\relax}}
+
+%D Set the textarea width to X alphabets:
+\setbox\scratchbox\hbox{\dorecurse{26}{\character\recurselevel}}
+\Width=\dimexpr\TA@alphabets\wd\scratchbox\relax
+\ifdim\Width<\PageWidth\else
+\writestatus{error}{line wider than page}\end\fi
+
+%D Set the textarea height proportional to the width:
+\Height=\dimexpr(\Ratio\Width)
+
+%D Set the margin/gutter widths to be equal on a full spread:
+\doifelse\TA@oneside{yes}
+	{\Back=\dimexpr(\PageWidth - \Width) / 2 + \TA@bcor\relax}
+	{\Back=\dimexpr(\PageWidth - \Width) / 3 + \TA@bcor\relax}
+
+%D Set the top and bottom margins in a 1:2 ratio, ignoring headers:
+\edef\Top{\the\dimexpr(\paperheight - \Height) / 3 - 3\lineheight\relax}
+
+%D Redefine \type{\Height} to include header and footer space:
+\Height=\dimexpr(\Height + 8\lineheight)
+
+%D Set up the page layout using the calculated parameters:
+\setuplayout[
+     backspace=\the\Back,
+     height=\the\Height,
+     width=\the\Width,
+     header=2\lineheight,
+     headerdistance=\lineheight,
+     footer=2\lineheight,
+     footerdistance=3\lineheight,
+     topspace=\Top]
+}
+\protect
+
+\setupTypeArea[bcor=0pt,oneside=no,alphabets=2.6]
+
+\doifnotmode{demo}{\endinput}
+
+%D Usage example:
+\usemodule[typearea]
+\setupTypeArea[bcor=0mm,alphabets=3.1]
+\setuppagenumbering[alternative=doublesided]
+\starttext
+\dorecurse4{\framed[width=\textwidth,height=\textheight]{test}\page}
+\stoptext

@@ -1,0 +1,393 @@
+%D \module
+%D   [     file=t-ruby,
+%D      version=2012.12.01,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Ruby Markup,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=Public Domain]
+
+\writestatus{loading}{ConTeXt User Module / Ruby Markup}
+
+\unprotect
+
+%D simple ruby:
+%D
+%D \starttyping
+%D <ruby>
+%D   <rb>WWW</rb>
+%D   <rt>World Wide Web</rt>
+%D </ruby>
+%D \stoptyping
+%D
+%D complex ruby:
+%D
+%D \starttyping
+%D <ruby>
+%D   <rbc>
+%D     <rb>10</rb>
+%D     <rb>31</rb>
+%D     <rb>2002</rb>
+%D   </rbc>
+%D   <rtc>
+%D     <rt>Month</rt>
+%D     <rt>Day</rt>
+%D     <rt>Year</rt>
+%D   </rtc>
+%D   <rtc>
+%D     <rt rbspan="3">Expiration Date</rt>
+%D   </rtc>
+%D </ruby>
+%D \stoptyping
+
+%D Constants/variables
+
+\startinterface all
+  \setinterfaceconstant {basestyle} {basestyle}
+  \setinterfaceconstant {basecolor} {basecolor}
+  \setinterfaceconstant {rubybase}  {rubybase}
+  \setinterfaceconstant {rubytext}  {rubytext}
+\stopinterface
+
+\startinterface all
+  \setinterfacevariable {letter} {letter}
+\stopinterface
+
+%D Lua
+
+\startluacode
+
+thirddata      = thirddata      or { }
+thirddata.ruby = thirddata.ruby or { }
+
+function thirddata.ruby.doifelsecjk(string)
+    local state = true
+    for c in unicode.utf8.gmatch(string,".") do
+        local n = scripts.hash[utf.byte(c)]
+        if not ( n == "chinese" or n == "korean" ) then
+            state = false
+            break
+        end
+    end
+    commands.doifelse(state)
+end
+
+\stopluacode
+
+%D Namespace
+
+\installnamespace {ruby}
+\installnamespace {rubyalign}
+\installnamespace {rubyalternative}
+\installnamespace {rubyhang}
+
+%D Additional registers
+
+\newdimen  \d_ruby_width
+\newdimen  \d_ruby_left
+\newdimen  \d_ruby_right
+\newdimen  \d_ruby_position
+
+\newsignal \s_ruby_signal
+
+\newcount  \c_ruby_n
+
+\newtoks   \t_ruby_base
+\newtoks   \t_ruby_text
+
+\newbox    \b_ruby_base
+\newbox    \b_ruby_text
+\newbox    \b_ruby_box
+
+%D \macros
+%D   {defineruby,setupruby}
+
+\installcommandhandler \????ruby {ruby} \????ruby
+
+%D \macros
+%D   {ruby}
+
+\unexpanded\def\ruby
+  {\dontleavehmode
+   \begingroup
+   \let\currentruby\empty
+   \dosingleempty\ruby_direct_indeed}
+
+\unexpanded\def\ruby_direct#name%
+  {\dontleavehmode
+   \begingroup
+   \edef\currentruby{#name}%
+   \dosingleempty\ruby_direct_indeed}
+
+\def\ruby_direct_indeed[#parameters]#rubybase#rubytext%
+  {\setupcurrentruby[#parameters,\c!rubybase={#rubybase},\c!rubytext={#rubytext}]%
+   %
+   \scratchdimen\lastskip
+   \ifdim\scratchdimen=\s_ruby_signal\else\global\d_ruby_width\zeropoint\fi
+   %
+   \global\advance\c_ruby_n\plusone
+   %
+   \xypos{rubyposition:\number\c_ruby_n}%
+   \doifmodeelse\v!first
+     {\d_ruby_position\onepoint}
+     {\d_ruby_position\dimexpr\MPx{rubyposition:\number\c_ruby_n}-\MPx{text:\number\realpageno}\relax}%
+   %
+   \setbox\b_ruby_base\hbox{\userubystyleandcolor\c!basestyle\c!basecolor\directrubyparameter\c!rubybase}%
+   \setbox\b_ruby_text\hbox{\userubystyleandcolor\c!textstyle\c!textcolor\directrubyparameter\c!rubytext}%
+   %
+   \edef\p_ruby_align      {\rubyparameter\c!align      }%
+   \edef\p_ruby_alternative{\rubyparameter\c!alternative}%
+   \edef\p_ruby_hang       {\rubyparameter\c!hang       }%
+   %
+   \ruby_align
+   \ruby_alternative
+   \ruby_hang
+   %
+   \hskip\s_ruby_signal\relax
+   \endgroup}
+
+\appendtoks
+  \setuevalue\currentruby{\ruby_direct{\currentruby}}%
+\to \everydefineruby
+
+%D Alignment
+%D
+%D \startitemize[packed]
+%D \item left
+%D \item middle
+%D \item right
+%D \item auto
+%D \item letter
+%D \item space
+%D \stopitemize
+
+\unexpanded\def\ruby_distribute_space #1{\processtokens{\hss  }{\hss\hss}{\hss  }{\hss\hss}{#1}}
+\unexpanded\def\ruby_distribute_letter#1{\processtokens{\relax}{\hss    }{\relax}{\hss\hss}{#1}}
+
+\def\ruby_align_stretch
+  {\d_ruby_left \zeropoint
+   \d_ruby_right\zeropoint
+   \ifdim\wd\b_ruby_base>\wd\b_ruby_text
+     \setbox\b_ruby_base\hbox to \wd\b_ruby_base{\hss\box\b_ruby_base\hss}%
+     \setbox\b_ruby_text\hbox to \wd\b_ruby_base{\userubystyleandcolor\c!textstyle\c!textcolor\normalexpanded{\ruby_distribute_space{\directrubyparameter\c!rubytext}}}%
+   \else
+     \setbox\b_ruby_base\hbox to \wd\b_ruby_text{\userubystyleandcolor\c!basestyle\c!basecolor\normalexpanded{\ruby_distribute_space{\directrubyparameter\c!rubybase}}}%
+     \setbox\b_ruby_text\hbox to \wd\b_ruby_text{\hss\box\b_ruby_text\hss}%
+   \fi}
+
+\def\ruby_align_letter
+  {\d_ruby_left \zeropoint
+   \d_ruby_right\zeropoint
+   \ifdim\wd\b_ruby_base>\wd\b_ruby_test
+     \setbox\b_ruby_base\hbox to \wd\b_ruby_base{\hss\box\b_ruby_base\hss}%
+     \setbox\b_ruby_text\hbox to \wd\b_ruby_base{\userubystyleandcolor\c!textstyle\c!textcolor\normalexpanded{\ruby_distribute_letter{\directrubyparameter\c!rubytext}}}%
+   \else
+     \setbox\b_ruby_base\hbox to \wd\b_ruby_text{\userubystyleandcolor\c!basestyle\c!basecolor\normalexpanded{\ruby_distribute_letter{\directrubyparameter\c!rubybase}}}%
+     \setbox\b_ruby_text\hbox to \wd\b_ruby_text{\hss\box\b_ruby_text\hss}%
+   \fi}
+
+\def\ruby_align_auto
+  {\ifdim\wd\b_ruby_base>\wd\b_ruby_text
+     \ctxlua{thirddata.ruby.doifelsecjk("\directrubyparameter\c!rubybase")}\donetrue\donefalse
+     \ifdone
+       \ruby_align_stretch
+     \else
+       \ruby_align_middle
+     \fi
+   \else
+     \ifdim\d_ruby_position=\zeropoint % begin of the line
+       \ruby_align_left
+     \else\ifdim\d_ruby_position=\dimexpr\textwidth-\wd\b_ruby_base\relax % end of the line
+       \ruby_align_right
+     \else
+       \ctxlua{thirddata.ruby.doifelsecjk("\directrubyparameter\c!rubytext")}\donetrue\donefalse
+       \ifdone
+         \ruby_align_stretch
+       \else
+         \ruby_align_middle
+       \fi
+     \fi\fi
+   \fi}
+
+\def\ruby_align_left
+  {\ifdim\wd\b_ruby_base>\wd\b_ruby_text
+     \d_ruby_left \zeropoint
+     \d_ruby_right\zeropoint
+   \else
+     \d_ruby_left \zeropoint
+     \d_ruby_right\dimexpr\wd\b_ruby_text-\wd\b_ruby_base\relax
+   \fi
+   \setbox\b_ruby_base\hbox to \wd\b_ruby_base{\box\b_ruby_base\hss}%
+   \setbox\b_ruby_text\hbox to \wd\b_ruby_base{\box\b_ruby_text\hss}}
+
+\def\ruby_align_middle
+  {\ifdim\wd\b_ruby_base>\wd\b_ruby_text
+     \d_ruby_left \zeropoint
+     \d_ruby_right\zeropoint
+   \else
+     \d_ruby_left \dimexpr(\wd\b_ruby_text-\wd\b_ruby_base)/2\relax
+     \d_ruby_right\dimexpr(\wd\b_ruby_text-\wd\b_ruby_base)/2\relax
+   \fi
+   \setbox\b_ruby_base\hbox to \wd\b_ruby_base{\hss\box\b_ruby_base\hss}%
+   \setbox\b_ruby_text\hbox to \wd\b_ruby_base{\hss\box\b_ruby_text\hss}}
+
+\def\ruby_align_right
+  {\ifdim\wd\b_ruby_base>\wd\b_ruby_base
+     \d_ruby_left \zeropoint
+     \d_ruby_right\zeropoint
+   \else
+     \d_ruby_left \dimexpr\wd\b_ruby_text-\wd\b_ruby_base\relax
+     \d_ruby_right\zeropoint
+   \fi
+   \setbox\b_ruby_base\hbox to \wd\b_ruby_base{\hss\box\b_ruby_base}%
+   \setbox\b_ruby_text\hbox to \wd\b_ruby_base{\hss\box\b_ruby_text}}
+
+\def\ruby_align_margin
+  {\ifdim\d_ruby_position=\zeropoint
+     \ruby_align_left
+   \else\ifdim\d_ruby_position=\dimexpr\textwidth-\wd\b_ruby_base\relax
+     \ruby_align_right
+   \else
+     \ruby_align_middle
+   \fi\fi}
+
+\def\ruby_align
+  {\csname\????rubyalign
+     \ifcsname\????rubyalign\p_ruby_align\endcsname\p_ruby_align\else\v!auto\fi
+   \endcsname}
+
+\setvalue{\????rubyalign\v!auto   }{\ruby_align_auto   }
+\setvalue{\????rubyalign\v!left   }{\ruby_align_left   }
+\setvalue{\????rubyalign\v!right  }{\ruby_align_right  }
+\setvalue{\????rubyalign\v!middle }{\ruby_align_middle }
+\setvalue{\????rubyalign\v!letter }{\ruby_align_letter }
+\setvalue{\????rubyalign\v!stretch}{\ruby_align_stretch}
+\setvalue{\????rubyalign\v!margin }{\ruby_align_margin }
+
+%D Alternative
+%D
+%D \startitemize[packed]
+%D \item top
+%D \item bottom
+%D \item text
+%D \stopitemize
+
+% \setvalue{\????rubyalternative\v!none}% needed for \pdfactualtext
+%   {\directrubyparameter\c!rubybase
+%    \rubyparameter\c!separator
+%    \rubyparameter\c!lefttext
+%    \directrubyparameter\c!rubytext
+%    \rubyparameter\c!righttext}
+
+\def\ruby_alternative_top
+  {\setbox\b_ruby_box\vbox
+     {\doifsomething{\rubyparameter\c!strut}{\setupstrut[\rubyparameter\c!strut]}%
+      \offinterlineskip
+      \hbox{\undepthed{\begstrut\box\b_ruby_text\endstrut}}
+      \rubyparameter\c!inbetween
+      \hbox{\begstrut\box\b_ruby_base\endstrut}}}
+
+\def\ruby_alternative_bottom
+  {\setbox\b_ruby_box\vtop
+     {\doifsomething{\rubyparameter\c!strut}{\setupstrut[\rubyparameter\c!strut]}%
+      \offinterlineskip
+      \hbox{\undepthed{\begstrut\box\b_ruby_base\endstrut}}
+      \rubyparameter\c!inbetween
+      \hbox{\begstrut\box\b_ruby_text\endstrut}}}
+
+\def\ruby_alternative_text
+  {\setbox\b_ruby_box\box\voidbox
+   \d_ruby_left \zeropoint
+   \d_ruby_right\zeropoint
+   \directrubyparameter\c!rubybase
+   \rubyparameter\c!separator
+   \rubyparameter\c!lefttext\directrubyparameter\c!rubytext\rubyparameter\c!righttext}
+
+\unexpanded\def\ruby_alternative_vertical_process#text%
+  {\setbox\scratchbox\vbox
+     {\userubystyleandcolor\c!textstyle\c!textcolor
+      \setupinterlinespace[\rubyparameter\c!interlinespace]%
+      \handletokens#text\with\hbox
+      \par}%
+   \lower\dimexpr(\ht\scratchbox+\strutdp-\strutht)/2-\rubyparameter\c!dy\relax\box\scratchbox}
+
+\def\ruby_alternative_vertical
+  {\d_ruby_left \zeropoint
+   \d_ruby_right\zeropoint
+   \setbox\b_ruby_box\hbox\bgroup
+     \begingroup
+       \userubystyleandcolor\c!basestyle\c!basecolor
+       \directrubyparameter\c!rubybase
+     \endgroup
+     \normalexpanded{\ruby_alternative_vertical_process{\directrubyparameter\c!rubytext}}%
+     \egroup}
+
+\def\ruby_alternative
+  {\csname\????rubyalternative
+     \ifcsname\????rubyalternative\p_ruby_alternative\endcsname\p_ruby_alternative\else\v!text\fi
+   \endcsname}
+
+\setvalue{\????rubyalternative\v!top   }{\ruby_alternative_top   }
+\setvalue{\????rubyalternative\v!bottom}{\ruby_alternative_bottom}
+\setvalue{\????rubyalternative\v!text  }{\ruby_alternative_text  }
+
+%D Overhang
+%D
+%D \startitemize[packed]
+%D \item left
+%D \item right
+%D \item auto
+%D \item none
+%D \stopitemize
+
+\def\ruby_hang_auto
+  {\ifdim\d_ruby_width>\zeropoint
+     \kern\dimexpr\d_ruby_left+\d_ruby_width\relax
+   \fi
+   \box\b_ruby_box
+   \global\d_ruby_width\d_ruby_right}
+
+\def\ruby_hang_left
+  {\box\b_ruby_box\kern\d_ruby_right
+   \global\d_ruby_width\d_ruby_right}
+
+\def\ruby_hang_right
+  {\ifdim\d_ruby_width>\zeropoint
+     \kern\dimexpr\d_ruby_left+\d_ruby_width\relax
+   \else
+     \kern\d_ruby_left
+   \fi
+   \box\b_ruby_box
+   \global\d_ruby_width\zeropoint}
+
+\def\ruby_hang_none
+  {\kern\d_ruby_left\box\b_ruby_box\kern\d_ruby_right
+   \global\d_ruby_width\zeropoint}
+
+\def\ruby_hang
+  {\csname\????rubyhang
+     \ifcsname\????rubyhang\p_ruby_hang\endcsname\p_ruby_hang\else\v!auto\fi
+   \endcsname}
+
+\setvalue{\????rubyhang\v!auto }{\ruby_hang_auto }
+\setvalue{\????rubyhang\v!left }{\ruby_hang_left }
+\setvalue{\????rubyhang\v!right}{\ruby_hang_right}
+\setvalue{\????rubyhang\v!none }{\ruby_hang_none }
+
+%D Default values
+
+\setupruby
+  [\c!alternative=\v!top,
+         \c!align=\v!auto,
+          \c!hang=\v!auto,
+            \c!dy=\zeropoint,
+     \c!separator={ },
+      \c!lefttext={(},
+     \c!righttext={)},
+         \c!strut=\v!no,
+     \c!inbetween={\blank[\v!small]},
+     \c!textstyle=\txx]
+
+\protect \endinput

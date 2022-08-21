@@ -1,0 +1,1077 @@
+%D \module
+%D   [     file=t-annotation,
+%D      version=2013.05.27,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Annotations,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% begin info
+%
+% title   : annotate text blocks
+% comment : create todo commands and environments and inline buffers
+% status  : under development, mkiv only
+%
+% end info
+
+%M \usemodule[annotation]
+%M \loadsetups[t-annotation.xml]
+%M
+%M \setupbodyfont[calluna]
+%M
+%M \definedescription[description][alternative=margin]
+%M
+%M \setuptyping[typing][bodyfont=]
+
+%D \subject{\textbackslash defineannotation}
+%D
+%D \showsetup{defineannotation}
+%D
+%D \subject{The \tex{setupannotation} command}
+%D
+%D \showsetup{setupannotation}
+%D
+%D \startdescription {alternative}
+%D With the “alternative” you can control the placement of the anootation block.
+%D
+%D \starttabulate[|l|p|]
+%D \NC \bf Name    \NC \bf Description \NC\NR
+%D \NC text        \EQ inline \NC\NR
+%D \NC paragraph   \EQ Separate paragraph \NC\NR
+%D \NC comment     \EQ pdf comment \NC\NR
+%D \NC tooltip     \EQ \type{\tooltip} \NC\NR
+%D \NC inmargin    \EQ \type{\inmargin} \NC\NR
+%D \NC inleft      \EQ \type{\inleft} \NC\NR
+%D \NC inright     \EQ \type{\inright} \NC\NR
+%D \NC margin      \EQ \type{\inmargin} \NC\NR
+%D \NC leftmargin  \EQ \type{\inleft} \NC\NR
+%D \NC rightmargin \EQ \type{\inright} \NC\NR
+%D \NC innermargin \EQ \type{\ininner} \NC\NR
+%D \NC outermargin \EQ \type{\inouter} \NC\NR
+%D \NC footnote    \EQ \type{\footnote} \NC\NR
+%D \NC endnote     \EQ \type{\endnote} \NC\NR
+%D \NC command     \EQ use the “command” key \NC\NR
+%D \stoptabulate
+%D \stopdescription
+%D
+%D \startdescription {title}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {text}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {number}
+%D The “number” key let you control whether to show a number or not. Each time
+%D you show a number the associated counter is incremented by one.
+%D \stopdescription
+%D
+%D \startdescription {list}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {counter}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {reference}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {left}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {right}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {next}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {display}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {paragraph}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {command}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {export}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {before}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {after}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {inbetween}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {spacebefore}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {spaceafter}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {style}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {color}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {headstyle}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {headcolor}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {textstyle}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {textcolor}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {align}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {indenting}
+%D …
+%D \stopdescription
+%D
+%D \startdescription {indentnext}
+%D This key let you control whether the next paragraph after the annotation block
+%D is indented or not. The option is only used for annotation which are set with
+%D the “paragraph” or “command” alternative, for “command” this is only true when
+%D display is set to “yes” or “auto”.
+%D \stopdescription
+%D
+%D \subject{The \textbackslash annotation command}
+%D
+%D \showsetup{annotation}
+%D \showsetup{startannotation}
+%D
+%D \subject{Accesing values}
+%D
+%D As you saw before you can get the content of the title and content blocks
+%D with the “command” alternative but there is another way to access
+%D the raw values of each element with the following for commands.
+%D
+%D \startitemize[packed]
+%D \item \type{\placeannotationtext}
+%D \item \type{\placeannotationtitle}
+%D \item \type{\placeannotationnumber}
+%D \item \type{\placeannotationcontent}
+%D \stopitemize
+%D
+%D The following example shows you how you can use the commands for yourself
+%D in your own defintions for the annotation environment. The \type{\placeannotationtext}
+%D commands holds the value you set with the “title” key while \type{\placeannotationnumber}
+%D let you access the number countervalue.
+%D
+%D \subject{Customized Layouts}
+%D
+%D \subsubject{Example 1}
+%D
+%D \startbuffer
+%D \define[2]\AnnotationCommand
+%D   {\starttabulate[|l|p|]
+%D    \NC Text    \EQ \rawannotationtext    \NC\NR
+%D    \NC Number  \EQ \rawannotationcounter \NC\NR
+%D    \NC Title   \EQ \rawannotationtitle   \NC\NR
+%D    \NC Content \EQ \rawannotationcontent \NC\NR
+%D    \stoptabulate}
+%D
+%D \setupannotation
+%D   [alternative=command,
+%D        command=\AnnotationCommand,
+%D           text=Annotation ,
+%D         number=yes]
+%D
+%D \startannotation {Peter D. Ward}
+%D The Earth, as a habitat for animal life, is in old age and
+%D has a fatal illness. Several, in fact. It would be happening
+%D whether humans had ever evolved or not. But our presence is
+%D like the effect of an old-age patient who smokes many packs
+%D of cigarettes per day – and we humans are the cigarettes.
+%D \stopannotation
+%D \stopbuffer
+%D
+%D \start \typebuffer[option=tex] \getbuffer \stop
+%D
+%D \subsubject{Example 2}
+%D
+%D \startbuffer
+%D \define[2]\AnnotationCommand
+%D   {\textrule{#1}#2\textrule}
+%D
+%D \setupannotation
+%D   [alternative=command,
+%D        command=\AnnotationCommand,
+%D           text=Annotation]
+%D
+%D \startannotation
+%D The Earth, as a habitat for animal life, is in old age and
+%D has a fatal illness. Several, in fact. It would be happening
+%D whether humans had ever evolved or not. But our presence is
+%D like the effect of an old-age patient who smokes many packs
+%D of cigarettes per day – and we humans are the cigarettes.
+%D \stopannotation
+%D \stopbuffer
+%D
+%D \start \typebuffer \getbuffer \stop
+%D
+%D \subsubject{Example 3}
+%D
+%D \startbuffer
+%D \define[2]\AnnotationCommand
+%D   {\startblockquote
+%D    “#2”\wordright{\placeannotationtitle}%
+%D    \stopblockquote}
+%D
+%D \setupannotation
+%D   [alternative=command,
+%D        command=\AnnotationCommand]
+%D
+%D \startannotation {Peter D. Ward}
+%D The Earth, as a habitat for animal life, is in old age and
+%D has a fatal illness. Several, in fact. It would be happening
+%D whether humans had ever evolved or not. But our presence is
+%D like the effect of an old-age patient who smokes many packs
+%D of cigarettes per day – and we humans are the cigarettes.
+%D \stopannotation
+%D \stopbuffer
+%D
+%D \start \typebuffer \getbuffer \stop
+
+\writestatus{loading}{ConTeXt User Module / Annotations}
+
+\unprotect
+
+\startinterface all
+  \setinterfacevariable {annotation} {annotation}
+  \setinterfacevariable {tooltip}    {tooltip}
+\stopinterface
+
+\startinterface all
+  \setinterfaceconstant {content}     {content}
+  \setinterfaceconstant {leftsymbol}  {leftsymbol}
+  \setinterfaceconstant {rightsymbol} {rightsymbol}
+\stopinterface
+
+\newconditional\c_annotation_header
+\newconditional\c_annotation_display
+\newconditional\c_annotation_inline
+\newconditional\c_annotation_number
+\newconditional\c_annotation_title
+\newconditional\c_annotation_paragraph
+\newconditional\c_annotation_buffer
+\newconditional\c_annotation_rightpage
+
+\installnamespace {annotation}
+\installnamespace {annotationalternative}
+\installnamespace {annotationrenderings}
+\installnamespace {annotationmethod}
+\installnamespace {annotationlevel}
+
+\installcommandhandler \????annotation {annotation} \????annotation
+
+\ctxloadluafile{t-annotation}
+
+\appendtoks
+  \expandafter\newcount\csname\????annotationlevel\currentannotation\endcsname
+  \setuevalue        {\currentannotation}{\annotation_cmd{\currentannotation}}%
+  \setuevalue{\e!start\currentannotation}{\annotation_beg{\currentannotation}}%
+  \setuevalue{\e!stop \currentannotation}{\annotation_end                    }%
+  \setuevalue{\e!get  \currentannotation}{\annotation_get{\currentannotation}}%
+\to \everydefineannotation
+
+\appendtoks
+  \definedataset[\currentannotation]%
+\to \everydefineannotation
+
+% each new environment creates a list and a counter with the same,
+% one can also use the counter of another environment but in this
+% case it has to be set with the “counter” key
+
+\appendtoks
+  \letannotationparameter\s!counter\currentannotation
+\to \everypresetannotation
+
+\appendtoks
+  \edef\p_annotation_counter{\annotationparameter\s!counter}%
+  \ifx\p_annotation_counter\currentannotation
+    \registerannotationcounter\currentannotation
+    \definelist   [\currentannotation]%
+    \definecounter[\currentannotation]%
+    \synchronizeannotationcounters
+  \fi
+\to \everydefineannotation
+
+% the \setupannotation command inherits all keys from \setupstructurecounter,
+% to do this a single line is necessary which takes care of this
+
+\installcounterassociation{annotation}
+
+\appendtoks
+  \synchronizeannotationcounters
+\to \everysetupannotation
+
+% Code for the annotation environment and command
+
+\def\annotation_initialize
+  {\let\m_annotation_name      \empty
+   \let\m_annotation_parameters\empty
+   %
+   \setfalse\c_annotation_header
+   \setfalse\c_annotation_display
+   \setfalse\c_annotation_inline
+   \setfalse\c_annotation_number
+   \setfalse\c_annotation_title
+   \setfalse\c_annotation_paragraph
+   \setfalse\c_annotation_buffer
+   \setfalse\c_annotation_rightpage
+   %
+   \let\currentannotationheader \annotation_header_formatted_indeed
+   \let\currentannotationcontent\annotation_content_formatted_indeed
+   \let\currentannotationtext   \annotation_text_formatted
+   \let\currentannotationcounter\annotation_counter_formatted
+   \let\currentannotationtitle  \annotation_title_formatted
+   %
+   \let\rawannotationheader \annotation_header_raw
+   \let\rawannotationcontent\annotation_content_raw
+   \let\rawannotationtext   \annotation_text_raw
+   \let\rawannotationcounter\annotation_counter_raw
+   \let\rawannotationtitle  \annotation_title_raw}
+
+\unexpanded\def\annotation_beg#environment%
+  {\begingroup
+   \annotation_initialize
+   \edef\currentannotation{#environment}%
+   \dodoubleempty\annotation_beg_parameters}
+
+\def\annotation_beg_parameters
+  {\iffirstargument
+     \ifsecondargument
+       \doubleexpandafter\annotation_beg_parameters_two
+     \else
+       \doubleexpandafter\annotation_beg_parameters_one
+     \fi
+   \else
+     \expandafter\annotation_beg_parameters_zero
+   \fi}
+
+\def\annotation_beg_parameters_two[#name][#parameters]%
+  {\edef\m_annotation_name      {#name}%
+   \edef\m_annotation_parameters{#parameters}%
+   \dosinglegroupempty\annotation_beg_title}
+
+\def\annotation_beg_parameters_one[#name][#parameters]%
+  {\doifassignmentelse{#name}
+     {\edef\m_annotation_parameters{#name}}
+     {\edef\m_annotation_name      {#name}}%
+   \dosinglegroupempty\annotation_beg_title}
+
+\def\annotation_beg_parameters_zero[#name][#parameters]%
+  {\dosinglegroupempty\annotation_beg_title}
+
+\def\annotation_beg_title#title%
+  {\ctxlua{thirddata.annotation.erasedata("\m_annotation_name")}%
+   \edef\m_annotation_parameters{\c!reference=,\c!list=,\c!title={#title},\m_annotation_parameters}%
+   \normalexpanded
+     {\annotation_environment
+        \expandafter\noexpand\csname\e!start\currentannotation\endcsname
+        \expandafter\noexpand\csname\e!stop \currentannotation\endcsname}}
+
+\unexpanded\def\annotation_environment#1#2%
+  {\begingroup\obeylines
+   \def\annotation_collect##1#2%
+     {\ctxlua{thirddata.annotation.collectdata("\currentannotation","\m_annotation_name",\!!bs\m_annotation_parameters\!!es,\!!bs\normalunexpanded{##1}\!!es,\!!bs#1\!!es,\!!bs#2\!!es,\number\catcodetable)}
+        \annotation_collect
+        \annotation_method}%
+   \annotation_collect}
+
+\unexpanded\def\annotation_end
+  {}
+
+\unexpanded\def\annotation_cmd#environment%
+  {\begingroup
+   \annotation_initialize
+   \edef\currentannotation{#environment}%
+   \dodoubleempty\annotation_cmd_parameters}
+
+\def\annotation_cmd_parameters
+  {\iffirstargument
+     \ifsecondargument
+       \doubleexpandafter\annotation_cmd_parameters_two
+     \else
+       \doubleexpandafter\annotation_cmd_parameters_one
+     \fi
+   \else
+     \expandafter\annotation_cmd_parameters_zero
+   \fi}
+
+\def\annotation_cmd_parameters_two[#name][#parameters]%
+  {\edef\m_annotation_name      {#name}%
+   \edef\m_annotation_parameters{#parameters}%
+   \dodoublegroupempty\annotation_cmd_title}
+
+\def\annotation_cmd_parameters_one[#name][#parameters]%
+  {\doifassignmentelse{#name}
+     {\edef\m_annotation_parameters{#name}}
+     {\edef\m_annotation_name      {#name}}%
+   \dodoublegroupempty\annotation_cmd_title}
+
+\def\annotation_cmd_parameters_zero[#name][#parameters]%
+  {\dodoublegroupempty\annotation_cmd_title}
+
+\def\annotation_cmd_title
+  {\ifsecondargument
+     \expandafter\annotation_cmd_content
+   \else
+     \expandafter\annotation_cmd_content\expandafter\empty
+   \fi}
+
+\def\annotation_cmd_content#title#content%
+  {\ctxlua{thirddata.annotation.erasedata("\m_annotation_name")}%
+   \edef\m_annotation_parameters{\c!reference=,\c!list=,\c!title={#title},\m_annotation_parameters}%
+   \begingroup
+   \ctxlua{thirddata.annotation.savedata("\currentannotation","\m_annotation_name","\m_annotation_parameters",\!!bs\normalunexpanded{#content}\!!es,\number\catcodetable)}%
+   \annotation_method}
+
+\unexpanded\def\annotation_get#environment%
+  {\begingroup
+   \annotation_initialize
+   \edef\currentannotation{#environment}%
+   \dodoubleempty\annotation_get_parameters}
+
+\def\annotation_get_parameters
+  {\iffirstargument
+     \iffirstargument
+       \doubleexpandafter\annotation_get_parameters_two
+     \else
+       \doubleexpandafter\annotation_get_parameters_one
+     \fi
+   \else
+     \expandafter\annotation_get_parameters_zero
+   \fi}
+
+\def\annotation_get_parameters_two[#name][#parameters]%
+  {\edef\m_annotation_name      {#name}%
+   \edef\m_annotation_parameters{#parameters}%
+   \annotation_get_content}
+
+\def\annotation_get_parameters_one[#name][#parameters]%
+  {\doifassignmentelse{#name}
+     {\edef\m_annotation_parameters{#name}}
+     {\edef\m_annotation_name      {#name}}%
+   \annotation_get_content}
+
+\def\annotation_get_parameters_zero[#name][#parameters]%
+  {\annotation_get_content}
+
+\def\annotation_get_content
+  {\letannotationparameter\c!method\s!default
+   \settrue\c_annotation_buffer
+   \edef\m_annotation_parameters{\ctxlua{thirddata.annotation.parameters("\currentannotation","\m_annotation_name")},\m_annotation_parameters}%
+   \begingroup
+   \annotation_method}
+
+\def\annotation_alternative
+  {\edef\currentannotationalternative          {\annotationparameter           \c!alternative   }%
+   \edef\p_annotationalternative_renderingsetup{\annotationalternativeparameter\c!renderingsetup}%
+   \edef\p_annotationalternative_alternative   {\annotationalternativeparameter\c!alternative   }%
+   \ifx\p_annotationalternative_alternative\v!vertical
+     \settrue\c_annotation_display
+   \else\ifx\p_annotationalternative_alternative\v!horizontal
+     \settrue\c_annotation_inline
+   \else\ifx\p_annotationalternative_alternative\v!auto % used for \setupannotation[alternative=command]
+     \ifx\p_annotation_display\v!yes
+       \settrue\c_annotation_display
+     \else\ifx\p_annotation_display\v!no
+       \settrue\c_annotation_inline
+     \else
+       \ifvmode
+         \settrue\c_annotation_display
+       \else
+         \settrue\c_annotation_inline
+       \fi
+     \fi\fi
+   \else\ifx\p_annotationalternative_alternative\v!none % needed for \setupannotation[alternative=none]
+     \ifhmode
+       \settrue\c_annotation_inline
+     \fi
+   \else
+     % margin, comment etc. annotations
+   \fi\fi\fi\fi
+   \annotation_before
+   \annotation_tagged_start
+   \autosetups\p_annotationalternative_renderingsetup
+   \annotation_tagged_stop
+   \annotation_after}
+
+\def\annotation_before
+  {\ifconditional\c_annotation_display
+     \edef\p_annotation_spacebefore   {\annotationparameter\c!spacebefore   }%
+     \edef\p_annotation_before        {\annotationparameter\c!before        }%
+     \edef\p_annotation_spaceafter    {\annotationparameter\c!spaceafter    }%
+     \edef\p_annotation_after         {\annotationparameter\c!after         }%
+     \edef\p_annotation_inbetween     {\annotationparameter\c!inbetween     }%
+     \edef\p_annotation_indenting     {\annotationparameter\c!indenting     }%
+     \edef\p_annotation_interlinespace{\annotationparameter\c!interlinespace}%
+     \ifx\p_annotation_spacebefore\empty
+       \endgraf
+     \else
+       \blank[\p_annotation_spacebefore]%
+     \fi
+     \ifx\p_annotation_indenting\empty \else
+       \setupindenting[\p_annotation_indenting]%
+     \fi
+     \ifconditional\c_annotation_paragraph
+       \ifx\p_annotation_interlinespace\v!empty
+         \setupinterlinespace
+       \else
+         \setupinterlinespace[\p_annotation_interlinespace]%
+       \fi
+     \fi
+     \p_annotation_before
+   \fi}
+
+\def\annotation_after
+  {\ifconditional\c_annotation_display
+     \p_annotation_after
+     \ifx\p_annotation_spaceafter\empty
+       \endgraf
+     \else
+       \blank[\p_annotation_spaceafter]%
+     \fi
+   \fi}
+
+% methods
+
+\unexpanded\def\installannotationmethod#name#command%
+  {\setvalue{\????annotationmethod#name}{#command}}
+
+\def\annotation_method
+  {\endgroup
+   \expandnamespaceparameter\????annotationmethod\annotationparameter\c!method\s!default}
+
+\def\annotation_method_default
+  {\normalexpanded{\annotation_parameters[\m_annotation_parameters]}%
+   \annotation_alternative
+   \ifconditional\c_annotation_display
+     \checknextindentation[\p_annotation_indentnext]%
+     \glet\annotation_aftergroup\dorechecknextindentation
+   \else
+     \ifconditional\c_annotation_inline
+       \glet\annotation_aftergroup\p_annotation_next
+     \else
+       \glet\annotation_aftergroup\GotoPar
+     \fi
+   \fi
+   \aftergroup\annotation_aftergroup
+   \endgroup}
+
+\def\annotation_method_buffer
+  {\endgroup}
+
+\installannotationmethod \s!default \annotation_method_default
+\installannotationmethod \v!buffer  \annotation_method_buffer
+
+% processing
+
+\def\c_annotation_level{\csname\????annotationlevel\currentparentannotation\endcsname}
+
+\def\annotation_level
+  {\let\currentparentannotation\currentannotation
+   \advance\c_annotation_level\plusone
+   \chaintocurrentannotation{\currentparentannotation:\number\c_annotation_level}%
+   \edef\currentannotation{\currentparentannotation:\number\c_annotation_level}}
+
+\unexpanded\def\annotation_parameters[#parameters]%
+  {\annotation_level
+   \setupcurrentannotation[#parameters]%
+   \useannotationstyleandcolor\c!style\c!color
+   \edef\p_annotation_number     {\annotationparameter\c!number     }%
+   \edef\p_annotation_header     {\annotationparameter\c!header     }%
+   \edef\p_annotation_title      {\annotationparameter\c!title      }%
+   \edef\p_annotation_text       {\annotationparameter\c!text       }%
+   \edef\p_annotation_left       {\annotationparameter\c!left       }%
+   \edef\p_annotation_right      {\annotationparameter\c!right      }%
+   \edef\p_annotation_stopper    {\annotationparameter\c!stopper    }%
+   \edef\p_annotation_reference  {\annotationparameter\c!reference  }%
+   \edef\p_annotation_list       {\annotationparameter\c!list       }%
+   \edef\p_annotation_counter    {\annotationparameter\s!counter    }%
+   \edef\p_annotation_display    {\annotationparameter\c!display    }%
+   \edef\p_annotation_paragraph  {\annotationparameter\c!paragraph  }%
+   \edef\p_annotation_export     {\annotationparameter\c!export     }%
+   \edef\p_annotation_indentnext {\annotationparameter\c!indentnext }%
+   \edef\p_annotation_next       {\annotationparameter\c!next       }%
+   \edef\p_annotation_doublesided{\annotationparameter\c!doublesided}%
+   \edef\p_annotation_leftmargin {\annotationparameter\c!leftmargin }%
+   \edef\p_annotation_rightmargin{\annotationparameter\c!rightmargin}%
+   \ifx\p_annotation_number\v!yes
+     \settrue\c_annotation_number
+     \incrementcounter[\p_annotation_counter]%
+   \fi
+   \ifx\p_annotation_title\empty \else
+     \settrue\c_annotation_title
+   \fi
+   \ifx\p_annotation_header\v!yes
+     \ifconditional\c_annotation_number
+       \settrue\c_annotation_header
+     \else\ifconditional\c_annotation_title
+       \settrue\c_annotation_header
+     \else\ifx\p_annotation_text\empty
+       % \setfalse\c_annotation_header
+     \else
+       \settrue\c_annotation_header
+     \fi\fi\fi
+   \fi
+   \ifx\p_annotation_reference\empty \else
+     \ifconditional\c_annotation_number
+       \normalexpanded{\reference[\p_annotation_reference]{\directconvertedcounter\p_annotation_counter\empty}}%
+     \else
+       \normalexpanded{\reference[\p_annotation_reference]{{\tttf ??}}}%
+     \fi
+   \fi
+   \ifx\p_annotation_list\empty \else
+     \ifconditional\c_annotation_number
+       \normalexpanded{\writetolist[\currentparentannotation]{\directconvertedcounter\p_annotation_counter\empty}{\p_annotation_list}}%
+     \else
+       \normalexpanded{\writetolist[\currentparentannotation]{}{\p_annotation_list}}%
+     \fi
+   \fi
+   \ifx\p_annotation_paragraph\v!yes
+     \settrue\c_annotation_paragraph
+   \fi
+   \ifx\p_annotation_doublesided\v!yes
+     \signalrightpage
+     \doifrightpageelse\settrue\setfalse\c_annotation_rightpage
+   \else
+     \settrue\c_annotation_rightpage
+   \fi
+   \ifx\p_annotation_export\v!yes
+     \ifconditional\c_annotation_header % do this at the lua with the raw text
+       \begingroup\simplifycommands
+       \ctxlua{thirddata.annotation.write(\!!bs\annotation_header_raw\!!es,\!!bs\normalexpanded{\noexpand\detokenize{\annotation_content_raw}}\!!es)}%
+       \endgroup
+     \fi
+   \fi}
+
+\def\annotation_tagged_start
+  {\ifconditional\c_annotation_inline
+     \dostarttagged\t!construct\currentparentannotation
+   \else
+     \dostarttagged\t!division\currentparentannotation
+   \fi}
+
+\def\annotation_tagged_stop
+  {\dostoptagged}
+
+% The title and the content of the annotation commands is accesed
+% by the following four commands, the formatted version is used
+% by alternatives which allow you to change the style and color.
+%
+% The raw version is used by alternatives where attributes are
+% not possible (comment) or undesired (footnotes).
+
+\unexpanded\def\annotation_header_formatted
+  {\edef\p_annotation_headcommand{\annotationparameter\c!headcommand}%
+   \p_annotation_headcommand\annotation_header_formatted_indeed}
+
+\unexpanded\def\annotation_header_formatted_indeed
+  {\begingroup
+     \useannotationstyleandcolor\c!headstyle\c!headcolor
+     \p_annotation_text
+     \ifconditional\c_annotation_number
+       \ifx\p_annotation_text\empty \else
+         \removeunwantedspaces\space % add space between “text” and “number” when there is text
+       \fi
+       \convertedcounter[\p_annotation_counter]%
+     \fi
+     \ifconditional\c_annotation_title
+       \ifx\p_annotation_text\empty
+         \ifconditional\c_annotation_number \space \fi % add space between “number” and “title” when there is a number
+       \else
+         \space % add space between “text” and “title” when there is a text
+       \fi
+       \p_annotation_left
+       \p_annotation_title
+       \p_annotation_right
+     \fi
+     \p_annotation_stopper
+   \endgroup}
+
+\unexpanded\def\annotation_content_formatted
+  {\edef\p_annotation_textcommand{\annotationparameter\c!textcommand}%
+   \p_annotation_textcommand\annotation_content_formatted_indeed}
+
+\unexpanded\def\annotation_content_formatted_indeed
+  {\begingroup
+     \useannotationstyleandcolor\c!textstyle\c!textcolor
+     \ifconditional\c_annotation_paragraph\setupinterlinespace\fi
+     \ctxlua{thirddata.annotation.printdata("\currentparentannotation","\m_annotation_name")}%
+     \removeunwantedspaces
+     \ifconditional\c_annotation_paragraph\par\fi
+   \endgroup}
+
+\unexpanded\def\annotation_text_formatted
+  {\begingroup
+     \useannotationstyleandcolor\c!headstyle\c!headcolor
+     \annotationparameter\c!text
+   \endgroup}
+
+\unexpanded\def\annotation_counter_formatted
+  {\begingroup
+     \useannotationstyleandcolor\c!headstyle\c!headcolor
+     \convertedcounter[\p_annotation_counter]%
+   \endgroup}
+
+\unexpanded\def\annotation_title_formatted
+  {\begingroup
+     \useannotationstyleandcolor\c!headstyle\c!headcolor
+     \p_annotation_title
+   \endgroup}
+
+\def\annotation_header_raw
+  {\p_annotation_text
+   \ifconditional\c_annotation_number
+     \ifx\p_annotation_text\empty \else
+       \removeunwantedspaces\space
+     \fi
+     \rawcountervalue[\p_annotation_counter]%
+   \fi
+   \ifconditional\c_annotation_title
+     \ifx\p_annotation_text\empty
+       \ifconditional\c_annotation_number \space \fi
+     \else
+       \space
+     \fi
+     \p_annotation_left
+     \p_annotation_title
+     \p_annotation_right
+   \fi
+   \p_annotation_stopper}
+
+\def\annotation_content_raw{\ctxlua{thirddata.annotation.printdata("\currentparentannotation","\m_annotation_name")}}
+\def\annotation_text_raw   {\p_annotation_text}
+\def\annotation_counter_raw{\rawcountervalue[\p_annotation_counter]}
+\def\annotation_title_raw  {\p_annotation_title}
+
+% With the command alternative one can access the formatted content and title
+% with the two arguments but it’s also possible to use the raw content of
+% each element with the \placeannotation... commands.
+
+\let\placeannotationtext   \annotation_text_raw
+\let\placeannotationnumber \annotation_counter_raw
+\let\placeannotationtitle  \annotation_title_raw
+\let\placeannotationcontent\annotation_content_raw
+
+% Condtionals for the users to check whether your’re in vertical or
+% horizontal mode, they are usefull when you want a command which
+% works different depenedent on the mode.
+
+\unexpanded\def\doifdisplayannotation
+  {\ifconditional\c_annotation_display
+     \expandafter\firstofoneargument
+   \else
+     \expandafter\gobbleoneargument
+   \fi}
+
+\unexpanded\def\doifelsedisplayannotation
+  {\ifconditional\c_annotation_display
+     \expandafter\firstoftwoarguments
+   \else
+     \expandafter\secondoftwoarguments
+   \fi}
+
+\unexpanded\def\doifinlineannotation
+  {\ifconditional\c_annotation_inline
+     \expandafter\firstofoneargument
+   \else
+     \expandafter\gobbleoneargument
+   \fi}
+
+\unexpanded\def\doifelseinlineannotation
+  {\ifconditional\c_annotation_inline
+     \expandafter\firstoftwoarguments
+   \else
+     \expandafter\secondoftwoarguments
+   \fi}
+
+% All layouts for the annotation commands are accessible with the alternative key,
+% the relation between the key values and the internal layout is done with the
+% following command. This command is not meant for user because they should always
+% use the command alternative for their own layouts but the author will add new
+% layouts if they are usefull.
+
+\installcommandhandler \????annotationalternative {annotationalternative} \????annotationalternative
+
+\defineannotationalternative
+  [\v!text]
+  [   \c!alternative=\v!horizontal,
+   \c!renderingsetup=\????annotationrenderings:\v!text]
+
+\startsetups[\????annotationrenderings:\v!text]
+  \ifconditional\c_annotation_header
+    \annotation_header_formatted\space
+  \fi
+  \annotation_content_formatted
+\stopsetups
+
+\defineannotationalternative
+  [\v!paragraph]
+  [   \c!alternative=\v!vertical,
+   \c!renderingsetup=\????annotationrenderings:\v!paragraph]
+
+\startsetups[\????annotationrenderings:\v!paragraph]
+  \ifconditional\c_annotation_header
+    \noindent\annotation_header_formatted
+    \p_annotation_inbetween
+  \fi
+  \annotation_content_formatted
+\stopsetups
+
+\defineannotationalternative
+  [\v!narrow]
+  [   \c!alternative=\v!vertical,
+   \c!renderingsetup=\????annotationrenderings:\v!narrow]
+
+\startsetups[\????annotationrenderings:\v!narrow]
+  \ifconditional\c_annotation_rightpage
+    \doadaptleftskip \p_annotation_leftmargin
+    \doadaptrightskip\p_annotation_rightmargin
+  \else
+    \doadaptleftskip \p_annotation_rightmargin
+    \doadaptrightskip\p_annotation_leftmargin
+  \fi
+  \annotation_content_formatted
+\stopsetups
+
+\defineannotationalternative
+  [\v!comment]
+  [\c!renderingsetup=\????annotationrenderings:\v!comment]
+
+\startsetups[\????annotationrenderings:\v!comment]
+  \begingroup\simplifycommands
+  \doifsomething{\annotationparameter\c!color}{\setupcomment[\c!color=\annotationparameter\c!color]}
+  \removeunwantedspaces
+  \ifconditional\c_annotation_header
+    \inmargin[\c!stack=\v!yes]{\normalexpanded{\comment[\annotation_header_raw]{\annotation_content_raw}}}
+  \else
+    \inmargin[\c!stack=\v!yes]{\normalexpanded{\comment{\annotation_content_raw}}}
+  \fi
+  \endgroup
+\stopsetups
+
+\defineannotationalternative
+  [\v!tooltip]
+  [\c!renderingsetup=\????annotationrenderings:\v!tooltip]
+
+\startsetups[\????annotationrenderings:\v!tooltip]
+  \ifconditional\c_annotation_title\else\removeunwantedspaces\fi
+  \tooltip[\annotationparameter\c!location]{\annotation_title_raw}{\annotation_content_raw}
+\stopsetups
+
+\defineannotationalternative
+  [\v!inmargin]
+  [\c!command=\inmargin,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\defineannotationalternative
+  [\v!margin]
+  [\c!command=\inmargin,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\defineannotationalternative
+  [\v!inleft]
+  [\c!command=\inleft,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\defineannotationalternative
+  [\v!leftmargin]
+  [\c!command=\inleft,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\defineannotationalternative
+  [\v!inright]
+  [\c!command=\inright,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\defineannotationalternative
+  [\v!rightmargin]
+  [\c!command=\inright,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\defineannotationalternative
+  [\v!innermargin]
+  [\c!command=\ininner,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\defineannotationalternative
+  [\v!outermargin]
+  [\c!command=\inouter,
+   \c!renderingsetup=\????annotationrenderings:\v!margin]
+
+\startsetups[\????annotationrenderings:\v!margin]
+  \edef\p_annotation_command{\annotationalternativeparameter\c!command}%
+  \ifx\p_annotation_command\empty \else
+    \p_annotation_command{\annotationparameter\c!before
+                          \ifconditional\c_annotation_header
+                            \annotation_header_formatted
+                          \fi
+                          \annotationparameter\c!inbetween
+                          \annotation_content_formatted
+                          \annotationparameter\c!after}
+  \fi
+\stopsetups
+
+\defineannotationalternative
+  [\v!footnote]
+  [   \c!alternative=\v!horizontal,
+   \c!renderingsetup=\????annotationrenderings:\v!footnote]
+
+\startsetups[\????annotationrenderings:\v!footnote]
+  \normalexpanded{\footnote{\annotation_content_raw}}
+\stopsetups
+
+\defineannotationalternative
+  [\v!endnote]
+  [   \c!alternative=\v!horizontal,
+   \c!renderingsetup=\????annotationrenderings:\v!endnote]
+
+\startsetups[\????annotationrenderings:\v!endnote]
+  \normalexpanded{\endnote{\annotation_content_raw}}
+\stopsetups
+
+\defineannotationalternative
+  [\v!command]
+  [   \c!alternative=\v!auto,
+   \c!renderingsetup=\????annotationrenderings:\v!command]
+
+\startsetups[\????annotationrenderings:\v!command]
+  \edef\p_annotation_command{\annotationparameter\c!command}%
+  \ifx\p_annotation_command\empty \else
+    \p_annotation_command\annotation_header_formatted\annotation_content_formatted
+  \fi
+\stopsetups
+
+\defineannotationalternative
+  [\v!quotation]
+  [   \c!alternative=\v!horizontal,
+   \c!renderingsetup=\????annotationrenderings:\v!quotation]
+
+\startsetups[\????annotationrenderings:\v!quotation]
+  \annotationparameter\c!leftsymbol
+  \annotation_content_raw\removeunwantedspaces
+  \annotationparameter\c!rightsymbol
+\stopsetups
+
+\defineannotationalternative
+  [\v!none]
+  [\c!renderingsetup=\????annotationrenderings:\v!none]
+
+\startsetups[\????annotationrenderings:\v!none]
+  \removeunwantedspaces
+\stopsetups
+
+% The module provides the option to write the content of each command to a external
+% file. The values for the option are defined with \defineannotationexport and can
+% be changed with \setupannotationexport.
+
+% \definenamespace
+%   [annotationexport]
+%   [     type=module,
+%      comment=Annotationexport,
+%      version=2011.02.17,
+%         name=annotationexport,
+%        style=no,
+%      command=yes,
+%        setup=yes,
+%    \s!parent=annotationexport]
+%
+% \appendtoks
+%   \ctxlua{thirddata.annotation.export_define{...}}%
+% \to \everydefineannotationexport
+%
+% \appendtoks
+%   \ctxlua{thirddata.annotation.export_setup{...}}%
+% \to \everysetupannotationexport
+%
+% \defineannotationexport[\v!yes][\c!type=\v!default]
+% \defineannotationexport[\v!org][\c!type=\v!org]
+
+% To make the module usefull even if there is no annotation command in a document
+% i predefine here the command \annotation. As the command is created with
+% \defineannotation you can make specific setups for this command with
+% \setupannotation[annotation][...] which won’t affect all other commands.
+
+\defineannotation[\v!annotation]
+
+% Finally i set default values for all commands, you can change them in
+% your document but all or individual annotation commands.
+
+\setupannotation
+  [  \c!headstyle=\v!bold,
+          \c!left=(,
+         \c!right=),
+   \c!spacebefore=\v!line,
+    \c!spaceafter=\annotationparameter\c!spacebefore,
+     \c!inbetween=\blank,
+   \c!alternative=\v!paragraph,
+     \c!paragraph=\v!no,
+        \c!number=\v!no,
+       \c!header=\v!yes,
+        \c!export=\v!no,
+     \c!indenting=\v!never,
+    \c!indentnext=\v!yes,
+          \c!next=\autoinsertnextspace]
+
+\setupannotationalternative
+  [\c!alternative=\v!none]
+
+% \setupannotationexport
+%   [     \c!mode=\v!default,
+%         \c!name=\v!annotation,
+%    \c!extension=\s!txt]
+
+\protect \endinput

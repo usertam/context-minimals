@@ -1,0 +1,145 @@
+%D \module
+%D   [     file=resume-imp-classic,
+%D      version=2014.10.31,
+%D        title=\CONTEXT\ Resume Style,
+%D     subtitle=Classic style,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2012 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\useresumestyle[default]
+
+% The colors are black by default, use one of the color styles to change them.
+
+\definecolor [resume:forename]   [black]
+\definecolor [resume:surename]   [black]
+\definecolor [resume:title]      [black]
+\definecolor [resume:quote]      [black]
+\definecolor [resume:address]    [black]
+\definecolor [resume:rule]       [black]
+\definecolor [resume:section]    [black]
+\definecolor [resume:subsection] [black]
+\definecolor [resume:separator]  [black]
+
+% Values for the margins etc.
+
+\definemeasure [resume:margin]   [.150\textwidth]
+\definemeasure [resume:distance] [.025\textwidth]
+
+% Layout
+
+% \setupresumelayout
+%   [\v!firstpage,\v!secondpage]
+%   [\c!backspace=20mm,
+%    \c!width=168mm,
+%    \c!header=0pt,
+%    \c!footer=0pt,
+%    \c!topspace=30mm,
+%    \c!bottomspace=40mm,
+%    \c!height=\v!fit]
+
+% Section commands
+
+\define[1]\ResumeSectionCommand
+  {\hbox to \hsize\bgroup
+     \blackrule[\c!width=\measure{resume:margin},\c!height=1\exheight,\c!depth=-.5\exheight,\c!color=resume:rule]%
+     \hskip\measure{resume:distance}\relax
+     \vtop\bgroup
+       \hsize\dimexpr\hsize-\measure{resume:margin}-\measure{resume:distance}\relax
+       #1%
+     \egroup
+   \egroup}
+
+\setupresumehead
+  [\v!resume\v!section]
+  [\c!align=\v!flushleft,
+   \c!style=\tfb,
+   \c!color=modern:section,
+   \c!textcommand=\ResumeSectionCommand]
+
+\define[1]\ResumeSubsectionCommand
+  {\hbox to \hsize\bgroup
+     \hskip\dimexpr\measure{resume:margin}+\measure{resume:distance}\relax
+     \vtop\bgroup
+       \hsize\dimexpr\hsize-\measure{resume:margin}-\measure{resume:distance}\relax
+       #1%
+     \egroup
+   \egroup}
+
+\setupresumehead
+  [\v!resume\v!subsection]
+  [\c!align=\v!flushleft,
+   \c!style=\tfa,
+   \c!color=modern:subsection,
+   \c!textcommand=\ResumeSubsectionCommand]
+
+% Paragraphs
+
+\setupresumeparagraph
+  [\v!two\v!columns]
+  [\c!distance=\measure{resume:distance}]
+
+\setupresumeparagraph
+  [\v!two\v!columns:1]
+  [\c!width=\measure{resume:margin}]
+
+% Layer
+
+\setupresumesection
+  [\v!head]
+  [\c!alternative=\v!classic]
+
+\setupresumeframe
+  [\v!head]
+  [\c!height=3.5cm,
+   \c!frame=\v!off,
+   \c!align={\v!wide,\v!middle}]
+
+% Layer
+
+\setupresumelayer
+  [\v!nextfoot]
+  [\c!alternative=\v!classic,
+   \c!preset=\v!left\v!bottom,
+   \c!x=\backspace,
+   \c!y=2cm,
+   \c!state=\v!repeat]
+
+\setupresumeframe
+  [\v!nextfoot]
+  [\c!frame=\v!off,
+   \c!width=\textwidth,
+   \c!height=2cm,
+   \c!align={\v!flushright,\v!lohi}]
+
+% Font and color settings
+
+\setupresumestyle [firstname] [\c!style=\tfd,\c!color=resume:forename]
+\setupresumestyle [familyname][\c!style=\tfd,\c!color=resume:surename]
+\setupresumestyle [quote]     [\c!style=\tf, \c!color=resume:quote]
+\setupresumestyle [title]     [\c!style=\it, \c!color=resume:title]
+\setupresumestyle [street]    [\c!style=\it, \c!color=resume:address]
+\setupresumestyle [town]      [\c!style=\it, \c!color=resume:address]
+\setupresumestyle [mobile]    [\c!style=\it, \c!color=resume:address]
+\setupresumestyle [phone]     [\c!style=\it, \c!color=resume:address]
+\setupresumestyle [fax]       [\c!style=\it, \c!color=resume:address]
+\setupresumestyle [email]     [\c!style=\it, \c!color=resume:address]
+\setupresumestyle [info]      [\c!style=\it, \c!color=resume:address]
+
+\endinput

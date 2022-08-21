@@ -1,0 +1,53 @@
+%D \module
+%D   [     file=type-imp-vollkorn,
+%D      version=2010.09.15,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Vollkorn Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [vollkorn]
+
+\starttypescript [\s!serif] [vollkorn]
+    \definefontsynonym [Vollkorn-Regular]    [\s!file:vollkornregular]    [\s!features=\s!default]
+    \definefontsynonym [Vollkorn-Italic]     [\s!file:vollkornitalic]     [\s!features=\s!default]
+    \definefontsynonym [Vollkorn-Bold]       [\s!file:vollkornbold]       [\s!features=\s!default]
+    \definefontsynonym [Vollkorn-BoldItalic] [\s!file:vollkornbolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [vollkorn]
+    \setups[\s!font:\s!fallback:\s!serif]
+    \definefontsynonym [Serif]           [Vollkorn-Regular]    [\s!features=\s!default]
+    \definefontsynonym [SerifItalic]     [Vollkorn-Italic]     [\s!features=\s!default]
+    \definefontsynonym [SerifBold]       [Vollkorn-Bold]       [\s!features=\s!default]
+    \definefontsynonym [SerifBoldItalic] [Vollkorn-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [vollkorn]
+    \definetypeface [vollkorn] [rm] [\s!serif] [vollkorn] [\s!default]
+    \definetypeface [vollkorn] [ss] [\s!sans]  [modern]   [\s!default]
+    \definetypeface [vollkorn] [tt] [\s!mono]  [modern]   [\s!default]
+    \definetypeface [vollkorn] [mm] [\s!math]  [modern]   [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

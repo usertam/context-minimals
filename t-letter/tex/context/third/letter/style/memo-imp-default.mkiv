@@ -1,0 +1,96 @@
+%D \module
+%D   [     file=memo-imp-default,
+%D      version=2012.02.04,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Default memo style,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\setupmemo
+  [\c!date=\currentdate]
+
+\setupmemooptions
+  [\c!marking=\v!no]
+
+\setupmemolayer
+  [\v!head,\v!nexthead,\v!lefthead,\v!righthead]
+  [\c!x=\backspace,
+   \c!y=\topspace]
+
+\setupmemoframe
+  [\v!head,\v!nexthead,\v!lefthead,\v!righthead]
+  [\c!width=\textwidth]
+
+\setupmemolayer
+  [\v!foot,\v!nextfoot,\v!leftfoot,\v!rightfoot]
+  [\c!preset=\v!left\v!bottom,
+   \c!x=\backspace,
+   \c!y=\bottomspace]
+
+\setupmemoframe
+  [\v!foot,\v!nextfoot,\v!leftfoot,\v!rightfoot]
+  [\c!width=\textwidth,
+   \c!height=\footerheight]
+
+\setupmemolayer
+  [\v!nexthead,\v!nextfoot]
+  [\c!state=\v!next]
+
+\setupmemolayer
+  [\v!lefthead,\v!leftfoot]
+  [\c!state=\v!left]
+
+\setupmemolayer
+  [\v!righthead,\v!rightfoot]
+  [\c!state=\v!right]
+
+\definememoelements
+  [\v!layer]
+  [\v!memomain,
+   \v!memonext,
+   \v!head,
+   \v!nexthead,
+   \v!lefthead,
+   \v!righthead,
+   \v!foot,
+   \v!nextfoot,
+   \v!leftfoot,
+   \v!rightfoot,
+   \v!topmark,
+   \v!botmark,
+   \v!cutmark,
+   \v!endmark,
+   \v!usermark]
+
+\definememoelements
+  [\v!section]
+  [\v!head
+   \v!date,
+   \v!reference,
+   \v!specialnotation,
+   \v!address,
+   \v!title,
+   \v!opening,
+   \v!subject,
+   \v!content,
+   \v!closing,
+   \v!appendices]
+
+\endinput

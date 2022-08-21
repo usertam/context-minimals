@@ -1,0 +1,160 @@
+%D \module
+%D   [     file=t-algorithmic,
+%D      version=2012.06.22,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Algorithms,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+\writestatus{loading}{Context User Module / Algorithms}
+
+\unprotect
+
+\def\????algorithmic{@@@@algorithmic}
+
+\def\algorithmicparameter#1%
+  {\csname\ifcsname\????algorithmic#1\endcsname\????algorithmic#1\else\s!empty\fi\endcsname}
+
+\def\startalgorithmic
+  {\bgroup
+   \dosingleempty\dostartalgorithmic}
+
+\def\dostartalgorithmic[#1]%
+  {\iffirstargument
+     \setupalgorithmic[#1]%
+   \fi
+   \the\everyalgorithmic
+   \doifsomething{\algorithmicparameter\c!spacebefore}{\blank[\algorithmicparameter\c!spacebefore]}%
+   \algorithmicparameter\c!before
+   \setupwhitespace[\v!none]%
+   \doadaptleftskip{\algorithmicparameter\c!margin}%
+   \doif{\algorithmicparameter\c!numbering}\v!yes
+     {\setuplinenumbering
+        [\c!start=\algorithmicparameter\c!start,
+          \c!stop=\algorithmicparameter\c!stop,
+          \c!step=\algorithmicparameter\c!step]%
+      \startlinenumbering}}
+
+\def\stopalgorithmic
+  {\par
+   \doif{\algorithmicparameter\c!numbering}\v!yes\stoplinenumbering
+   \algorithmicparameter\c!after
+   \doifsomething{\algorithmicparameter\c!spaceafter}{\blank[\algorithmicparameter\c!spaceafter]}%
+   \egroup}
+
+\def\setupalgorithmic
+  {\dodoubleargument\getparameters[\????algorithmic]}
+
+% Commands
+
+\newtoks\everyalgorithmic
+
+\def\startsubalgorithmic
+  {\par\doadaptleftskip{\algorithmicparameter\c!width}}
+
+\def\stopsubalgorithmic
+  {\par\doadaptleftskip{-\algorithmicparameter\c!width}}
+
+\def\algorithmic!state   {\par}
+\def\algorithmic!if    #1{\par\algorithmicif\ #1 \algorithmicthen\startsubalgorithmic}
+\def\algorithmic!else    {\stopsubalgorithmic\algorithmicelse\startsubalgorithmic}
+\def\algorithmic!elsif #1{\stopsubalgorithmic\algorithmicelsif\ #1 \algorithmicthen\startsubalgorithmic}
+\def\algorithmic!endif   {\stopsubalgorithmic\algorithmicendif}
+\def\algorithmic!for   #1{\par\algorithmicfor\ #1 \algorithmicdo\startsubalgorithmic}
+\def\algorithmic!forall#1{\par\algorithmicforall\ #1 \algorithmicdo\startsubalgorithmic}
+\def\algorithmic!endfor  {\stopsubalgorithmic\algorithmicendfor}
+\def\algorithmic!while #1{\par\algorithmicwhile\ #1 \algorithmicdo\startsubalgorithmic}
+\def\algorithmic!endwhile{\stopsubalgorithmic\algorithmicendwhile}
+\def\algorithmic!repeat  {\par\algorithmicrepeat\startsubalgorithmic}
+\def\algorithmic!until #1{\stopsubalgorithmic\algorithmicuntil\ #1}
+\def\algorithmic!loop    {\par\algorithmicloop\startsubalgorithmic}
+\def\algorithmic!endloop {\stopsubalgorithmic\algorithmicendloop}
+\def\algorithmic!require {\par\algorithmicrequire\space}
+\def\algorithmic!ensure  {\par\algorithmicensure\space}
+\def\algorithmic!return  {\par\algorithmicreturn\space}
+\def\algorithmic!true    {\algorithmictrue}
+\def\algorithmic!false   {\algorithmicfalse}
+\def\algorithmic!print   {\par\algorithmicprint\space}
+\def\algorithmic!comment {\algorithmiccomment}
+
+\appendtoks
+  \let\STATE   \algorithmic!state
+  \let\IF      \algorithmic!if
+  \let\ELSE    \algorithmic!else
+  \let\ELSIF   \algorithmic!elsif
+  \let\ENDIF   \algorithmic!endif
+  \let\FOR     \algorithmic!for
+  \let\FORALL  \algorithmic!forall
+  \let\ENDFOR  \algorithmic!endfor
+  \let\WHILE   \algorithmic!while
+  \let\ENDWHILE\algorithmic!endwhile
+  \let\REPEAT  \algorithmic!repeat
+  \let\UNTIL   \algorithmic!until
+  \let\LOOP    \algorithmic!loop
+  \let\ENDLOOP \algorithmic!endloop
+  \let\REQUIRE \algorithmic!require
+  \let\ENSURE  \algorithmic!ensure
+  \let\RETURN  \algorithmic!return
+  \let\TRUE    \algorithmic!true
+  \let\FALSE   \algorithmic!false
+  \let\PRINT   \algorithmic!print
+  \let\COMMENT \algorithmic!comment
+\to \everyalgorithmic
+
+% I should make this multilingual
+
+\def\algorithmicrequire  {{\bf Require:}}
+\def\algorithmicensure   {{\bf Ensure:}}
+\def\algorithmiccomment#1{\{#1\}}
+\def\algorithmicend      {{\bf end}}
+\def\algorithmicif       {{\bf if}}
+\def\algorithmicthen     {{\bf then}}
+\def\algorithmicelse     {{\bf else}}
+\def\algorithmicelsif    {\algorithmicelse\ \algorithmicif}
+\def\algorithmicendif    {\algorithmicend\ \algorithmicif}
+\def\algorithmicfor      {{\bf for}}
+\def\algorithmicforall   {{\bf for all}}
+\def\algorithmicdo       {{\bf do}}
+\def\algorithmicendfor   {\algorithmicend\ \algorithmicfor}
+\def\algorithmicwhile    {{\bf while}}
+\def\algorithmicendwhile {\algorithmicend\ \algorithmicwhile}
+\def\algorithmicloop     {{\bf loop}}
+\def\algorithmicendloop  {\algorithmicend\ \algorithmicloop}
+\def\algorithmicrepeat   {{\bf repeat}}
+\def\algorithmicuntil    {{\bf until}}
+\def\algorithmicprint    {{\bf print}}
+\def\algorithmicreturn   {{\bf return}}
+\def\algorithmictrue     {{\bf true}}
+\def\algorithmicfalse    {{\bf false}}
+
+% Default values
+
+\setupalgorithmic
+  [  \c!numbering=\v!no,
+         \c!start=1,
+          \c!stop=,
+          \c!step=1,
+         \c!width=1em,
+        \c!margin=1em,
+   \c!spacebefore=\v!line,
+    \c!spaceafter=\v!line]
+
+\protect \endinput

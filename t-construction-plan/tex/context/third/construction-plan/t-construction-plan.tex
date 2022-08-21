@@ -1,0 +1,150 @@
+%D \module
+%D   [      file=t-construction-plan,
+%D        version=2008.04.05,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Construction plans,
+%D         author=Peter Münster,
+%D           date=\currentdate,
+%D      copyright={Peter Münster}]
+%C This module is copyrighted by Peter Münster.
+%C Please send any comments to pmrb at free.fr.
+
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; either version 2
+% of the License, or (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but without any warranty; without even the implied warranty of
+% merchantability or fitness for a particular purpose.  See the
+% GNU General Public License for more details.
+
+\writestatus{loading}{Typesetting construction plans}
+
+\unprotect
+
+%D We need a lot of space.
+\setuplayout[header=0pt,footer=0pt,backspace=2cm,width=middle,
+  topspace=1cm,height=middle]
+
+%D Doing pagenumbering on our own.
+\setuppagenumbering[state=stop]
+
+%D \macros
+%D   {setupPlan}
+%D
+%D Setting up some values.
+%D
+%D Default setup:
+%D
+%D \starttyping
+%D \setupPlan[paper=A3,project=,author=,prec=10]
+%D \stoptyping
+%D
+%D Example:
+%D
+%D \starttyping
+%D \setupPlan[paper=A3,project=My garage,author=Peter Münster,
+%D   prec=Precision factor for figure width]
+%D \stoptyping
+\def\setupPlan[#1]{\getparameters[CP][#1]}
+\setupPlan[paper=A4,project=,author=,date=,prec=10]
+
+%D Support for more than one language!
+\setuplabeltext[fr][project=Projet,author=Auteur,date=Date,scale=Échelle]
+\setuplabeltext[en][project=Project,author=Author,date=Date,scale=Scale]
+\setuplabeltext[de][project=Projekt,author=Autor,date=Datum,scale=Maßstab]
+
+%D \macros
+%D   {Plan}
+%D
+%D Makes a page with a plan and some comments below it.
+%D
+%D Example:
+%D
+%D \starttyping
+%D \Plan[Prefix=file prefix,Scale=scale of figure,mm=width of figure in mm,
+%D   Title=title of plan]
+%D \stoptyping
+%D
+%D If you want to include the file \type{plan-20000.eps} you have to use
+%D \type{Prefix=plan,mm=20000}.
+%D
+%D Sample document:
+%D
+%D \starttyping
+%D \usemodule[construction-plan]
+%D \mainlanguage[fr] % or better: \usemodule[french]
+%D \starttext
+%D \Plan[Prefix=situ,Scale=2000,mm=351000,Title=Plan de situation]
+%D \Plan[Prefix=masse,Scale=400,mm=66000,Title=Plan de masse]
+%D \Plan[Prefix=nord,Scale=100,mm=20906,Title=Façade nord]
+%D \Plan[Prefix=sud,mm=18900,Title=Façade sud]
+%D \Plan[Prefix=west,mm=23390,Title=Pignon ouest]
+%D \Plan[Prefix=ost,mm=23513,Title=Pignon est]
+%D \Plan[Prefix=rdc,mm=18456,Title=Rez-de-chaussée]
+%D \Plan[Prefix=etage,mm=16695,Title=Étage]
+%D \Plan[Prefix=haus1,Scale=150,mm=30000,Title=Simulation 1]
+%D \Plan[Prefix=haus2,Scale=100,mm=20000,Title=Simulation 2]
+%D \stoptext
+%D \stoptyping
+
+\def\@BottomLine{{\tx\doifsomething\CPproject{%
+      \labeltext{project}: \CPproject, }%
+      \doifsomething\CPauthor{\labeltext{author}: \CPauthor, }%
+      \labeltext{date}: \doifelsenothing\CPdate\currentdate\CPdate}\hfill}
+
+\newdimen\CPwidth \newdimen\CPheight
+\def\Plan[#1]{%
+  \getparameters[CP][#1]
+  \CPwidth=\dimexpr(\the\numexpr(\CPprec*\CPmm/\CPscale)mm/\CPprec)
+  \def\CPfig{\externalfigure[\CPprefix-\CPmm][width=\the\CPwidth]}%
+  \setbox\scratchbox\hbox{\CPfig}\CPheight=\ht\scratchbox
+  \ifdim\CPwidth>1.1\CPheight
+    \setuppapersize[\CPpaper,landscape,rotated][\CPpaper]
+  \else
+    \setuppapersize[\CPpaper][\CPpaper]
+  \fi
+  \startstandardmakeup
+    \midaligned{\CPfig}\vfil\@BottomLine
+    \framed[align=lohi,offset=2ex]{{\bfc\CPtitle}\blank
+    \labeltext{scale}: 1/\CPscale\quad\hfill(\currentpage/\lastpage)}%
+    \vskip0pt plus -1fil
+  \stopstandardmakeup}
+
+%D \macros
+%D   {NoPlan}
+%D
+%D Makes a page with some content and some comments below it.
+%D
+%D Example:
+%D
+%D \starttyping
+%D \NoPlan[Title=Some notes]{Here are some notes about the plans.}
+%D \stoptyping
+
+\long\def\NoPlan[#1]#2{%
+  \getparameters[CP][#1]
+  \setuppapersize[\CPpaper][\CPpaper]
+  \startstandardmakeup
+    #2\vfil\@BottomLine
+    \framed[align=lohi,offset=2ex]{{\bfc\CPtitle}\blank
+    (\currentpage/\lastpage)}\vskip0pt plus -1fil
+  \stopstandardmakeup}
+
+\protect
+
+\doifnotmode{demo}{\endinput}
+
+%D Usage example:
+\usemodule[construction-plan]
+\setupexternalfigures[directory=samples]
+\mainlanguage[de]
+\setupPlan[paper=A3,project=Mein Haus,prec=15]
+\starttext
+\Plan[prefix=unten,scale=100,mm=21478,title=Erdgeschoß]
+\Plan[prefix=oben,mm=21345,title=Obergeschoß]
+\Plan[prefix=simulation,scale=250,mm=80000,title=Simulation]
+\NoPlan[title=Notizen,paper=A4]{\tfb\setupinterlinespace
+  Einige Notizen, die das Bauvorhaben beschreiben...}
+\stoptext

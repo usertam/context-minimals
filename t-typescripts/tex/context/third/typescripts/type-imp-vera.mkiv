@@ -1,0 +1,79 @@
+%D \module
+%D   [     file=type-imp-vera,
+%D      version=2010.09.14,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Bitstream Vera Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [vera]
+
+\starttypescript [\s!serif] [vera]
+    \definefontsynonym [VeraSerif-Regular] [\s!file:veraserif]     [\s!features=\s!default]
+    \definefontsynonym [VeraSerif-Bold]    [\s!file:veraserifbold] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [vera]
+    \setups[\s!font:\s!fallback:\s!serif]
+    \definefontsynonym [\s!Serif]     [VeraSerif-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold] [VeraSerif-Bold]    [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [vera]
+    \definefontsynonym [VeraSans-Regular]    [\s!file:vera]           [\s!features=\s!default]
+    \definefontsynonym [VeraSans-Italic]     [\s!file:veraitalic]     [\s!features=\s!default]
+    \definefontsynonym [VeraSans-Bold]       [\s!file:verabold]       [\s!features=\s!default]
+    \definefontsynonym [VeraSans-BoldItalic] [\s!file:verabolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [vera]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]           [VeraSans-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SansItalic]     [VeraSans-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold]       [VeraSans-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SansBoldItalic] [VeraSans-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [mono] [vera]
+    \definefontsynonym [VeraMono-Regular]    [\s!file:veramono]           [\s!features=\s!default]
+    \definefontsynonym [VeraMono-Italic]     [\s!file:veramonoitalic]     [\s!features=\s!default]
+    \definefontsynonym [VeraMono-Bold]       [\s!file:veramonobold]       [\s!features=\s!default]
+    \definefontsynonym [VeraMono-BoldItalic] [\s!file:veramonobolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!mono] [vera]
+    \setups[\s!font:\s!fallback:\s!mono]
+    \definefontsynonym [Mono]           [VeraMono-Regular]    [\s!features=\s!default]
+    \definefontsynonym [MonoItalic]     [VeraMono-Italic]     [\s!features=\s!default]
+    \definefontsynonym [MonoBold]       [VeraMono-Bold]       [\s!features=\s!default]
+    \definefontsynonym [MonoBoldItalic] [VeraMono-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [vera]
+    \definetypeface [vera] [rm] [\s!serif] [vera]   [\s!default]
+    \definetypeface [vera] [ss] [\s!sans]  [vera]   [\s!default]
+    \definetypeface [vera] [tt] [\s!mono]  [vera]   [\s!default]
+    \definetypeface [vera] [mm] [\s!math]  [modern] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

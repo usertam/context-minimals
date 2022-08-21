@@ -1,0 +1,224 @@
+%D \module
+%D   [      file=simpleslides-s-Rounded,
+%D        version=2009.03.30
+%D          title=\CONTEXT\ Style File,
+%D       subtitle=Presentation Module Rounded,
+%D         author=Aditya Mahajan and Thomas A. Schmitz,
+%D           date=\currentdate,
+%D      copyright={Aditya Mahajan and Thomas A. Schmitz}]
+%C
+%C Copyright 2007 Aditya Mahajan and Thomas A. Schmitz
+%C This file may be distributed under the GNU General Public License v. 2.0.
+
+%D This file provides the \quotation{Rounded} style for the presentation
+%D module. It is loaded at runtime. 
+
+\writestatus{simpleslides}{loading style Rounded}
+
+\startmodule[simpleslides-s-Rounded]
+
+\unprotect
+
+%D The page layout:
+
+\setuplayout [width=fit,
+              leftmargin=1.5cm,
+	      rightmargin=0cm,
+              leftmargindistance=1.2cm,
+              rightmargindistance=0pt,
+              height=fit, 
+              header=5.3cm, 
+              footer=0cm, 
+              topspace=.4cm, 
+              backspace=2.5cm,
+	      cutspace=3.2cm,
+              bottomspace=0cm,
+              bottom=0pt,
+              location=singlesided]
+
+\setuplayout [simpleslides:layout:horizontal][header=5.3cm]
+\setuplayout [simpleslides:layout:vertical]  [header=2.3cm]
+\setuplayout [simpleslides:layout:title]     [header=2.3cm]
+
+%D We also specify the position of the slidetitle.
+
+\setuplayer[simpleslides:layer:slidetitle]
+    [y=23mm]
+
+%D These macros are used for placing figures/pictures:
+
+\define\NormalHeight         {\textheight}
+\define\NormalWidth          {.476\textwidth}
+\define\PictureFrameHeight   {\textheight}
+\define\PictureFrameWidth    {.476\textwidth}
+
+%D We define our color scheme:
+
+\definecolor [simpleslides:backgroundcolor]  [s=.95]
+\definecolor [simpleslides:contrastcolor]    [r=.58,g=.81,b=.58]
+\definecolor [simpleslides:textcolor]        [r=.09,g=.2,b=.41]
+\definecolor [simpleslides:variantcolor]     [r=.04,g=.4,b=.4]
+\definecolor [simpleslides:itemize:color]    [simpleslides:textcolor]
+
+\setupcolors[textcolor=simpleslides:textcolor]
+
+%D We let \METAPOST\ calculate the background:
+
+\startuseMPgraphic{simpleslides:MP:common}
+save a,b,c,d;
+numeric a,b,c,d ;
+
+a = 2cm ;   b = 0.7cm ;
+c = 6cm ;   d = .7cm ;
+
+save p ; path p[] ;
+
+fill Page withcolor \MPcolor{simpleslides:backgroundcolor} ;
+
+z1 = llcorner Page shifted (a,0) ;
+z2 = ulcorner Page shifted (a,-a-b) ;
+z3 = ulcorner Page shifted (a+b/4,-a-b/4) ;
+z4 = ulcorner Page shifted (a+b,-a) ;
+z5 = urcorner Page shifted (0,-a) ;
+z6 = ulcorner Page shifted (c,0) ;
+z7 = ulcorner Page shifted (c,-a) ;
+
+
+p[1] = llcorner Page -- z1 -- z2 .. z3 .. z4 -- z7 -- z6 -- 
+       ulcorner Page -- cycle ;
+
+fill p[1] withcolor \MPcolor{simpleslides:contrastcolor} ;
+
+\stopuseMPgraphic
+
+\startuseMPgraphic{simpleslides:MP:vertical}
+StartPage ;
+\includeMPgraphic{simpleslides:MP:common} ;
+% The pagenumber cannot be part of MP:common otherwise pdftex ignores it.
+draw \sometxt{\framed[frame=off,width=2cm,height=2cm]%
+             {\color[simpleslides:backgroundcolor]{\pagenumber}}} ;
+
+StopPage ;
+\stopuseMPgraphic
+
+\startuseMPgraphic{simpleslides:MP:horizontal}
+StartPage;
+
+\includeMPgraphic{simpleslides:MP:common} ;
+draw \sometxt{\framed[frame=off,width=2cm,height=2cm]%
+             {\color[simpleslides:backgroundcolor]{\pagenumber}}} ;
+
+
+z8 = ulcorner Page shifted (a/2,-2.2*a) ;
+z9 = z8 shifted (0,-d) ;
+z10 = urcorner Page shifted (-a,-2.2*a-d) ;
+z11 = z10 shifted (0,d) ;
+z12 = z8 shifted (-d/2,-d/2) ;
+
+p[2] = z8 .. z12 .. z9 -- z10 -- z11 -- cycle ;
+
+fill p[2] withcolor \MPcolor{simpleslides:textcolor} ;
+
+StopPage ;
+\stopuseMPgraphic
+
+\startuniqueMPgraphic{simpleslides:MP:title}
+StartPage ;
+
+save a,b,c,d;
+numeric a,b,c,d;
+
+a = 4cm ;   b = 3cm ;
+c = 8cm ;   d = .7cm ;
+
+save p; path p[] ;
+p[1] = ulcorner Page -- ulcorner Page shifted (PaperWidth/2,0) -- 
+       llcorner Page shifted (PaperWidth/2,0) -- llcorner Page -- cycle ;
+
+fill Page withcolor \MPcolor{simpleslides:backgroundcolor} ;
+fill p[1] withcolor \MPcolor{simpleslides:contrastcolor} ;
+
+z1 = ulcorner Page shifted (PaperWidth/2,-b) ;
+z2 = z1 shifted (-c,0) ;
+z3 = z2 shifted (0,-a) ;
+z4 = z3 shifted (c,0) ;
+z5 = z2 shifted (-1.5cm,-a/2) ;
+
+p[2] = z1 -- z2 .. z5 .. z3 -- z4 -- cycle ;
+fill p[2] withcolor \MPcolor{simpleslides:backgroundcolor} ;
+
+z6  = llcorner Page shifted (PaperWidth/2,0) ;
+z7  = 1/2[z6,z4] ;
+z8  = z7 shifted (-.75*b,d/2) ;
+z9  = z8 shifted (0,-d) ;
+z10 = z9 shifted (1.3*c,0) ;
+z11 = z10 shifted (0,d) ;
+z12 = z10 shifted (d/2,d/2) ;
+
+p[3] = z8 -- z9 -- z10 .. z12 .. z11 -- cycle ;
+fill p[3] withcolor \MPcolor{simpleslides:textcolor} ;
+
+StopPage ;
+\stopuniqueMPgraphic
+
+%D We define these backgrounds as overlays:
+
+\defineoverlay 
+  [simpleslides:background:horizontal] 
+  [\useMPgraphic{simpleslides:MP:horizontal}] 
+
+\defineoverlay 
+  [simpleslides:background:vertical] 
+  [\useMPgraphic{simpleslides:MP:vertical}] 
+
+\defineoverlay 
+  [simpleslides:background:title] 
+  [\useMPgraphic{simpleslides:MP:title}] 
+
+\defineoverlay 
+  [simpleslides:background:ornament] 
+  [\useMPgraphic{simpleslides:MP:ornament}] 
+
+
+%D The title page:
+
+\setupTitle
+  [\c!before=\strut{\blank[0.25cm]},
+   \c!author\c!align=\v!right, 
+   \c!before\c!author={\blank[3.1cm]\setupnarrower[left=9cm]
+                       \startnarrower[left]},
+    \c!after\c!author={\stopnarrower},
+   \c!date\c!align=\v!right, 
+   \c!before\c!date={\blank[3.7cm]\setupnarrower[left=9cm]
+                       \startnarrower[left]},
+    \c!after\c!date={\stopnarrower},
+   \c!headcolor={simpleslides:textcolor}]
+
+
+%D The slide title is typeset in a layer
+
+\setupSlideTitle
+  [\c!color={simpleslides:variantcolor},
+   \c!alternative=layer,
+   \c!align=\v!center,
+   \c!width=\textwidth,
+   \c!style={\switchtobodyfont[\TitleSize]\bf},
+   \c!height=2cm,
+   \c!after=]
+
+% \definelayer[presauthor]
+%     [width=.5\paperwidth,
+%     height=.5\paperheight,
+%     x=104mm,
+%     y=118mm]
+
+%D The symbol for the first level of itemizations. 
+
+\definesymbol[1][\useMPgraphic{simpleslides:itemize:square}]
+\setupitemize[1][inmargin][color={simpleslides:itemize:color}]
+
+\protect
+\stopmodule
+
+\endinput
+

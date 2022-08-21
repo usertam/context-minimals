@@ -1,0 +1,977 @@
+%D \module
+%D   [       file=t-gnuplot.mkiv,
+%D        version=2013.05.09,
+%D          title=\CONTEXT\ Extra Modules,
+%D       subtitle=\GNUPLOT\ Inclusion,
+%D         author={Mojca Miklavec, Marco Patzer, Hans Hagen, Taco Hoekwater, Aditya Mahajan},
+%D           date=\currentdate,
+%D      copyright=\PRAGMA]
+
+% begin info
+%
+% title   : Gnuplot module
+%
+% comment : simplifies inclusion of gnuplot-generated graphs into ConTeXt documents
+% status  : stable, supports both MKII and MKIV
+%
+% end info
+
+%D This module is used for creating gnuplot graphs on-the-fly and including them
+%D into documents.
+%D
+%D Known Bugs:
+%D
+%D \startitemize
+%D \item spurious space \& page
+%D \stopitemize
+%D 
+%D TODO (Optimisations):
+%D
+%D \startitemize
+%D \item optimize the number of gnuplot runs (if possible, gnuplot should be run only once)
+%D \item optimize the number of times for loading/converting an already used graphic
+%D \item pstopdf is a bit slow
+%D \stopitemize
+%D
+%D TODO (Handle things that may go wrong):
+%D - gnuplot executable doesn't exist
+%D - context terminal isn't available or some other failure in gnuplot script (no file created)
+%D - write18 disabled (you may call gnuplot later - create a script)
+%D
+%D TODO (Missing functionality):
+%D
+%D - a lot ...
+
+\writestatus{loading}{Gnuplot module}
+
+\startmodule[gnuplot]
+
+\unprotect
+
+\def\c!terminal {terminal}
+\def\c!options  {options}
+\def\c!pointset {pointset}
+\def\c!purge    {purge}
+
+%D MPextensions
+%D
+%D XXX
+%D if possible, they should be specific to \type{\startGNUPLOTgraphic},
+%D so unvisible to \type{MPcode}
+%D (probably something like \type+\appendtoks ... to\everyGNUPLOTgraphic+)
+\startMPinitializations
+	% load metapost macros (only once)
+	input mp-gnuplot.mp ;
+	% number of points defined with \setupGNUPLOTterminal[pointset=...]
+	%gp_num_points_with_tex := \gp:num:pointswithtex;
+	gp_num_points_with_tex := 3;
+	% main color should be set equal to the current text color
+	gp_color_foreground := \MPcolor{currentcolor};
+	gp_color_lt[-2] := gp_color_foreground;
+	% TODO: is there any chance to make this local to gnuplot?
+	% linejoin & linecap
+	linejoin := \@@GNUPLOT@term@context@linejoin;
+%	linecap  := \gp:term:context:linecap;
+	% dashes or solid? (true/false)
+	gp_use_dashed := \@@GNUPLOT@term@context@is@dashed;
+	% dashlength scale
+%	gp_scale_dashlength := \gp:term:context:dashlength;
+	% linewidth scale
+	gp_scale_linewidth := \@@GNUPLOT@term@context@linewidth;
+	
+	gp_scale_text := \@@GNUPLOT@term@context@fontscale;
+
+	% linejoin := \gp:term:context:linejoin;
+	% linecap  := \gp:term:context:linecap;
+	% % dashes or solid? (true/false)
+	% gp_use_dashed := \gp:term:context:dashed;
+	% % dashlength scale
+	% gp_scale_dashlength := \gp:term:context:dashlength;
+	% % linewidth scale
+	% gp_scale_linewidth := \gp:term:context:linewidth;
+	
+	gp_points_with := gp_points_with_\@@GNUPLOT@term@context@points;
+	
+\stopMPinitializations
+
+%D We need a \type{\strut} in front of labels for better vertical centering.
+%D This might still fail for Zapfino and alike where \type{\strut} might be smaller
+%D than the actual font height.
+%D
+%D TODO (optional improvement): instead of placing \type{\strut} in front,
+%D create a \type{\hbox} and adjust it's dimensions to \type{\strut}'s height and depth.
+
+%D Aditya, thanks a lot for requesting it!
+%D Hans, thanks a lot for implementing this!
+\definetextext[gp]{\strut}
+%D TODO (feature request):
+%D \starttyping
+%D    \sometxt[gp][ss,20pt]{abc}
+%D \stoptyping
+%D should become equivalent to
+%D \starttyping
+%D    \sometxt{\switchtobodyfont[ss,20pt]\strut abc}
+%D \stoptyping
+%D
+%D Or, even more drastic perhaps, I would love to implement
+%D \starttyping
+%D    \sometxt[gp][iwona,bold,c]{abc}
+%D \stoptyping
+%D meaning: iwona, bold typeface, size \quote{c}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% TODO: make \sometxt[gp][12pt]{text} work in MKIV
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcounter\GNUPLOTnumber
+\newdimen\GNUPLOThcharsize
+\newdimen\GNUPLOTvcharsize
+\newcounter\tikzGNUPLOTnumber
+
+% macro to calculate true character size from current font
+% (However it is not 100 % that it gets the job properly done
+%  in case that other font settings are used inside the picture.)
+\def\calculateGNUPLOTcharsize{%
+  \global\GNUPLOThcharsize=1.05\fontcharwd\font`0%
+  \global\GNUPLOTvcharsize=1.05\fontcharht\font`0%
+  \global\advance\GNUPLOTvcharsize by 1.05\fontchardp\font`g%
+}
+
+%D \macros
+%D   {startGNUPLOTinclusions, resetGNUPLOTinclusions}
+%D
+%D For those who want to have two or more graphs with similar options,
+%D these options may be included inside \type{\startMPinclusions ... \stopMPinclusions}
+%D and will be place on the top of the created \GNUPLOT\ script.
+%D
+%D \starttyping
+%D \startGNUPLOTinclusions
+%D    set xlabel '$x$'
+%D    set ylabel '$y$'
+%D    set format y "%.1f"
+%D \stopGNUPLOTinclusions
+%D
+%D \startGNUPLOTscript[sin]
+%D    plot sin(x)
+%D \stopGNUPLOTscript
+%D \startGNUPLOTscript[cos]
+%D    plot cos(x)
+%D \stopGNUPLOTscript
+%D \stoptyping
+\long\def\startGNUPLOTinclusions
+  {\def\stopGNUPLOTinclusions{\ifx\savebuffer\undefined \else \savebuffer[gnuplot-inclusions]\fi}%
+   \dostartbuffer[gnuplot-inclusions][startGNUPLOTinclusions][stopGNUPLOTinclusions]}
+
+% \def\resetGNUPLOTinclusions{\let\GNUPLOTinclusions\empty}
+
+% creates an empty file (there must be a cleaner way to do it)
+\def\resetGNUPLOTinclusions
+  {\immediate\openout\scratchwrite=\jobname-gnuplot-inclusions.tmp
+   \immediate\closeout\scratchwrite}
+
+%\startbuffer[gnuplot-inclusions]\stopbuffer\ifx\savebuffer\undefined \else \savebuffer[gnuplot-inclusions]\fi}
+
+\resetGNUPLOTinclusions
+
+%D On the other hand, one can probably achieve the same effect
+%D when drawing two plots inside the same script, like that:
+%D
+%D \starttyping
+%D \startGNUPLOTscript[sin and cos]
+%D    set xlabel '$x$'
+%D    set ylabel '$y$'
+%D    set format y "%.1f"
+%D    plot sin(x)
+%D    plot cos(x)
+%D \stopGNUPLOTscript
+%D \stoptyping
+%D
+%D and then recall the graphics using \type{\useGNUPLOTgraphic[sin and cos][1]}.
+
+%D \macros
+%D   {startGNUPLOTscript}
+%D
+%D \starttyping
+%D \startGNUPLOTscript{some name}
+%D   plot sin(x)
+%D \stopGNUPLOTscript
+%D \stoptyping
+
+\def\startGNUPLOTscript
+  {\bgroup\dosingleempty\dostartGNUPLOTscript}
+
+% \def\redostartGNUPLOTscript#1
+%   {\obeylines
+%    \catcode`\%=\@@letter
+%    \catcode`\|=\@@letter
+%    \catcode`\$=\@@letter
+%    \dodostartGNUPLOTscript{#1}%
+% %\dostartGNUPLOTscript[#2]
+% }
+% 
+% \def\dostartGNUPLOTscript[#1]%
+%   {\iffirstargument
+%      \obeylines
+%      \catcode`\%=\@@letter
+%      \catcode`\|=\@@letter
+%      \catcode`\$=\@@letter
+%      \dodostartGNUPLOTscript{#1}%
+%    \else
+%      \redostartGNUPLOTscript
+%    \fi
+% }
+
+\def\dostartGNUPLOTscript[#1]%
+  {%\iffirstargument
+     \dodostartGNUPLOTscript{#1}%
+   %\else
+   %  \dodostartGNUPLOTscript
+   %\fi
+}
+
+% gps:n:{name} = gnuplotscript : number : {name} - number of script with name {name}
+\long\def\dodostartGNUPLOTscript#1%#2\stopGNUPLOTscript
+  {\doglobal\increment\GNUPLOTnumber
+   \letgvalue{gps:n:#1}\GNUPLOTnumber
+   % in case of LuaTeX we need to write the buffer into file explicitely
+   \def\stopGNUPLOTscript{\egroup \ifx\savebuffer\undefined \else \savebuffer[gnuplot-\GNUPLOTnumber]\fi}%
+   \dostartbuffer[gnuplot-\GNUPLOTnumber][startGNUPLOTscript][stopGNUPLOTscript]%
+   }
+
+% When are the graphics processed/read?
+%
+% - \gps:n:{name} (gnuplot script:name:{name}) holds the number of gnuplot script;
+%   - that number was defined if we created the plot using \startGNUPLOTscript{name}
+%   - and most probably undefined if we only issued \processGNUPLOTfile[name][filename]
+%     => if, at the time of issuing \processGNUPLOTfile[name][filename], \gps:n:{name} is not defined,
+%        it should be defined at that time
+% - \gpe:{name}:{terminal} (gnuplot graphic executed:{name}:{terminal})
+%   is defined if we executed the command for that specific name and for that terminal
+%   (once it will probably be 0 for a failed run and 1 for a successful one)
+
+% \useGNUPLOTgraphic[name] has three different ways of working:
+% - it can be called after \processGNUPLOTfile[name][filename]
+%   which defined MP graphics that are now used
+% - it can be called for the first time under the current terminal
+%   in that case it compiles the graphic and includes it
+% - it can be called for the second, third, ... time
+%   in which case it only includes files without compiling it
+
+%D \macros
+%D   {useGNUPLOTgraphic}
+
+% 5 ways of calling it:
+% - \useGNUPLOTgraphic{name}
+% - \useGNUPLOTgraphic[name]
+% - \useGNUPLOTgraphic[name][1,2,5]
+% - \useGNUPLOTgraphic[name][width=.8\textwidth]
+% - \useGNUPLOTgraphic[name][1,2,5][width=.8\textwidth]
+
+% this code takes care of reading arguments
+\def\useGNUPLOTgraphic
+	{\dotripleempty\douseGNUPLOTgraphic}
+
+\def\douseGNUPLOTgraphic[#1][#2][#3]%
+	{\doifelse{#3}{}{%
+		% < 3 arguments
+		\doifelse{#2}{}%
+			% 1 argument
+			% as in \useGNUPLOTgraphic[name]
+			{\dodouseGNUPLOTgraphic[#1][][]}%
+			% % as in \useGNUPLOTgraphic{name}
+			% {\redouseGNUPLOTgraphic[][][]}%
+			% 2 arguments
+			{\doifassignmentelse{#2}%
+				% as in \useGNUPLOTgraphic[name][width=.8\textwidth]
+				{\dodouseGNUPLOTgraphic[#1][][#2]}%
+				% as in \useGNUPLOTgraphic[name][1,2,5]
+				{\dodouseGNUPLOTgraphic[#1][#2][]}%
+			}%
+		}%
+		% as in \useGNUPLOTgraphic[name][1,2,5][width=.8\textwidth]
+		{\dodouseGNUPLOTgraphic[#1][#2][#3]}%
+	}
+
+\def\redouseGNUPLOTgraphic[#1][#2][#3]#4%
+	{\dodouseGNUPLOTgraphic[#4][][]}
+
+% and this code actually does something with it
+
+%D \doifundefined      {string}    {...}
+%D \doifdefined        {string}    {...}
+%D \doifundefinedelse  {string}    {then ...} {else ...}
+%D \doifdefinedelse    {string}    {then ...} {else ...}
+
+% \doifGNUPLOTscriptdefined{name}{...}
+
+%  if gnuplot script with {name} and current terminal has already been processed
+% \doifGNUPLOTscriptprocessed{name}{...}
+
+% \letGNUPLOTscriptprocessed[optional terminal]{name} signals that the gnuplot script named {name}
+% has already been processed with the current terminal
+% TODO: currently it is always defined to be one as soon as one tries to process it,
+%       even if en error is produced; in future it would be helpful if it would be set to zero
+%       if it was unsuccessfully executed;
+% that is needed, since scripts are processed only when one first asks for including the graphic
+\def\letGNUPLOTscriptprocessed
+	{\dosingleempty\doletGNUPLOTscriptprocessed}
+%\def\doletGNUPLOTscriptprocessed[#1]#2%
+%{\letgvalue{gpe:#1:\@@GNUPLOTterminal}\plusone}
+\def\doletGNUPLOTscriptprocessed[#1]#2%
+	{\iffirstargument
+	 	% terminal has been specified
+	 	\letgvalue{gpe:#2:#1}\plusone
+	 \else
+	 	% no terminal specified - use the current one
+	 	\letgvalue{gpe:#2:\@@GNUPLOTterminal}\plusone
+	 \fi}
+
+% Although that should preferably not happen, one might come to an idea of defining
+% a gnuplot script with the same name as already defined.
+% In that case the old script cannot be referenced any more, but we can still try
+% to do out best to make it work anyway. We have to do two things:
+% - claim that script with that name hasn't been defined yet, so that processing will happen again
+%   (TODO: do it in a more elegant way for all known terminals)
+% - undefine any metapost graphics (TODO: I have no idea yet how it can be done)
+%
+% \resetGNUPLOTscriptprocessed{name}
+\def\resetGNUPLOTscriptprocessed#1%
+	{\bgroup
+		% claim that the script with {name} (#1) hasn't been processed with {terminal} (##1) yet
+		\def\undefineGNUPLOTscriptforterminal##1{\letbeundefined{gpe:#1:##1}}%
+		% TODO: the list of available terminals should be generated automatically
+		\processcommalist[context,postscript,ps,eps,pdf,metapost,mp,png]\undefineGNUPLOTscriptforterminal
+		\resetGNUPLOTgraphics{#1}%
+	\egroup}
+
+% \resetGNUPLOTgraphics{name} undefines any gnuplot graphic defined with \startGNUPLOTgraphic[name][number]
+\def\resetGNUPLOTgraphics#1%
+	{\doloop
+		{\doifMPgraphicelse{gpg:#1:\recurselevel}%
+		% TODO: be aware - @@MPG is low-level ConTeXt variable which might change without notice,
+		% it would be better to call this \undefineMPgraphic{gpg:#1:\recurselevel} or something similar
+		{\letbeundefined{@@MPGgpg:#1:\recurselevel}}%
+		{\exitloop}}%
+	\doloop
+		{\doifdefinedelse{TKZp:#1:\recurselevel}%
+		{\letbeundefined{TKZp:#1:\recurselevel}}%
+		{\exitloop}}%
+	}%
+
+% TODO: this can probably be done in a better way
+\def\doifGNUPLOTscriptprocessed#1#2%
+	{\doifdefined      {gpe:#1:\@@GNUPLOTterminal}{#2}}
+\def\doifGNUPLOTscriptprocessedelse#1#2#3%
+	{\doifdefinedelse  {gpe:#1:\@@GNUPLOTterminal}{#2}{#3}}
+\def\doifGNUPLOTscriptnotprocessed#1#2%
+	{\doifundefined    {gpe:#1:\@@GNUPLOTterminal}{#2}}
+\def\doifGNUPLOTscriptnotprocessedelse#1#2#3%
+	{\doifundefinedelse{gpe:#1:\@@GNUPLOTterminal}{#2}{#3}}
+
+
+% private
+% \writeandprocessGNUPLOTscript{name}
+\def\writeandprocessGNUPLOTscript#1%
+	% TODO: if gps:n:#1 (holding the script content) is not defined,
+	% error or warning should be issued
+	%
+	% only process the script if it has been defined and not processed before for the current terminal
+	{\doifdefined{gps:n:#1}{\doifGNUPLOTscriptnotprocessed{#1}{%
+		% \gpe:{name}:{terminal} is defined
+		%\setgvalue{gpe:#1:\@@GNUPLOTterminal}{#2}
+		\letGNUPLOTscriptprocessed{#1}%
+		% call to gnuplot and processing/converting the graphics is only needed in the first ConTeXt run
+		\doifmode{*\v!first}{% (perhaps also: if files haven't changed)
+			\bgroup
+			% for TikZ we want to calculate character size, so that it gets printed
+			% to inclusions with \@@GNUPLOToptions
+			\calculateGNUPLOTcharsize
+			% catcodes trickery & alike
+			%\the\everyGNUPLOTscript
+			% open file for writing
+			\immediate\openout\scratchwrite=\GNUPLOTfile.plt
+			% TODO: terminal-specific options (default or provided by the user)
+			\immediate\write\scratchwrite{\letterhash\space Do not modify this file - all changes will be overwritten}%
+			\immediate\write\scratchwrite{\letterhash\space Change \jobname.tex instead.}%
+			\immediate\write\scratchwrite{set terminal \@@GNUPLOToutput\space\@@GNUPLOToptions}%
+			% add common inclusions in scripts for multiple similar plots
+			%\doifnotempty
+			%	{\GNUPLOTinclusions}{\immediate\write\scratchwrite{\GNUPLOTinclusions}}%
+			% include common gnuplot 'inclusions'
+			\immediate\write\scratchwrite{load '\jobname-gnuplot-inclusions.tmp'}%
+			% output file
+			\immediate\write\scratchwrite{set output "\@@GNUPLOTresult"}%
+			% write main contents of the script, like "plot sin(x)"
+			%\immediate\write\scratchwrite{\getvalue{gps:d:\GNUPLOTnumber}}%
+			\immediate\write\scratchwrite{load '\GNUPLOTfile.tmp'}%
+			\immediate\closeout\scratchwrite
+			\egroup
+			% TODO:
+			% - check the state of write18 and warn the user if it's disabled,
+			%   otherwise just everyone will start complaining that the module doens't work
+			% - check if execution was successful; possible pitfalls:
+			%   - gnuplot doesn't exist as a binary
+			%   - gnuplot doesn't support context terminal
+			%     or some other error in script which results in empty output file
+			%
+			% run gnuplot & execute the script that has just been written
+			% \executesystemcommand{mtxrun --ifchanged=\GNUPLOTfile.plt\space
+			% 	--direct \@@GNUPLOTprogram\space\GNUPLOTfile.plt}%
+			\executesystemcommand{mtxrun --direct \@@GNUPLOTprogram\space\GNUPLOTfile.plt}%
+			\writestatus{aaa}{mtxrun --direct \@@GNUPLOTprogram\space\GNUPLOTfile.plt}%
+			\convertGNUPLOTgraphic
+		}%
+		% for ConTeXt terminal only - read the result
+		\doif{\@@GNUPLOTterminal}{context}{\processGNUPLOTfile[#1][\@@GNUPLOTresult]}%
+		\doif{\@@GNUPLOTterminal}{tikz}   {\processGNUPLOTfile[#1][\@@GNUPLOTresult]}%
+	}}}
+
+% \dodouseGNUPLOTgraphic[name][numbers][options]
+\def\dodouseGNUPLOTgraphic[#1][#2][#3]%
+	{\bgroup
+	\doifdefinedelse{gps:n:#1}
+		{\edef\GNUPLOTnumber{\getvalue{gps:n:#1}}%
+		 \edef\GNUPLOTfile  {\jobname-gnuplot-\GNUPLOTnumber}%
+		\writeandprocessGNUPLOTscript{#1}%
+		% "ctxtools --purge" should delete the gnuplot script and other intermediate files
+		% (but it seems that they are deleted automatically already; preferred or not?)
+%		\registertempfile{\GNUPLOTfile.plt}
+%		\registertempfile{\@@GNUPLOTresult}
+%		\registertempfile{\@@GNUPLOTfinalresult}
+		\doifelse{\@@GNUPLOTterminal}{context}%
+		% for ConTeXt terminal only
+		{\doifelse{#2}{}%
+			% if no explicit figure number was specified, include all the figures
+			{\doloop
+				{\doifMPgraphicelse{gpg:#1:\recurselevel}%
+				{\scale[#3]{\reuseMPgraphic{gpg:#1:\recurselevel}}}%
+				{\exitloop}}}%
+			% if numbers were specified, include the figures specified in the list only
+			{\begingroup
+				\def\useGNUPLOTgraphicN##1{\doifMPgraphicelse
+					{gpg:#1:##1}%
+					{\scale[#3]{\reuseMPgraphic{gpg:#1:##1}}}%
+					% if graphic doesn't exist: draw a dummy frame instead and warn the user
+					{\scale[#3]{\framed[frame=on,width=5in,height=3in,align={middle,lohi}]{GNUPLOT graphic #1, Nr. ##1 doesn't exist}}}}%
+				\processcommalist[#2]\useGNUPLOTgraphicN
+				\endgroup
+			}%
+		}{%
+		% for TikZ terminal only
+		\doifelse{\@@GNUPLOTterminal}{tikz}%
+		{\doifelse{#2}{}%
+			% if no explicit figure number was specified, include all the figures
+			{\doloop
+				{\doifdefinedelse{TKZp:#1:\recurselevel}%
+				{\scale[#3]{\getvalue{TKZp:#1:\recurselevel}}}%
+				{\exitloop}}}%
+			% if numbers were specified, include the figures specified in the list only
+			{\begingroup
+				\def\useGNUPLOTgraphicN##1{\doifdefinedelse
+					{TKZp:#1:##1}%
+					{\scale[#3]{\getvalue{TKZp:#1:##1}}}%
+					% if graphic doesn't exist: draw a dummy frame instead and warn the user
+					{\scale[#3]{\framed[frame=on,width=5in,height=3in,align={middle,lohi}]{GNUPLOT graphic #1, Nr. ##1 doesn't exist}}}}%
+				\processcommalist[#2]\useGNUPLOTgraphicN
+				\endgroup
+			}%
+		}%
+		% for all the other terminals
+		% TODO: add more safety switches (if pages don't exist for example)
+		{\doifelse{#2}{}%
+			% if no explicite figure number was specified, include all the pages
+			% TODO: properly handle METAPOST & PNG (only works for (E)PS & PDF) !!!
+			{\getfiguredimensions[\@@GNUPLOTfinalresult]%
+				\dorecurse{\noffigurepages}{\externalfigure[\@@GNUPLOTfinalresult][page=\recurselevel,#3]}}%
+			% if numbers were specified, include the pages specified in the list only
+			{\begingroup
+				\def\useGNUPLOTgraphicN##1{\externalfigure[\@@GNUPLOTfinalresult][page=##1,#3]}%
+				\processcommalist[#2]\useGNUPLOTgraphicN
+				\endgroup
+			}%
+		}}%
+	}%
+	% else part - in case that graphic gets included with \processGNUPLOTfile[name][file]
+	{\doifelse{\@@GNUPLOTterminal}{context}
+		% TODO: this part has been literally copied from above; create a subroutine instead
+		{\doifelse{#2}{}%
+			% if no explicit figure number was specified, include all the figures
+			{\doloop
+				{\doifMPgraphicelse{gpg:#1:\recurselevel}%
+				{\scale[#3]{\reuseMPgraphic{gpg:#1:\recurselevel}}}%
+				{\exitloop}}}%
+			% if numbers were specified, include the figures specified in the list only
+			{\begingroup
+				\def\useGNUPLOTgraphicN##1{\doifMPgraphicelse
+					{gpg:#1:##1}%
+					{\scale[#3]{\reuseMPgraphic{gpg:#1:##1}}}%
+					% if graphic doesn't exist: draw a dummy frame instead and warn the user
+					{\scale[#3]{\framed[frame=on,width=5in,height=3in,align={middle,lohi}]{GNUPLOT graphic #1, Nr. ##1 doesn't exist}}}}%
+				\processcommalist[#2]\useGNUPLOTgraphicN
+				\endgroup
+			}%
+		}%
+		{\message{The gnuplot graphic #1 has not been defined.}}}%
+	\egroup}
+
+%D \macros
+%D   {setupGNUPLOT}
+
+\def\setupGNUPLOT
+%  {\dodoubleempty\getparameters[@@GNUPLOT]}
+  {\dosingleargument\dosetupGNUPLOT}
+
+\def\dosetupGNUPLOT[#1]%
+  {\getparameters[@@GNUPLOT][#1]%
+   % define all the necessary points according to the option "pointset"
+   %
+   % XXX: no idea why this is needed, but otherwise it complains that @@GNUPLOTpointset is undefined
+   \edef\currentGNUPLOTpointset{\@@GNUPLOTpointset}%
+   % \gp:num:pointswithtex is passed to metapost, so that it knows
+   % how many points are defined and chooses the proper point
+   % form a set of the defined ones
+   %
+   % for safety reasons define \gp:num:pointswithtex to be equal to 1 (it can only increase later), otherwise:
+   % - (something mod 0) won't work
+   % - if conversion is not defined, the number will retain its old value (not desirable)
+   \edef\gp:num:pointswithtex{1}%
+   \doloop{\doifelseconversionnumber{\@@GNUPLOTpointset}{\recurselevel}%
+       {\edef\gp:num:pointswithtex{\recurselevel}}%
+       {\exitloop}}%
+   % in case of TikZ terminal we have to generate the needed style files first
+   \doif{\@@GNUPLOTterminal}{tikz}
+       {\executesystemcommand{gnuplot -e "set term tikz context createstyle"}\usemodule[gnuplot-lua-tikz]}
+   % TODO:
+   % - issue a warning if user wants to use points with TeX,
+   %   but pointset= is undefined (if the first point doesn't exist)
+   % - no idea what happens if conversion is infinite,
+   %   so try to stop at some reasonable value (100?)
+   % - current implementation redefines the points even if only terminal type
+   %   has been set to some other value (which is a stupid approach, but I
+   %   wanted to have a working version first and will consider efficiency later)
+   % - it may be that the old points remain defined if conversion changes
+   %   (perhaps they should be undefined again?)
+  }
+
+% Hans has written this piece of code, but:
+% - "start" and "/MIN" caused problems
+% - pgnuplot is not much more "portable" than gnuplot
+%   best thing to do is to create a "gnuplot.bat" somewhere in PATH
+%
+%\def\processGNUPLOTscript
+%  {\doifelse\operatingsystem{mswin}
+%     {\executesystemcommand{start /MIN pgnuplot \GNUPLOTfile.plt}} % start is needed else gp fails
+%     {\executesystemcommand{gnuplot \GNUPLOTfile.plt}}}
+%\def\processGNUPLOTscript
+%  {\executesystemcommand{gnuplot \GNUPLOTfile.plt}}
+
+% TODO: check if write18 is enabled; if not, issue a command and warn the user that running the module might be pointless or that he/she has to run gnuplot on the produced files manually
+\def\convertGNUPLOTgraphic
+  {\doifsomething\@@GNUPLOThandle{\writestatus{conversion}{\@@GNUPLOThandle}\executesystemcommand{\@@GNUPLOThandle}}}
+
+%D \macros
+%D   {processGNUPLOTfile}
+
+%D It's needed to input a file resulting from a gnuplot run (with ConTeXt terminal).
+%D It reads the file and "saves" the metapost graphics defined in that file,
+%D so that they can be used with \usegnuplotgraphic (low level: \reuseMPgraphic) later
+%D
+% \processGNUPLOTfile[NAME][filename]
+\def\processGNUPLOTfile
+  {\dodoubleargument\doprocessGNUPLOTfile}
+
+\def\doprocessGNUPLOTfile[#1][#2]%
+  {\bgroup
+      % for ConTeXt teminal
+      %--------------------
+      % we first define two commands: \startGNUPLOTgraphic & \stopGNUPLOTgraphic to read the files in;
+      % files that gnuplot creates in non-standalone mode look approximately like this:
+      %
+      % \startGNUPLOTgraphic[1]
+      % ... metapost commands to draw the graph ...
+      % \stopGNUPLOTgraphic
+      % \startGNUPLOTgraphic[2]
+      % ... metapost commands to draw the graph ...
+      % \stopGNUPLOTgraphic
+      % ...
+      %
+      % while reading the file in, metapost graphics named "gpg:{name}:{number}" are defined
+      %
+      % (we might need some additional arguments later on, but for now the figure number should suffice)
+      \def\startGNUPLOTgraphic
+         {%\obeyMPlines % <- no longer a problem
+          \def\obeyedline{}% <- thanks to this
+          \dosingleargument\dostartGNUPLOTgraphic}%
+      \long\def\dostartGNUPLOTgraphic[##1]##2\stopGNUPLOTgraphic
+         {\startreusableMPgraphic{gpg:#1:##1}##2\stopreusableMPgraphic}%
+      %------------------
+      % for TikZ terminal
+      %------------------
+      \newcounter\tikzGNUPLOTnumber
+      \let\normalstarttikzpicture=\starttikzpicture
+      \let\normalstoptikzpicture=\stoptikzpicture
+      \long\def\starttikzpicture##1\stoptikzpicture%
+        {\increment\tikzGNUPLOTnumber
+         % \long\setgvalue{TKZp:#1:\tikzGNUPLOTnumber}{##1}}
+         \long\setgvalue{TKZp:#1:\tikzGNUPLOTnumber}{\hbox{\starttikzpicture##1\stoptikzpicture}}}
+      %---------
+      % for both
+      %---------
+      % input the file
+      % TODO: error / warning if the files doesn't exist
+      \readlocfile{#2}{}{}% the third argument should be: if file not found
+      % this file is known
+      % TODO \letgvalue{gpf:#1}\plusone
+   \egroup
+  }
+
+%D \macros
+%D   {startGNUPLOTpage}
+%D
+%D Used for standalone \GNUPLOT\ figures & written out by gnuplot in standalone mode.
+%D
+%D Instead of having to \type{\useGNUPLOTgraphic}, a figure is inserted directly using
+%D \type{\startMPpage ... }\type{\stopMPpage}.
+%D
+%D A high-level command is provided if some more advance features will
+%D be needed in the future and to be able to ensure backward compatibility.
+
+%D We need to preserve line breaks, otherwise metapost runs into troubles for longer input.
+\def\startGNUPLOTpage
+	{\begingroup\dostartGNUPLOTpage}
+
+\long\def\dostartGNUPLOTpage#1\stopGNUPLOTpage
+	{\endgroup\startMPpage#1\stopMPpage}
+
+% TODO: use a separate instance for MKIV
+%
+% \defineMPinstance[gnuplot]
+% \startTEXpage\startMPcode{gnuplot}
+% \stopMPcode\stopTEXpage
+
+% TODO: currently, the following definitions are used,
+%       but the ones below would be preferred
+
+\def\defineGNUPLOThandle#1#2#3#4#5#6% name; output; suffix; conversion-method; gnuplot's result; final result
+  {\setvalue{@@GNUPLOT-#1}{{#2}{#3}{#4}{#5}{#6}}}
+
+\def\@@GNUPLOToutput{\filterfromvalue{@@GNUPLOT-\@@GNUPLOTterminal}51}
+\def\@@GNUPLOTsuffix{\filterfromvalue{@@GNUPLOT-\@@GNUPLOTterminal}52}
+\def\@@GNUPLOThandle{\filterfromvalue{@@GNUPLOT-\@@GNUPLOTterminal}53}
+\def\@@GNUPLOTresult{\filterfromvalue{@@GNUPLOT-\@@GNUPLOTterminal}54}
+\def\@@GNUPLOTfinalresult{\filterfromvalue{@@GNUPLOT-\@@GNUPLOTterminal}55}
+
+%                    name       "set term" suffix conversion (system command)                         gnuplot's result          final result
+% (suffix is probably not needed any more since full names were introduced)
+\defineGNUPLOThandle
+	{postscript}{postscript color}{ps}{mtxrun pstopdf \GNUPLOTfile-ps.ps}
+	{\GNUPLOTfile-ps.ps}{\GNUPLOTfile-ps.pdf}
+\defineGNUPLOThandle
+	{ps}{postscript color}{ps}{mtxrun pstopdf -dAutoRotatePages=/PageByPage \GNUPLOTfile-ps.ps}
+	{\GNUPLOTfile-ps.ps}{\GNUPLOTfile-ps.pdf}
+\defineGNUPLOThandle
+	{eps}{postscript color eps}{ps}{mtxrun pstopdf -dEPSCrop \GNUPLOTfile-eps.eps}
+	{\GNUPLOTfile-eps.eps}{\GNUPLOTfile-eps.pdf}
+\defineGNUPLOThandle
+	{pdf}{pdf}{pdf}{}
+	{\GNUPLOTfile-pdf.pdf}{\GNUPLOTfile-pdf.pdf}
+\defineGNUPLOThandle
+	{pdfcairo}{pdfcairo}{pdf}{}
+	{\GNUPLOTfile-pdfcairo.pdf}{\GNUPLOTfile-pdfcairo.pdf}
+\defineGNUPLOThandle
+	{metapost}{mp}{mp}{mtxrun mptopdf \GNUPLOTfile-mp.mp}
+	{\GNUPLOTfile-mp.mp}{\GNUPLOTfile-mp-0.pdf}
+\defineGNUPLOThandle
+	{mp}{mp}{mp}{mtxrun mptopdf \GNUPLOTfile-mp.mp}
+	{\GNUPLOTfile-mp.mp}{\GNUPLOTfile-mp-0.pdf}
+\defineGNUPLOThandle
+	{png}{png}{png}{}
+	{\GNUPLOTfile-png.png}{\GNUPLOTfile-png.png}
+\defineGNUPLOThandle
+	{pngcairo}{pngcairo}{png}{}
+	{\GNUPLOTfile-pngcairo.png}{\GNUPLOTfile-pngcairo.png}
+\defineGNUPLOThandle
+	{tikz}{tikz context createstyle
+	       size \@@GNUPLOT@term@tikz@width,\@@GNUPLOT@term@tikz@height\space
+	       charsize \the\GNUPLOThcharsize,\the\GNUPLOTvcharsize\space
+	       fontscale \@@GNUPLOT@term@tikz@fontscale
+	}{tex}{}
+	{\GNUPLOTfile-tikz.tex}{\GNUPLOTfile-tikz.tex}
+\defineGNUPLOThandle
+	{context}{context
+	          size \@@GNUPLOT@term@context@width,\@@GNUPLOT@term@context@height\space
+	          fontscale \@@GNUPLOT@term@context@fontscale
+	}{tex}{}
+	{\GNUPLOTfile-ctx.tex}{\GNUPLOTfile-ctx.tex}
+% \doifnotempty{\@@GNUPLOT@term@context@fontscale}{fontscale \@@GNUPLOT@term@context@fontscale}
+
+\def\defineGNUPLOTterminal
+	{\dodoubleargument\dodefineGNUPLOTterminal}
+
+\def\dodefineGNUPLOTterminal[#1][#2]%
+	{\doifassignmentelse{#2}%
+	 	% define a proper terminal
+	 	{}% TODO
+	 	% only define a synonym for that terminal
+	 	{}% TODO
+	}
+
+%D {\sl terminal}: argument to be passed to gnuplot in the form of "set term {\sl terminal}"
+%D {\sl defaultoptions}: options to be passed to gnuplot after terminal name:
+%D      set term {\sl teminal} {\sl defaultoptions}
+%D      not to be touched by users
+%D {\sl suffix}: filename suffix
+%D {\sl result}: the file to which gnuplot should output the result
+%D      set output {\sl result}
+%D {\sl convertwith}: command for conversion from gnuplot-generated file to a file that can be read by \CONTEXT; may be empty
+%D {\sl finalresult}: file resulting after the conversion to be read by \CONTEXT
+
+%D \POSTSCRIPT\ terminal
+\defineGNUPLOTterminal
+	[postscript]
+	[terminal=postscript,
+	 defaultoptions=color, % TODO: only if \setupcolors[state=start]
+	 suffix=ps,
+	 result=\GNUPLOTfile-ps.ps,
+	 % TODO: -dAutoRotatePages=/PageByPage or remove that option from the default ones
+	 convertwith={mtxrun pstopdf \GNUPLOTfile-ps.ps},
+	 finalresult=\GNUPLOTfile-ps.pdf,
+	]
+%D Define \type{ps} as a synonym for \type{postscript} terminal
+\defineGNUPLOTterminal
+	[ps]
+	[postscript]
+
+%D \EPS\ terminal:
+%D - same terminal as for \POSTSCRIPT, but slightly different handling
+\defineGNUPLOTterminal
+	[eps]
+	[terminal=postscript,
+	 defaultoptions=eps color,
+	 suffix=eps,
+	 result=\GNUPLOTfile-eps.eps,
+	 % TODO: -dEPSCrop
+	 convertwith={mtxrun pstopdf -dEPSCrop \GNUPLOTfile-eps.eps},
+	 finalresult=\GNUPLOTfile-eps.pdf,
+	]
+
+%D \PDF\ terminal
+\defineGNUPLOTterminal
+	[pdf]
+	[terminal=pdf,
+	 defaultoptions=,
+	 suffix=pdf,
+	 result=\GNUPLOTfile-pdf.pdf,
+	 convertwith=,
+	 finalresult=\GNUPLOTfile-pdf.pdf,
+	]
+\defineGNUPLOTterminal
+	[pdfcairo]
+	[terminal=pdfcairo,
+	 defaultoptions=,
+	 suffix=pdf,
+	 result=\GNUPLOTfile-pdfcairo.pdf,
+	 convertwith=,
+	 finalresult=\GNUPLOTfile-pdfcairo.pdf,
+	]
+
+%D \METAPOST\ terminal:
+%D - deprecated: use the \CONTEXT\ terminal instead,
+%D   which was built starting from the \METAPOST\ one,
+%D   but improved in many aspects
+\defineGNUPLOTterminal
+	[mp]
+	[terminal=mp,
+	 defaultoptions=,
+	 suffix=mp,
+	 result=\GNUPLOTfile-mp.mp,
+	 convertwith={mtxrun mptopdf \GNUPLOTfile-mp.mp},
+	 % TODO: support for multiple graphics
+	 % one would need a switch in mptopdf, so that a single pdf would be created instead of multiple ones
+	 finalresult=\GNUPLOTfile-mp-0.pdf,
+	]
+
+\defineGNUPLOTterminal
+	[metapost]
+	[mp]
+
+%D png terminal:
+%D - bitmap
+%D - no conversion needed
+%D - new version pretty advanced
+\defineGNUPLOTterminal
+	[png]
+	[terminal=png,
+	 defaultoptions=,
+	 suffix=png,
+	 result=\GNUPLOTfile-png.png,
+	 convertwith=,
+	 finalresult=\GNUPLOTfile-png.png,
+	]
+\defineGNUPLOTterminal
+	[pngcairo]
+	[terminal=pngcairo,
+	 defaultoptions=,
+	 suffix=png,
+	 result=\GNUPLOTfile-pngcairo.png,
+	 convertwith=,
+	 finalresult=\GNUPLOTfile-pngcairo.png,
+	]
+%D \CONTEXT\ terminal (native)
+\defineGNUPLOTterminal
+	[context]
+	[terminal=context,
+	 defaultoptions=,
+	 suffix=tex,
+	 result=\GNUPLOTfile-ctx.tex,
+	 convertwith=,
+	 finalresult=\GNUPLOTfile-ctx.tex,
+	]
+
+\def\setupGNUPLOTterminal
+	{\dodoubleargument\dosetupGNUPLOTterminal}
+
+\def\dosetupGNUPLOTterminal[#1][#2]%
+	{% TODO
+		\getparameters[@@GNUPLOT@term@#1@][#2]
+		% TODO: width & height
+		% linejoin, linecap - I have to improve this !!!
+	%	\edef\gp:term:context:linejoin{\@@GNUPLOT@term@context@linejoin}
+	%	\edef\gp:term:context:linecap{\@@GNUPLOT@term@context@linecap}
+		% dashed or solid lines?
+		\doifsamestringelse{\@@GNUPLOT@term@context@dashed}{yes}% yes or no
+			{\edef\@@GNUPLOT@term@context@is@dashed{true}}%
+			{\edef\@@GNUPLOT@term@context@is@dashed{false}}%
+		\doifsamestring{\@@GNUPLOT@term@context@width}{default}
+			{\edef\@@GNUPLOT@term@context@width{5in}}
+		\doifsamestring{\@@GNUPLOT@term@context@height}{default}
+			{\edef\@@GNUPLOT@term@context@height{3in}}
+	%		{\edef\gp:term:context:dashed{true}}%
+	%		{\edef\gp:term:context:dashed{false}}%
+	%	% dashlength scale
+	%	\edef\gp:term:context:dashlength{\@@GNUPLOT@term@context@dashlength}
+	%	% linewidth scale
+	%	\edef\gp:term:context:linewidth{\@@GNUPLOT@term@context@linewidth}
+	%	\doifsamestringelse{\@@GNUPLOT@term@context@points}{metapost}% tex or metapost
+	}
+
+\setupGNUPLOTterminal
+	[context]
+	[width=default,    % *default* (5in) | <dimension>
+	 height=default,   % *default* (3in) | <dimension>
+	 linejoin=rounded, % mitered | *rounded* | beveled
+	 linecap=butt,     % *butt* | rounded (in gnuplot: round) | squared
+	 dashed=yes,       % *yes* | no
+	 dashlength=1,     % scaling factor for dash lengths
+	 linewidth=1,      % scaling factor for line widths (1.0 means 0.4bp)
+	 fontscale=1,      % scaling factor for text labels
+	 points=metapost]  % *metapost* | tex (Should points be drawn with MetaPost or TeX?)
+
+\setupGNUPLOTterminal
+	[tikz]
+	[width=5in,        % *5in* | default (todo)  | <dimension>
+	 height=3in,       % *3in* | default (todo) | <dimension>
+	 fontscale=1,      % scaling factor for text labels
+	]
+
+% TODO: better scaling
+\defineconversion
+	[gnuplot:pointset]
+	[{\scale[scale=800]{\mathematics{+}}},
+	 {\scale[scale=800]{\mathematics{\times}}},
+	 \mathematics{\ast},
+	 {\scale[scale=700]{\mathematics{\square}}},
+	 {\scale[scale=700]{\mathematics{\blacksquare}}},
+	 \mathematics{\circ},
+	 \mathematics{\bullet},
+	 {\scale[scale=900]{\mathematics{\triangleup}}},
+	 {\scale[scale=900]{\mathematics{\blacktriangle}}},
+	 {\scale[scale=900]{\mathematics{\triangledown}}},
+	 {\scale[scale=900]{\mathematics{\blacktriangledown}}},
+	 {\scale[scale=800]{\mathematics{\lozenge}}},
+	 {\scale[scale=800]{\mathematics{\blacklozenge}}}%,
+%  {\rotate[rotation=45]{\mathematics{\square}}},
+%  {\rotate[rotation=45]{\mathematics{\blacksquare}}},
+	]
+
+%\defineGNUPLOTcolor[red]    [r=1]
+%\defineGNUPLOTcolor[green]  [g=1]
+%\defineGNUPLOTcolor[blue]   [b=1]
+%\defineGNUPLOTcolor[magenta][r=1,b=1]
+%\defineGNUPLOTcolor[cyan]   [g=1,b=1]
+%\defineGNUPLOTcolor[yellow] [r=1,g=1]
+%\defineGNUPLOTcolor[black]  [s=0]
+%\defineGNUPLOTcolor[orange] [r=1,g=.3,b=0]
+%\defineGNUPLOTcolor[gray50] [s=.5]
+
+%\defineGNUPLOTcolors
+%	[default] % from PostScript
+%	[red,green,blue,magenta,cyan,yellow,black,orange,gray50]
+
+% TODO: testset is here only temporary & for testing
+\setupGNUPLOT[program=gnuplot,\c!terminal=context,\c!purge=\v!yes,\c!options=,\c!pointset=gnuplot:pointset] % colors=postscript
+
+%D Some additional typescripts which enable us using font "Arial" and "Helvetica"
+
+%D Pretend the font to be serif as well, so that no "ss" switch is needed
+\starttypescript [serif] [helvetica] [name]
+  \definefontsynonym [Serif]            [Helvetica]
+  \definefontsynonym [SerifBold]        [Helvetica-Bold]
+  \definefontsynonym [SerifItalic]      [Helvetica-Oblique]
+  \definefontsynonym [SerifSlanted]     [Helvetica-Oblique]
+  \definefontsynonym [SerifBoldItalic]  [Helvetica-BoldOblique]
+  \definefontsynonym [SerifBoldSlanted] [Helvetica-BoldOblique]
+  \definefontsynonym [SerifCaps]        [Helvetica]
+\stoptypescript
+
+\starttypescript [gnuplot]
+  \definetypeface [Helvetica] [rm] [serif]  [helvetica] [default]
+  \definetypeface [Helvetica] [ss] [sans]   [helvetica] [default]
+  \definetypeface [Arial]     [rm] [serif]  [helvetica] [default]
+  \definetypeface [Arial]     [ss] [sans]   [helvetica] [default]
+\stoptypescript
+\usetypescript[gnuplot]
+
+\stopmodule
+
+\protect \doifnotmode{demo}{\endinput}
+
+
+\starttext
+
+\startGNUPLOTscript[exp]
+set key bottom
+set format x "%.1f"
+set format y "%.1f"
+set style fill solid 0.25 noborder
+plot [0:3] 2/sqrt(pi)*exp(-x**2) t '$\frac{2}{\sqrt{\pi}}e^{-x^2}$' with filledcurves x1 lt 3, erf(x) lc 3 lw 2
+\stopGNUPLOTscript
+
+\useGNUPLOTgraphic[exp][width=.7\textwidth]
+
+
+\startGNUPLOTinclusions
+    set title "trigonometry"
+\stopGNUPLOTinclusions
+
+\startGNUPLOTscript[sin]
+    plot sin(x)
+\stopGNUPLOTscript
+
+\startGNUPLOTscript[cos]
+    plot cos(x)
+\stopGNUPLOTscript
+
+\useGNUPLOTgraphic[sin] \endgraf
+\useGNUPLOTgraphic[cos] \endgraf
+\useGNUPLOTgraphic[cos] \endgraf
+
+\setupGNUPLOT[terminal=ps]  \useGNUPLOTgraphic[sin][object=no,height=2cm] \blank
+%setupGNUPLOT[terminal=pdf] \useGNUPLOTgraphic[sin][object=no,height=2cm] \blank
+%setupGNUPLOT[terminal=png] \useGNUPLOTgraphic[sin][object=no,height=2cm] \blank
+\setupGNUPLOT[terminal=mp]  \useGNUPLOTgraphic[sin][object=no,height=2cm,options=color] \blank
+
+\stoptext
+

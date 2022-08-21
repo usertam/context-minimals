@@ -1,0 +1,26 @@
+Games Module for ConTeXt
+
+
+Introduction
+------------
+
+The games module provides the function to create static and interactive versions
+of board games. The first release has support for Go and Hex, more games follow
+in later releases.
+
+To use the module write \usemodule[games] in the preamble of your document.
+
+The module works only with MkIV (LuaTeX), it is not planned to add MkII support.
+
+
+License
+-------
+
+The module is copyrighted by Wolfgang Schuster and published under Public Domain.
+
+
+Revision History
+----------------
+
+2009-01-08
+Initial release

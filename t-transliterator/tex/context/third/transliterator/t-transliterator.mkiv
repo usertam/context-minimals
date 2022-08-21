@@ -1,0 +1,188 @@
+%D \module
+%D   [      file=t-transliterator,
+%D        version=2021-11-21 18:19:24+0100,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=The Transliterator,
+%D         author=Philipp Gesang,
+%D           date=\currentdate,
+%D      copyright=Philipp Gesang,
+%D        license=2-clause BSD,
+%D          email={pgesang at ix dot urz dot uni-heidelberg dot de}]
+%D This module is licensed under the conditions of the BSD license with 
+%D two clauses, there is a copy it in a file named "COPYING" in the
+%D transliterator source tree.
+
+\writestatus{loading}{Transliteration from non-Latin scripts}
+
+\unprotect
+
+\definenamespace [TRL] [
+  name=transliterate,
+  type=module,
+  setup=list,
+  parent=TRL,
+  style=no,
+  version=2021,
+  comment=Transliteration from non-Latin scripts.,
+]
+
+\ctxlua{environment.loadluafile ("transliterator")}
+
+%D Use the Transliterator by adding \type{\usemodule[transliterator]} somewhere
+%D before \type{\starttext}.  Adjust the Transliterator through the
+%D \type{\setuptransliterate} command.  As a first argument it accepts a set of
+%D key-value options; at present you may configure \type{mode} and
+%D \type{hyphenate}.
+
+\def\set_serbian_exceptions{%
+  \doifelse{\transliterateparameter{sr_exceptions}}\v!yes
+           {\ctxlua{thirddata.translit.sr_except = true}}
+           {\ctxlua{thirddata.translit.sr_except = false}}%
+}
+
+\def\set_hinting{%
+  \doifelse{\transliterateparameter{hinting}}\v!yes
+           {\ctxlua{thirddata.translit.hinting = true}}
+           {\ctxlua{thirddata.translit.hinting = false}}%
+}
+
+\appendtoks \set_serbian_exceptions \to \everysetuptransliterate
+\appendtoks \set_hinting            \to \everysetuptransliterate
+
+%D At first we'll set some defaults:
+
+\setuptransliterate[%
+  debug=\v!false,
+  hinting=\v!yes,
+  hyphenate=cz,
+  mode=ru_old,
+  sr_exceptions=\v!yes,
+  deficient_font=\v!no,
+]
+
+%D Possible values for \type{mode} are by the time of this writing:
+%D \type{ru}, \type{ru_transcript_de}, \type{ru_transcript_en}, \type{ru_old},
+%D \type{all}, \type{iso9_ocs}, \type{ocs}, \type{ocs_gla}, \type{ru_cz},
+%D \type{ocs_cz}, \type{gr} and \type{gr_n}.
+%D As not all fonts, even the expensive ones, support some of the most frequent
+%D unicode signs used in ISO~9, there are fallbacks for the transliterations of
+%D the weak and hard sign.
+%D They work with the modes \type{iso9_ocs}, \type{all} and
+%D \type{ru_old} only and can be triggered by setting the
+%D variable \type{deficient_font} to the value {\em yes}.
+%D This will transliterate {\em ь} and {\em ъ} (both upper and
+%D lower case) to the more common, but non-ISO characters {\em ’} and {\em ”}
+%D respectively.
+%D Possible values for \type{hyphenate} are all valid \CONTEXT\ language code, for an
+%D overview see \type{http://wiki.contextgarden.net/Language_Codes}.
+%D In praxi you may want to choose either Czech (the default) or Slovak
+%D (\type{sk}) for most transliterations from cyrillic scripts.  I've not yet
+%D made up my mind concerning Greek transliteration, any suggestions are
+%D welcome.
+
+%D The following will help debugging and reviewing tables.  Make sure your
+%D typescript can handle the characters, in general it's no use with Latin
+%D Modern which unfortunately provides only a restricted set of the unicode
+%D range.
+%D
+%D The user-level command to output a single substitution table is
+%D \type{\showOneTranslitTab{#1}}.
+
+\define[1]\showOneTranslitTab{%
+  \startluacode
+    environment.loadluafile ("trans_tables_iso9")
+    environment.loadluafile ("trans_tables_trsc")
+    environment.loadluafile ("trans_tables_scntfc")
+    environment.loadluafile ("trans_tables_trsc")
+    environment.loadluafile ("trans_tables_glag")
+    environment.loadluafile ("trans_tables_gr")
+    thirddata.translit.gen_rules_en()
+    thirddata.translit.gen_rules_de()
+    thirddata.translit.show_tab(translit["\luaescapestring{#1}"])
+  \stopluacode
+}
+
+%D The user-level command to output all defined tables is
+%D \type{\showTranslitTabs}.
+
+\define\showTranslitTabs{%
+  \ctxlua{thirddata.translit.show_all_tabs()}%
+}
+
+\def\translitDebug#1{%
+  \doif{\transliterateparameter{debug}}{yes}{%
+    {\ss\inmargin{\ctxlua{thirddata.translit.debug_next()}} #1}%
+  }%
+}
+
+
+%D The user-level command \type{\transliterate[#1]{#2}} does the job of
+%D switching to a given language (for hyphenation) and adjusting the
+%D substitution method locally.  It takes an optional list \type{[#1]} of
+%D key-value arguments to allow ad-hoc specification of either two that deviate
+%D from the defaults set initially by means of \type{\setuptransliterate}.
+%D 
+%D Internally, \type{\dotransliterate} is called according to the \CONTEXT\ 
+%D coding style and in case the user provides \type{hyphenate=} or
+%D \type{mode=} those will be used instead of the globals.  Note that this
+%D leaves the latter unchanged.  Thus, in order to permanently switch to
+%D another transliteration style the user would have to set it by calling
+%D \type{\setuptransliterate} again.
+%D
+% All credits for rewriting the TeX code go to Wolfgang as well.
+% http://www.ntg.nl/pipermail/ntg-context/2010/047816.html
+
+\def\dotransliterate[#1]#2{%
+  \bgroup\iffirstargument
+    \setuptransliterate[#1]%
+  \fi
+    \language[\transliterateparameter{hyphenate}]%
+    \ctxlua{
+      thirddata.translit.deficient_font = "\transliterateparameter{deficient_font}"
+      thirddata.translit.transliterate("\transliterateparameter{mode}","\luaescapestring{#2}")
+    }%
+  \egroup%
+}
+
+\unexpanded\def\transliterate{\dosingleempty\dotransliterate}
+
+\def\expandabletransliterate#1{%
+  %\bgroup
+    %\setuptransliterate[#1]%
+    %\language[\transliterateparameter{hyphenate}]%
+    \ctxlua{
+      thirddata.translit.deficient_font = "\transliterateparameter{deficient_font}"
+      thirddata.translit.transliterate("\transliterateparameter{mode}","#1")
+    }%
+  %\egroup%
+}
+
+\unexpanded\def\starttransliterate{%
+  \bgroup%
+  \dosingleempty\dostarttransliterate%
+}
+
+\let\stoptransliterate\relax
+
+\def\dostarttransliterate[#1]#2\stoptransliterate{%
+  \iffirstargument
+    \setuptransliterate[#1]%
+  \fi
+  \language[\transliterateparameter{hyphenate}]%
+  \ctxlua{thirddata.translit.transliterate("\transliterateparameter{mode}","\luaescapestring{#2}")}%
+  \egroup%
+}
+
+\newconditional\transliterate_useexpanded \setfalse\transliterate_useexpanded
+
+\def\transliterate_conditional[#1]#2{%
+  \ifconditional\transliterate_useexpanded
+    \transliterate[#1]{#2}%
+  \else
+    \expandabletransliterate{#2}%
+  \fi%
+}
+
+\protect \endinput
+
+%   vim:ft=context

@@ -1,0 +1,345 @@
+%D \module
+%D   [     file=t-vim,
+%D      version=2022.02.17,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Vim syntax highlighting,
+%D       author=Aditya Mahajan,
+%D         date=\currentdate,
+%D    copyright=Aditya Mahajan,
+%D        email=adityam <at> ieee <dot> org,
+%D      license=Simplified BSD License]
+
+\writestatus{loading}{Vim syntax highlighting (ver: 2022.02.17)}
+
+\startmodule [vim]
+\usemodule   [filter]           % loads module catcodes
+\usemodule   [syntax-highlight] % loads syntax-groups and filter module
+
+\unprotectmodulecatcodes
+
+\startinterface all
+    \setinterfaceconstant {vimrc}           {vimrc}
+    \setinterfaceconstant {vimcommand}      {vim\c!command}
+\stopinterface
+
+
+\def\vimtyping@id          {vimtyping}
+\def\vimtyping@namespace   {@@@@\vimtyping@id}
+\def\vimtyping@name        {}
+
+\def\vimrc@id              {vimrc}
+
+\installparameterhandler \vimtyping@namespace \vimtyping@id
+\installsetuphandler     \vimtyping@namespace \vimtyping@id
+
+\appendtoks
+    % \setupvimtyping[...][...] does not call
+    % \setupsyntaxhighlighting[...][...],
+    % So, the line numbering options are not reset. Reset them explicitly here
+   \syntaxhighlighting@set_linenumbers\vimtyping@id
+\to\everysetupvimtyping
+  
+\def\definevimtyping
+  {\dodoubleargument\vimtyping@define}
+
+\starttexdefinition vimtyping@define [#1][#2]
+    \setupvimtyping[#1][\s!parent=\vimtyping@namespace,#2]
+
+    \definesyntaxhighlighting[#1][\s!parent=\vimtyping@namespace#1]
+    \setupsyntaxhighlighting [#1][#2]
+\stoptexdefinition
+
+% Mode to testing the dev version of 2context script.
+\doifmodeelse{vim-dev,dev-vim}
+  {\def\vimtyping@script_name{2context.vim}%
+   \doifmode\s!mkiv{\def\vimtyping@css_name{vimtyping-default.css}}}
+  {\doifmodeelse\s!mkiv
+      {\ctxlua{context.setvalue("vimtyping@script_name",resolvers.resolve("full:2context.vim"))}%
+      \ctxlua{context.setvalue("vimtyping@css_name",
+      resolvers.resolve("full:vimtyping-default.css"))}}
+      {\def\vimtyping@script_name{kpse:2context.vim}}}
+
+\def\vimtypingcssfile{\vimtyping@css_name}
+
+\def\vimtyping@filter_command
+  {\externalfilterparameter\c!vimcommand\space
+        -u \vimrc_filename\space % read global config file
+        % --startuptime log
+        % -V3log
+       -X % dont connect to X server
+       -i NONE % dont use viminfo file
+       --noplugin % dont load plugins
+       -es % run in ex mode in silent
+       % -C % set compatible
+       -n % no swap file
+       -c "syntax manual" % don't load filetype detection
+       -c "set syntax=\externalfilterparameter\c!syntax" %
+       -c "set tabstop=\externalfilterparameter\c!tab" %
+       % vim only accepts 10 -c commands, so we combine a few let statements
+       -c "let contextstartline=\externalfilterparameter\c!start \letterbar\space %
+           let contextstopline=\externalfilterparameter\c!stop   \letterbar\space %
+           let strip=\getvalue{\vimtyping@id-\c!strip-\externalfilterparameter\c!strip}" %
+       -c "let escapecomments=\getvalue{\vimtyping@id-\c!escape-\externalfilterparameter\c!escape}"
+       -c "let highlight=[\externalfilterparameter\c!highlight]" %
+       \vimrc_extras\space
+       -c "source \vimtyping@script_name" %
+       -c "qa" %
+       \externalfilterinputfile\space
+       \externalfilteroutputfile}
+
+\setvalue{\vimtyping@id-\c!strip-\v!off}{0}
+\setvalue{\vimtyping@id-\c!strip-\v!on}{1}
+
+\setvalue{\vimtyping@id-\c!escape-}{0} % Empty value
+
+\setvalue{\vimtyping@id-\c!escape-\v!off}{0}
+\setvalue{\vimtyping@id-\c!escape-\v!on}{1}
+
+\setvalue{\vimtyping@id-\c!escape-\v!comment}{1}
+\setvalue{\vimtyping@id-\c!escape-\v!command}{2}
+
+
+% Undocumented ... but useful if the user makes a mistake
+\setvalue{\vimtyping@id-\c!strip-\v!no}{0}
+\setvalue{\vimtyping@id-\c!strip-\v!yes}{1}
+
+\setvalue{\vimtyping@id-\c!escape-\v!no}{0}
+\setvalue{\vimtyping@id-\c!escape-\v!yes}{1}
+
+\setupvimtyping
+  [\c!vimcommand={vim},
+   % \c!tab=4,
+   % \c!start=1,
+   % \c!stop=0,
+   % \c!syntax=context,
+   % \c!alternative=pscolor,
+   % \c!before=,
+   % \c!after=,
+   % \c!style=\tttf,
+   % \c!color=,
+   \c!strip=\v!yes,
+   \c!escape=\v!off,
+   % \c!highlight=,
+   % \c!highlightcolor=lightgray,
+   \c!filtercommand=\vimtyping@filter_command,
+   % \c!continue=yes,
+   % All options that effect the call to vim. When syntax highlighting
+   % external files, changing any one of these options will result in a new
+   % call to vim and the result will be saved in a different file
+   \c!cache\c!option={\externalfilterparameter\c!start
+                      \externalfilterparameter\c!stop
+                      \externalfilterparameter\c!syntax
+                      \externalfilterparameter\c!strip
+                      \externalfilterparameter\c!escape
+                      \externalfilterparameter\c!highlight},
+   % \c!read=\v!yes,
+   % \c!readcommand=\syntaxhighlighting@read_command,
+   \c!output=\externalfilterbasefile.vimout,
+   %\c!setups=syntaxhighlighting@setup,
+   \c!filter\c!setups=vimrc@setup,
+   % \c!option=\v!packed, % Could be a list
+   \s!parent=\syntaxhighlighting@namespace,
+   \c!vimrc=,
+   % % Numbering options
+   % \c!numbering=\v!no,
+   % \c!number\c!start=1,
+   % \c!number\c!step=1,
+   % \c!number\c!continue=\v!no,
+   % \c!numberconversion=\v!numbers,
+   % \c!number\c!method=\v!first,
+   % \c!number\c!location=\v!left,
+   % \c!numberstyle=\ttx,
+   % \c!numbercolor=,
+   % \c!number\c!width=2em,
+   % \c!number\c!left=,
+   % \c!number\c!right=,
+   % \c!number\c!command=,
+   % \c!number\c!distance=0.5em,
+   % \c!number\c!align=\v!flushright,
+  ]
+
+\def\currentvimtyping  {\vimtyping@name}
+
+\defineexternalfilter
+  [\vimrc@id]
+  [\c!continue=\v!no,
+   \c!read=\v!no,
+   \c!purge=\v!no,
+   \c!filtercommand=\empty]
+
+\def\vimrcfile_name{NONE}
+\def\vimrc_extras{}
+
+\startsetups vimrc@setup
+  \doifelsenothing{\externalfilterparameter\c!vimrc}
+      {\def\vimrc_filename{NONE}}
+      {\begingroup
+       \expanded{\setupexternalfilter[\vimrc@id][\c!name=\externalfilterparameter\c!vimrc]}
+
+       \edef\externalfilter@name{\vimrc@id}
+       \edef\currentexternalfilter{\vimrc@id}
+
+       \externalfilter@set_filenames
+
+       \global\xdef\vimrc_filename{\externalfilter@input_file}
+       \endgroup
+      }
+
+  \doifelsenothing{\externalfilterparameter\c!extras}
+      {\def\vimrc_extras{}}
+      {\begingroup
+       \expanded{\setupexternalfilter[\vimrc@id][\c!name=\externalfilterparameter\c!extras]}
+
+       \edef\externalfilter@name{\vimrc@id}
+       \edef\currentexternalfilter{\vimrc@id}
+
+       \externalfilter@set_filenames
+
+       \global\xdef\vimrc_extras{-c "source \externalfilter@input_file"}
+       \endgroup
+      }
+\stopsetups
+
+\defineframed[vimtodoframed]
+             [
+               \c!location=\v!low,
+               \c!frame=\v!off,
+               \c!background=\v!color,
+               \c!backgroundcolor=vimtodoyellow,
+            ]
+
+\definecolor[vimtodoyellow]
+            [h={E0E090}]
+
+\startsetups[vim-minor-groups]
+    \definesyntaxgroup
+        [SpecialComment]
+        [Comment]
+
+    \definesyntaxgroup
+        [String,Character,Number,Boolean,Float]
+        [Constant]
+
+    \definesyntaxgroup
+        [Function]
+        [Identifier]
+
+    \definesyntaxgroup
+        [Conditional,Repeat,Label,Operator,Keyword,Exception]
+        [Statement]
+
+    \definesyntaxgroup
+        [Include,Define,Macro,PreCondit]
+        [PreProc]
+
+    \definesyntaxgroup
+        [StorageClass,Structure,Typedef]
+        [Type]
+
+    \definesyntaxgroup
+        [SpecialChar,Delimiter,Debug]
+        [Special]
+\stopsetups
+
+\startcolorscheme[pscolor]
+    % Vim Preferred groups
+    \definesyntaxgroup
+        [Constant]
+        [\c!color={h=007068}]
+
+    \definesyntaxgroup
+        [Identifier]
+        [\c!color={h=a030a0}]
+
+    \definesyntaxgroup
+        [Statement]
+        [\c!color={h=2060a8}]
+
+    \definesyntaxgroup
+        [PreProc]
+        [\c!color={h=009030}]
+
+    \definesyntaxgroup
+        [Type]
+        [\c!color={h=0850a0}]
+
+    \definesyntaxgroup
+        [Special]
+        [\c!color={h=907000}]
+
+    \definesyntaxgroup
+        [Comment]
+        [\c!color={h=606000}]
+
+    \definesyntaxgroup
+         [Ignore]
+
+    \definesyntaxgroup
+        [Todo]
+        [\c!color={h=800000},
+         \c!command=\vimtodoframed]
+
+    \definesyntaxgroup
+        [Error]
+        [\c!color={h=c03000}]
+
+    \definesyntaxgroup
+        [Underlined]
+        [\c!color={h=6a5acd},
+         \c!command=\underbar]
+
+    \setups{vim-minor-groups}
+
+    \definesyntaxgroup
+        [Number]
+        [\c!color={h=907000}]
+\stopcolorscheme
+
+\startcolorscheme[blackandwhite]
+    \definesyntaxgroup
+        [Constant]
+
+    \definesyntaxgroup
+        [Identifier]
+
+    \definesyntaxgroup
+        [Statement]
+        [\c!style=bold]
+
+    \definesyntaxgroup
+        [PreProc]
+        [\c!style=bold]
+
+    \definesyntaxgroup
+        [Type]
+        [\c!style=bold]
+
+    \definesyntaxgroup
+        [Special]
+
+    \definesyntaxgroup
+        [Comment]
+        [\c!style=italic]
+
+    \definesyntaxgroup
+         [Ignore]
+
+    \definesyntaxgroup
+        [Todo]
+        [\c!command=\inframed]
+
+    \definesyntaxgroup
+        [Error]
+        [\c!command=\overstrike]
+
+    \definesyntaxgroup
+        [Underlined]
+        [\c!command=\underbar]
+
+    \setups{vim-minor-groups}
+
+\stopcolorscheme
+\protectmodulecatcodes
+
+\stopmodule
+

@@ -1,0 +1,67 @@
+%D \module
+%D   [     file=type-imp-diavlo,
+%D      version=2010.10.27,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Diavlo Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [diavlo]
+
+\starttypescript [\s!sans] [diavlo,diavlo-light,diavlo-medium,diavlo-bold]
+    \definefontsynonym [DiavloLight-Regular]  [\s!file:diavlolightii37]  [\s!features=\s!default]
+    \definefontsynonym [DiavloBook-Regular]   [\s!file:diavlobookii37]   [\s!features=\s!default]
+    \definefontsynonym [DiavloMedium-Regular] [\s!file:diavlomediumii37] [\s!features=\s!default]
+    \definefontsynonym [DiavloBold-Regular]   [\s!file:diavloboldii37]   [\s!features=\s!default]
+    \definefontsynonym [DiavloBlack-Regular]  [\s!file:diavloblackii37]  [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [diavlo]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [DiavloBook-Regular]   [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [DiavloMedium-Regular] [\s!features=\s!default]  
+\stoptypescript
+
+\starttypescript [\s!sans] [diavlo-light]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [DiavloLight-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [DiavloBook-Regular]  [\s!features=\s!default]  
+\stoptypescript
+
+\starttypescript [\s!sans] [diavlo-medium]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [DiavloMedium-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [DiavloBlack-Regular]  [\s!features=\s!default]  
+\stoptypescript
+
+\starttypescript [\s!sans] [diavlo-bold]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [DiavloBold-Regular]  [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [DiavloBlack-Regular] [\s!features=\s!default]  
+\stoptypescript
+
+\starttypescript [diavlo,diavlo-light,diavlo-medium,diavlo-bold]
+    \definetypeface [\typescriptone] [ss] [\s!sans] [\typescriptone] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

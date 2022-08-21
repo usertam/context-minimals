@@ -1,0 +1,40 @@
+%D \module
+%D   [       file=type-urwgothic.tex,
+%D        version=2006.04.05,
+%D          title=URW Gothic support,
+%D       subtitle=fonts,
+%D         author=Taco Hoekwater,
+%D           date=\currentdate,
+%D      copyright=Public Domain]
+%C
+%C Donated to the public domain.
+
+\starttypescript [sans] [urwgothic] [texnansi,ec,8r]
+  \loadmapfile[\typescriptthree-urw-urwgothic.map]
+  \definefontsynonym[URWGothicL-Book]    [\typescriptthree-uagk8a]  [encoding=\typescriptthree]
+  \definefontsynonym[URWGothicL-BookObli][\typescriptthree-uagko8a] [encoding=\typescriptthree]
+  \definefontsynonym[URWGothicL-Demi]    [\typescriptthree-uagd8a]  [encoding=\typescriptthree]
+  \definefontsynonym[URWGothicL-DemiObli][\typescriptthree-uagdo8a] [encoding=\typescriptthree]
+\stoptypescript
+
+\starttypescript [map] [urwgothic] [texansi,ec,8r]
+  \loadmapfile[\typescriptthree-urw-urwgothic.map]
+\stoptypescript
+
+\starttypescript [sans] [urwgothic] [name]
+  \definefontsynonym [Sans]            [URWGothicL-Book]
+  \definefontsynonym [SansItalic]      [URWGothicL-BookObli]
+  \definefontsynonym [SansBold]        [URWGothicL-Demi]
+  \definefontsynonym [SansBoldItalic]  [URWGothicL-DemiObli]
+  \definefontsynonym [SansSlanted]     [URWGothicL-BookObli]
+  \definefontsynonym [SansBoldSlanted] [URWGothicL-DemiObli]
+\stoptypescript
+
+\starttypescript [urwgothic] [texnansi,ec,8r]
+  \definetypeface [urwgothic][ss][sans] [urwgothic][default][encoding=\typescripttwo,rscale=0.9]
+  \definetypeface [urwgothic][rm][serif][times]    [default][encoding=\typescripttwo]
+  \definetypeface [urwgothic][tt][mono] [modern]   [default][encoding=\typescripttwo]
+  \definetypeface [urwgothic][mm][math] [times]    [default][encoding=\typescripttwo]
+  \quittypescriptscanning
+\stoptypescript
+

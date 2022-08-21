@@ -1,0 +1,22 @@
+\usemodule[gantt]
+%\usemodule[gantt][alternative=mp]
+%\usemodule[gantt][alternative=tikz]
+\setuppagenumbering[location=]
+
+\starttext
+  \startgantt{10}{12}
+    \startganttitle
+      \numtitle{1}{1}{12}{1}
+    \stopganttitle
+    \ganttbar{a task}{0}{2}
+    \ganttbarcon{a consecutive task}{2}{4}
+    \ganttbarcon{another consecutive task}{8}{2}
+    \ganttmilestone[color=darkcyan]{Milestone with color!}{4}
+    \ganttbar{another task}{2}{2}
+    \ganttbar[color=cyan]{another coloured task}{4}{4}
+    \ganttbar{another task}{4}{2}
+    \ganttcon{4}{5}{4}{7}
+    \ganttmilestonecon{A connected Milestone}{7}
+    \ganttbarcon{another consecutive task}{8}{2}
+  \stopgantt
+\stoptext

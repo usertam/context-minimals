@@ -1,0 +1,68 @@
+%D \module
+%D   [       file=floatnumber,
+%D        version=2008.02.11,
+%D          title=\CONTEXT\ User Module,
+%D       subtitle=Float Numbers,
+%D         author=Wolfgang Schuster,
+%D           date=\currentdate,
+%D      copyright=Wolfgang Schuster,
+%D          email=schuster.wolfgang@googlemail.com,
+%D        license=Public Domain]
+
+\writestatus{loading}{Context User Module / Float Numbers}
+
+\unprotect
+
+\def\@@floatnumber@@v{@@floatnumber@@v}
+\def\@@floatnumber@@s{@@floatnumber@@s}
+
+% namespace is already dealt with in the frontend
+
+% \def\@@floatnumber@@v{v:}
+% \def\@@floatnumber@@s{s:}
+
+\def\makefloatcounter#1%
+  {\global\@EA\let\csname\@@floatnumber@@v#1\endcsname\zeropoint
+   \global\@EA\let\csname\@@floatnumber@@s#1\endcsname\zeropoint}
+
+\def\floatcountervalue#1%
+  {\ifcsname\@@floatnumber@@v#1\endcsname
+     \@EA\withoutpt\the\dimexpr\csname\@@floatnumber@@v#1\endcsname\relax
+   \fi}
+
+\def\plusfloatcounter#1#2%
+  {\@EA\xdef\csname\@@floatnumber@@v#1\endcsname
+     {\the\dimexpr\csname\@@floatnumber@@v#1\endcsname+#2\points\relax}}
+
+\def\minusfloatcounter#1#2%
+  {\@EA\xdef\csname\@@floatnumber@@v#1\endcsname
+     {\the\dimexpr\csname\@@floatnumber@@v#1\endcsname-#2\points\relax}}
+
+\def\multiplyfloatcounter#1#2%
+  {\@EA\xdef\csname\@@floatnumber@@v#1\endcsname
+     {\the\dimexpr\csname\@@floatnumber@@v#1\endcsname*\integerrounding{\@EA\withoutpt\the\dimexpr#2\points*\plushundred\relax}/\plushundred\relax}}
+
+\def\multiplyfloatcounter#1#2%
+  {\@EA\xdef\csname\@@floatnumber@@v#1\endcsname
+     {\the\dimexpr\csname\@@floatnumber@@v#1\endcsname*\numexpr\number\dimexpr#2\points\relax*\plushundred/\maxcard\relax/\plushundred\relax}}
+
+\def\dividefloatcounter#1#2%
+  {\@EA\xdef\csname\@@floatnumber@@v#1\endcsname
+     {\the\dimexpr\csname\@@floatnumber@@v#1\endcsname*\plushundred/\integerrounding{\@EA\withoutpt\the\dimexpr#2\points*\plushundred\relax}\relax}}
+
+\def\dividefloatcounter#1#2%
+  {\@EA\xdef\csname\@@floatnumber@@v#1\endcsname
+     {\the\dimexpr\csname\@@floatnumber@@v#1\endcsname*\plushundred/\numexpr\number\dimexpr#2\points\relax*\plushundred/\maxcard\relax\relax}}
+
+\let\resetfloatcounter\makefloatcounter
+
+\def\setfloatcounter#1#2%
+  {\global\@EA\xdef\csname\@@floatnumber@@v#1\endcsname{\the\dimexpr#2\points\relax}}
+
+\def\savefloatcounter#1%
+  {\global\@EA\xdef\csname\@@floatnumber@@s#1\endcsname{\the\dimexpr\csname\@@floatnumber@@v#1\endcsname\relax}}
+
+\def\restorefloatcounter#1%
+  {\global\@EA\xdef\csname\@@floatnumber@@v#1\endcsname{\the\dimexpr\csname\@@floatnumber@@s#1\endcsname\relax}}
+
+\protect \endinput

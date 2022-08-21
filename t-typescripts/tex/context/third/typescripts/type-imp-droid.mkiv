@@ -1,0 +1,78 @@
+%D \module
+%D   [     file=type-imp-droid,
+%D      version=2010.09.13,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Droid Collection,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+%D Droid is a font family created by Ascender Corporation for the 
+%D Android platform, and licensed under the Apache license. They can be
+%D downloaded from the git snapshot of android:
+%D \hyphenatedurl{http://android.git.kernel.org/?p=platform/frameworks/base.git;a=snapshot;h=39b04dd27e6d20809f8ff26920d1e761a0005252;sf=tgz}
+
+\starttypescriptcollection[droid]
+
+\starttypescript [\s!serif] [droid]
+    \definefontsynonym [DroidSerif-Regular]    [\s!file:droidserifregular]    [\s!features=\s!default]
+    \definefontsynonym [DroidSerif-Italic]     [\s!file:droidserifitalic]     [\s!features=\s!default]
+    \definefontsynonym [DroidSerif-Bold]       [\s!file:droidserifbold]       [\s!features=\s!default]
+    \definefontsynonym [DroidSerif-BoldItalic] [\s!file:droidserifbolditalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [droid]
+    \setups[\s!font:\s!fallback:\s!serif]
+    \definefontsynonym [\s!Serif]           [DroidSerif-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SerifItalic]     [DroidSerif-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold]       [DroidSerif-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBoldItalic] [DroidSerif-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [droid]
+    \definefontsynonym [DroidSans-Regular] [\s!file:droidsans]     [\s!features=\s!default]
+    \definefontsynonym [DroidSans-Bold]    [\s!file:droidsansbold] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!sans] [droid]
+    \setups[\s!font:\s!fallback:\s!sans]
+    \definefontsynonym [\s!Sans]     [DroidSans-Regular] [\s!features=\s!default]
+    \definefontsynonym [\s!SansBold] [DroidSans-Bold]    [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!mono] [droid]
+    \definefontsynonym [DroidMono-Regular] [\s!file:droidsansmono] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!mono] [droid]
+    \setups[\s!font:\s!fallback:\s!mono]
+    \definefontsynonym [\s!Mono] [DroidMono-Regular] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [droid]
+    \definetypeface [droid] [rm] [\s!serif] [droid]  [\s!default]
+    \definetypeface [droid] [ss] [\s!sans]  [droid]  [\s!default]
+    \definetypeface [droid] [tt] [\s!mono]  [droid]  [\s!default]
+    \definetypeface [droid] [mm] [\s!math]  [modern] [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection
+
+\endinput

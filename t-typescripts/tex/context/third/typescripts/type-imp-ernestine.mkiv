@@ -1,0 +1,61 @@
+%D \module
+%D   [     file=type-imp-ernestine,
+%D      version=2011.12.18,
+%D        title=\CONTEXT\ Typescript Macros,
+%D     subtitle=Ernestine Pro Font Definitions,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\starttypescriptcollection [ernestine]
+
+\starttypescript [\s!serif] [ernestine,ernestine-light]
+    \definefontsynonym [Ernestine-Light]          [\s!file:ernestineprolight]          [\s!features=\s!default]
+    \definefontsynonym [Ernestine-LightItalic]    [\s!file:ernestineprolightitalic]    [\s!features=\s!default]
+    \definefontsynonym [Ernestine-Demibold]       [\s!file:ernestineprodemibold]       [\s!features=\s!default]
+    \definefontsynonym [Ernestine-DemiboldItalic] [\s!file:ernestineprodemibolditalic] [\s!features=\s!default]
+    \definefontsynonym [Ernestine-Regular]        [\s!file:ernestinepro]               [\s!features=\s!default]
+    \definefontsynonym [Ernestine-Italic]         [\s!file:ernestineproitalic]         [\s!features=\s!default]
+    \definefontsynonym [Ernestine-Bold]           [\s!file:ernestineprobold]           [\s!features=\s!default]
+    \definefontsynonym [Ernestine-BoldItalic]     [\s!file:ernestineprobolditalic]     [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [ernestine-light]
+    \definefontsynonym [\s!Serif]           [Ernestine-Light]          [\s!features=\s!default]
+    \definefontsynonym [\s!SerifItalic]     [Ernestine-LightItalic]    [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold]       [Ernestine-Demibold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBoldItalic] [Ernestine-DemiboldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [\s!serif] [ernestine]
+    \definefontsynonym [\s!Serif]           [Ernestine-Regular]    [\s!features=\s!default]
+    \definefontsynonym [\s!SerifItalic]     [Ernestine-Italic]     [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBold]       [Ernestine-Bold]       [\s!features=\s!default]
+    \definefontsynonym [\s!SerifBoldItalic] [Ernestine-BoldItalic] [\s!features=\s!default]
+\stoptypescript
+
+\starttypescript [ernestine,ernestine-light]
+    \definetypeface [ernestine] [rm] [\s!serif] [\typescriptone]  [\s!default]
+    \definetypeface [ernestine] [ss] [\s!sans]  [modern]          [\s!default] [\s!rscale=\v!auto]
+    \definetypeface [ernestine] [tt] [\s!mono]  [modern]          [\s!default] [\s!rscale=\v!auto]
+    \definetypeface [ernestine] [mm] [\s!math]  [modern]          [\s!default]
+    \quittypescriptscanning
+\stoptypescript
+
+\stoptypescriptcollection

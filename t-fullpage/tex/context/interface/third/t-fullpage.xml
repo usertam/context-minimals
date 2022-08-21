@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2010.12.27">
+
+<cd:command name="setupfullpage" file="t-fullpage.tex">
+    <cd:sequence>
+        <cd:string value="setupfullpage"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:assignments n="1" list="yes">
+            <cd:parameter name="style" list="yes">
+                <cd:constant type="in" default="yes"/>
+                <cd:constant type="cm"/>
+                <cd:constant type="margin"/>
+                <cd:constant type="plain" default="yes"/>
+                <cd:constant type="headings"/>
+                <cd:constant type="empty"/>
+                <cd:constant type="none"/>
+            </cd:parameter>
+            <cd:parameter name="margin">
+                <cd:constant type="cd:dimension" default="0pt"/>
+            </cd:parameter>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+</cd:interface>

@@ -1,0 +1,369 @@
+%D \module
+%D   [     file=t-gantt,
+%D      version=2012.08.19,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Drawing Gantt charts,
+%D       author={Adam Reviczky and Aditya Mahajan},
+%D         date=\currentdate,
+%D    copyright={Adam Reviczky and Aditya Mahajan},
+%D      license=Public Domain]
+
+%D Some macros for drawing Gantt charts using MetaPost.
+
+\writestatus{loading}{ConTeXt User Module / metapost gantt chart}
+
+\startmodule[gantt-s-mp]
+\unprotect
+
+\def\????gantt{@@@@gantt}
+
+\definesystemvariable{gantt}
+
+\startMPinclusions
+  % temporary solution for a pattern substitute
+  input hatching;
+\stopMPinclusions
+
+\newcount\ganttnum
+\newcount\gantttitlenum
+\newcount\ganttwidth
+
+\newdimen\ganttlastx \ganttlastx = 0cm
+\newdimen\nextganttlastx
+\newdimen\titleunitlength \titleunitlength = 1cm
+\newdimen\ganttunitlength \ganttunitlength = 1cm
+
+\newdimen\gantttmpa
+\newdimen\gantttmpb
+
+% workaround for titleelement
+\def\!!row{\numexpr\ganttnum-1\relax}
+
+\unexpanded\def\setupgantt
+        {\bgroup
+         \dosingleempty
+         \dosetupgantt}
+
+\unexpanded\def\dosetupgantt[#1]%
+        {\egroup
+         \getparameters[\????gantt][#1]}
+
+\setupgantt
+        [factor=1,
+         xunitlength=1cm,
+         style=\tf,
+         titlestyle=\tfx,
+         drawledgerline=false]
+
+\unexpanded\def\setupganttbar
+        {\bgroup
+         \dosingleempty
+         \dosetupganttbar}
+
+\unexpanded\def\dosetupganttbar[#1]%
+        {\egroup
+         \getparameters[\????gantt][#1]}
+
+\setupganttbar
+        [pattern=north east lines,
+         color=black]
+
+% The gantt environment draws the canvas of a gantt figure (realized as tikzpicture)
+% The usage is \startgantt[...]{no of Tasks to plot}{no of time slots}
+% The optional argument [...] can be filled in a key=value syntax, using one or more of the following keys:
+%
+% xunitlength - length of one time slot (default: 1cm)
+% style - style of labels (default: \tf)
+% titlestyle - style of title section (default: \tfx)
+% drawledgerline  - Switch to enable/disable the drawing of horizontal ledger lines (default value: false)
+\unexpanded\long\def\dostartgantt[#1]#2#3%
+  {\getparameters[\????gantt][#1]%
+   \gdef\gantt!factor{\@@@@ganttfactor}
+   \gdef\gantt!ganttunitlength{\@@@@ganttxunitlength}
+   \gdef\gantt!style{\getvalue{@@@@ganttstyle}}
+   \gdef\gantt!titlestyle{\getvalue{@@@@gantttitlestyle}}
+   \gdef\gantt!drawledgerline{\@@@@ganttdrawledgerline}
+
+   \bgroup
+   \newcount\ganttx \ganttx=0
+   \newcount\ganttheight
+
+   \def\ganttxstringtop{}
+   \def\ganttxstringbottom{}
+
+   \global\ganttwidth=#3
+   \global\ganttnum=0
+
+   \ganttheight=#2
+   \advance\ganttheight by 1
+
+   \startMPdrawing
+     linecap := squared;
+     linejoin := mitered;
+
+     draw (0,0.5cm)--(0,1.4cm-\the\ganttheight*cm);
+     draw (\the\ganttwidth*\gantt!ganttunitlength,0.5cm)--(\the\ganttwidth*\gantt!ganttunitlength,1.4cm-\the\ganttheight*cm);
+     % draw x axis
+     draw (0cm,-#2*cm+0.4cm)--(\the\ganttwidth*\gantt!ganttunitlength,-#2*cm+0.4cm);
+
+     % draw grid
+     for t=1 upto \the\ganttwidth:
+       draw (\gantt!ganttunitlength*t,-0.5cm)--(\gantt!ganttunitlength*t,1.4cm-\the\ganttheight*cm) dashed withdots;
+     endfor
+   \stopMPdrawing
+   \egroup
+  }
+
+\unexpanded\def\startgantt%
+  {\dosingleempty\dostartgantt}
+
+\unexpanded\def\stopgantt%
+  {\startMPdrawing
+     % debug
+     % draw bbox currentpicture withcolor .625red;
+     currentpicture := currentpicture scaled \gantt!factor;
+   \stopMPdrawing
+   \MPdrawingdonetrue\getMPdrawing
+   \resetMPdrawing
+   \doglobal\ganttnum=0
+   }
+
+% ganttitle is the environment for drawing the title section
+\definestartstop[ganttitle][
+  before={
+    \ganttlastx = 0cm
+    \doglobal\advance\ganttnum by 1
+  },
+  after={
+    \ganttlastx = 0cm
+  }
+  ]
+
+% \titleelement draws one element of the title
+% usage: \titleelement{label}{length}
+\unexpanded\long\def\dotitleelement#1#2%
+  {\gantttmpa=\dimexpr\gantt!ganttunitlength*#2\relax
+   \divide\gantttmpa by 2
+
+   \startMPdrawing
+     draw (\the\ganttlastx,0.5cm-\the\!!row*cm)--(\the\ganttlastx+#2*\gantt!ganttunitlength,0.5cm-\the\!!row*cm)--(\the\ganttlastx+#2*\gantt!ganttunitlength,0.5cm-0.6cm-\the\!!row*cm)--(\the\ganttlastx,0.5cm-0.6cm-\the\!!row*cm)--cycle;
+     path diam; diam = (\the\ganttlastx,0.5cm-\the\!!row*cm)--(\the\ganttlastx+#2*\gantt!ganttunitlength,0.5cm-0.6cm-\the\!!row*cm);
+     label (textext("\getvalue{gantt!titlestyle}{#1}"), center diam);
+   \stopMPdrawing
+
+   \ganttlastx=\dimexpr\ganttlastx+\gantt!ganttunitlength*#2\relax
+  }
+
+\unexpanded\def\titleelement%
+  {\dotitleelement}
+
+% \numtitle draws a numbered sequence of title elements
+% usage: \numtitle{start number}{increment}{end number}{length of each title element}
+\unexpanded\long\def\donumtitle#1#2#3#4%
+  {\gantttitlenum=#1
+   \dostepwiserecurse{#1}{#3}{#2}{
+     \titleelement{\the\gantttitlenum}{#4}
+     \advance\gantttitlenum by #2
+   }
+  }
+
+\unexpanded\def\numtitle%
+  {\donumtitle}
+
+% \ganttbar draws a single, unconnected bar for representing a task
+% usage: \ganttbar[pattern=<pattern>,color=<color>]{label}{start}{length}
+% where the optional comma separated arguments are:
+% pattern - not implemented with MetaPost yet! (FIXME)
+% color - a color of the pattern (e.g. red, green blue gray, dark gray)
+\unexpanded\long\def\doganttbar[#1]#2#3#4%
+  {\bgroup
+   \getparameters[\????gantt][#1]%
+   \edef\gantt!pattern{\@@@@ganttpattern}
+   \edef\gantt!color{\@@@@ganttcolor}
+
+   \gantttmpa=\dimexpr\gantt!ganttunitlength*#3\relax
+   \gantttmpb=\dimexpr\gantt!ganttunitlength*#4+\gantttmpa\relax
+
+   \doif{\gantt!drawledgerline}{true}{
+   \startMPdrawing
+     draw (0,-\the\ganttnum*cm-0.2cm)--(\the\ganttwidth*\gantt!ganttunitlength,-\the\ganttnum*cm-0.2cm) dashed withdots;
+   \stopMPdrawing
+   }
+   \startMPdrawing
+     path diag; diag = (0,-\the\ganttnum*cm+0.1cm)--(0,-\the\ganttnum*cm+0.5cm);
+     label.lft (textext("\getvalue{gantt!style}{#2}"), center diag);
+     path f; f := (\the\gantttmpa,-\the\ganttnum*cm+0.1cm)--(\the\gantttmpb,-\the\ganttnum*cm+0.1cm)--(\the\gantttmpb,-\the\ganttnum*cm+0.5cm)--(\the\gantttmpa,-\the\ganttnum*cm+0.5cm)--cycle;
+
+     hatchoptions(withcolor \gantt!color);
+     draw f withcolor black;
+     % workaround for transparent bug
+     % hatchfill f withcolor transparent("normal",0,white) withcolor (45,1mm,-0.5bp);
+     hatchfill f withcolor (45,1mm,-0.5bp);
+   \stopMPdrawing
+
+   \global\ganttlastx=\gantttmpb
+   \egroup
+   \doglobal\advance\ganttnum by 1
+  }
+
+\unexpanded\def\ganttbar
+  {\dosingleempty\doganttbar}
+
+% \ganttcon draws an arrow between to bars with specified coordinates
+% usage: \ganttcon{startx}{starty}{endx}{endy}
+\unexpanded\long\def\doganttcon#1#2#3#4%
+  {\bgroup
+   \startMPdrawing
+     begingroup;
+       interim linecap := squared;
+       interim linejoin := rounded;
+
+       drawarrow (#1*\gantt!ganttunitlength,-#2*cm+0.1cm+0.2cm)--(#1*\gantt!ganttunitlength+0.4*\gantt!ganttunitlength,-#2*cm+0.1*cm+0.2*cm)--(#1*\gantt!ganttunitlength+0.4*\gantt!ganttunitlength,-#2*cm-0.4*cm+0.2*cm)--(#1*\gantt!ganttunitlength-0.4*\gantt!ganttunitlength,-#2*cm-0.4*cm+0.2*cm)--(#1*\gantt!ganttunitlength-0.4*\gantt!ganttunitlength,-#4*cm+0.1*cm+0.2*cm)--(#3*\gantt!ganttunitlength,-#4*cm+0.1*cm+0.2*cm);
+     endgroup;
+   \stopMPdrawing
+   \egroup
+  }
+
+\unexpanded\def\ganttcon
+  {\doganttcon}
+
+% \ganttbarcon draws a single bar *and* connects the bar with the previous bar for
+% consecutive tasks
+% usage: \ganttbarcon[pattern=<pattern>,color=<color>]{label}{start}{length}
+% where the optional pattern argument are the same as for \ganttbar
+\unexpanded\long\def\doganttbarcon[#1]#2#3#4%
+  {\bgroup
+   \getparameters[\????gantt][#1]%
+   \edef\gantt!pattern{\@@@@ganttpattern}
+   \edef\gantt!color{\@@@@ganttcolor}
+
+   \nextganttlastx = \dimexpr\ganttlastx+\ganttunitlength*1\relax
+   \ifdim\nextganttlastx>\dimexpr\gantt!ganttunitlength*#3\relax
+     \startMPdrawing
+     begingroup;
+       interim linecap := squared;
+       interim linejoin := rounded;
+
+       drawarrow (\the\ganttlastx,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+0.6*cm+0.2*cm)--(\the\ganttlastx-0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+0.6*cm+0.2*cm)--(\the\ganttlastx-0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+0.1*cm+0.2*cm)--(#3*\gantt!ganttunitlength,-\the\ganttnum*cm+0.1*cm+0.2*cm);
+     endgroup;
+     \stopMPdrawing
+   \else
+     \startMPdrawing
+     begingroup;
+       interim linecap := squared;
+       interim linejoin := rounded;
+
+       drawarrow (\the\ganttlastx,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+0.1*cm+0.2*cm)--(#3*\gantt!ganttunitlength,-\the\ganttnum*cm+0.1*cm+0.2*cm);
+     endgroup;
+     \stopMPdrawing
+   \fi
+
+   \ganttbar[#1]{#2}{#3}{#4}
+   \egroup
+   \doglobal\advance\ganttnum by 1
+  }
+
+\unexpanded\def\ganttbarcon
+  {\dosingleempty\doganttbarcon}
+
+% \ganttgroup draws a bar to group tasks
+% usage: \ganttgroup{label}{start}{length}
+\unexpanded\long\def\doganttgroup#1#2#3%
+  {\bgroup
+   \gantttmpa=\dimexpr\gantt!ganttunitlength*#2\relax
+   \gantttmpb=\dimexpr\gantt!ganttunitlength*#3+\gantttmpa\relax
+
+   \doif{\gantt!drawledgerline}{true}{
+     \startMPdrawing
+       draw (0,-\the\ganttnum*cm-0.2cm)--(\the\ganttwidth*\gantt!ganttunitlength,-\the\ganttnum*cm-0.2cm) dashed withdots;
+     \stopMPdrawing
+   }
+   \startMPdrawing
+     pen diamond; diamond := makepen fulldiamond;
+     path diag; diag = (0,-\the\ganttnum*cm+0.1cm)--(0,-\the\ganttnum*cm+0.5cm);
+     label.lft (textext("\getvalue{gantt!style}{\bf #1}"), center diag);
+     fill (\the\gantttmpa-0.14*cm,-\the\ganttnum*cm+0.2cm)--(\the\gantttmpb+0.14*cm,-\the\ganttnum*cm+0.2cm)--(\the\gantttmpb+0.14*cm,-\the\ganttnum*cm+0.4cm)--(\the\gantttmpa-0.14*cm,-\the\ganttnum*cm+0.4cm)--cycle withcolor black;
+     fill fulldiamond scaled 0.3cm shifted (\the\gantttmpa+0.01cm,-\the\ganttnum*cm+0.2cm) withcolor black;
+     fill fulldiamond scaled 0.3cm shifted (\the\gantttmpb-0.01cm,-\the\ganttnum*cm+0.2cm) withcolor black;
+   \stopMPdrawing
+
+   \global\ganttlastx=\gantttmpb
+   \egroup
+   \doglobal\advance\ganttnum by 1
+  }
+
+\unexpanded\def\ganttgroup
+  {\doganttgroup}
+
+% \ganttmilestone, draw a diamond to represent a milestone
+% usage: \ganttgroup[color=<color>]{label}{start}
+% color - a tikz color of the pattern (e.g. red, green blue gray, dark gray)
+% for more information see the tikz documentation
+
+% Declaring layers to abvoid superposition when you connect a \ganttmileston with a task
+\unexpanded\long\def\doganttmilestone[#1]#2#3%
+  {\bgroup
+   \getparameters[\????gantt][#1]%
+   \edef\gantt!color{\@@@@ganttcolor}
+
+   \gantttmpa=\dimexpr\gantt!ganttunitlength*#3\relax
+   \gantttmpb=\dimexpr\gantt!ganttunitlength*0+\gantttmpa\relax
+
+   \doif{\gantt!drawledgerline}{true}{
+     \startMPdrawing
+       draw (0,-\the\ganttnum*cm-0.2cm)--(\the\ganttwidth*\gantt!ganttunitlength,-\the\ganttnum*cm-0.2cm) dashed withdots;
+     \stopMPdrawing
+   }
+   \startMPdrawing
+     pen diamond; diamond := makepen fulldiamond;
+     path diag; diag = (0,-\the\ganttnum*cm+0.1cm)--(0,-\the\ganttnum*cm+0.5cm);
+     label.lft (textext("\getvalue{gantt!style}{#2}"), center diag);
+     fill fulldiamond scaled 0.3cm shifted (\the\gantttmpb,-\the\ganttnum*cm+0.3cm) withcolor \gantt!color;
+   \stopMPdrawing
+
+   \global\ganttlastx=\gantttmpb
+   \egroup
+   \doglobal\advance\ganttnum by 1
+  }
+
+\unexpanded\def\ganttmilestone
+  {\dosingleempty\doganttmilestone}
+
+% \ganttmilestonecon draws a single diamond *and* connects the diamond with the previous task
+% usage: \ganttmilestonecon[color=<color>]{label}{start}{length}
+% where the optional color argument are the same as for \ganttbar and \ganttmilestone
+\unexpanded\long\def\doganttmilestonecon[#1]#2#3%
+  {\bgroup
+   \getparameters[\????gantt][#1]%
+   \edef\gantt!color{\@@@@ganttcolor}
+
+   \nextganttlastx = \dimexpr\ganttlastx+\ganttunitlength*1\relax
+   \ifdim\nextganttlastx>\dimexpr\gantt!ganttunitlength*#3\relax
+     \startMPdrawing
+     begingroup;
+       interim linecap := squared;
+       interim linejoin := rounded;
+
+       drawarrow (\the\ganttlastx,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+0.6*cm+0.2*cm)--(\the\ganttlastx-0.4*\gantt!ganttunitlength-0.14*cm,-\the\ganttnum*cm+0.6*cm+0.2*cm)--(\the\ganttlastx-0.4*\gantt!ganttunitlength-0.14*cm,-\the\ganttnum*cm+0.1*cm+0.2*cm)--(#3*\gantt!ganttunitlength-0.14*cm,-\the\ganttnum*cm+0.1*cm+0.2*cm);
+     endgroup;
+     \stopMPdrawing
+   \else
+     \startMPdrawing
+     begingroup;
+       interim linecap := squared;
+       interim linejoin := rounded;
+
+       drawarrow (\the\ganttlastx,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+1.1*cm+0.2*cm)--(\the\ganttlastx+0.4*\gantt!ganttunitlength,-\the\ganttnum*cm+0.1*cm+0.2*cm)--(#3*\gantt!ganttunitlength-0.14*cm,-\the\ganttnum*cm+0.1*cm+0.2*cm);
+     endgroup;
+     \stopMPdrawing
+   \fi
+
+   \ganttmilestone[#1]{#2}{#3}
+   \egroup
+   \doglobal\advance\ganttnum by 1
+  }
+
+\unexpanded\def\ganttmilestonecon
+  {\dosingleempty\doganttmilestonecon}
+
+\protect \stopmodule

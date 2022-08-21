@@ -1,0 +1,19 @@
+\usemodule[gantt]
+%\usemodule[gantt][alternative=mp]
+%\usemodule[gantt][alternative=tikz]
+\setuppagenumbering[location=]
+
+\starttext
+  \startgantt{4}{12}
+    \startganttitle
+      \numtitle{2010}{1}{2012}{4}
+    \stopganttitle
+    \startganttitle
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+      \numtitle{1}{1}{4}{1}
+    \stopganttitle
+    \ganttbar{Task 1}{0}{2}
+    \ganttbarcon{a consecutive task}{2}{4}
+  \stopgantt
+\stoptext

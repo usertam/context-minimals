@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cd:interface xmlns:cd="http://www.pragma-ade.com/commands" name="context" language="en" version="2011.05.19">
+
+<cd:command name="animation" type="environment" generated="yes" file="t-animation.mkvi">
+    <cd:sequence>
+        <cd:variable value="animation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" optional="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes" optional="yes">
+            <cd:inherit name="setupanimation" n="2"/>
+            <cd:inherit name="definefieldstack" n="3"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="animation" type="environment" file="t-animation.mkvi">
+    <cd:sequence>
+        <cd:string value="animation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1" optional="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2" list="yes" optional="yes">
+            <cd:inherit name="setupanimation" n="2"/>
+            <cd:inherit name="definefieldstack" n="3"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="defineanimation" file="t-animation.mkvi">
+    <cd:sequence>
+        <cd:string value="defineanimation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:keywords n="2" optional="yes">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="3" list="yes" optional="yes">
+            <cd:inherit name="setupanimation" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+<cd:command name="setupanimation" file="t-animation.mkvi">
+    <cd:sequence>
+        <cd:string value="setupanimation"/>
+    </cd:sequence>
+    <cd:arguments>
+        <cd:keywords n="1">
+            <cd:constant type="cd:name"/>
+        </cd:keywords>
+        <cd:assignments n="2">
+            <cd:parameter name="menu">
+                <cd:constant type="yes"/>
+                <cd:constant type="no"/>
+                <cd:constant type="overlay" default="yes"/>
+            </cd:parameter>
+            <cd:parameter name="menustyle">
+                <cd:resolve name="style"/>
+            </cd:parameter>
+            <cd:parameter name="menucolor">
+                <cd:constant type="cd:name"/>
+            </cd:parameter>
+            <cd:inherit name="setupframed" n="2"/>
+        </cd:assignments>
+    </cd:arguments>
+</cd:command>
+
+</cd:interface>

@@ -1,0 +1,493 @@
+%D \module
+%D   [     file=t-fancybreak,
+%D      version=2015.04.18,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Fancybreak,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D        email=schuster.wolfgang@googlemail.com,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2010  Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+%M \usemodule[fancybreak]
+%M \loadsetups[t-fancybreak.xml]
+
+%D \subject{Examples}
+%D
+%D \macros
+%D   {fancybreak}
+%D
+%D \subsubject{The \letterbackslash fancybreak command}
+%D
+%D \starttyping
+%D Making oil requires a specific series of geological accidents ...
+%D \fancybreak{$* * *$}
+%D Making oil requires a specific series of geological accidents ...
+%D \stoptyping
+%D
+%D results in
+%D
+%D \startexample
+%D \input montgomery
+%D \fancybreak{$* * *$}
+%D \input montgomery
+%D \stopexample
+%D
+%D \extras
+%D   {spacebefore,spaceafter}
+%D
+%D \subsubject{The “spacebefore” and “spaceafter” keys}
+%D
+%D \starttyping
+%D \setupfancybreak[spacebefore=line,spaceafter=line]
+%D
+%D The Earth, as a habitat for animal life, is in old age …
+%D \fancybreak{$* * *$}
+%D The Earth, as a habitat for animal life, is in old age …
+%D \stoptyping
+%D
+%D results in
+%D
+%D \start
+%D
+%D \setupfancybreak[spacebefore=line,spaceafter=line]
+%D
+%D \startexample
+%D \input ward
+%D \fancybreak{$* * *$}
+%D \input ward
+%D \stopexample
+%D
+%D \stop
+%D
+%D \extras
+%D   {style}
+%D
+%D \subsubject{The “style” key}
+%D
+%D \starttyping
+%D \setupfancybreak[style=bold]
+%D
+%D The warm water spills north and south through a series of ocean currents ...
+%D \fancybreak{* * *}
+%D The warm water spills north and south through a series of ocean currents ...
+%D \stoptyping
+%D
+%D \start
+%D
+%D \setupfancybreak[style=bold,spacebefore=medium]
+%D
+%D \input linden
+%D \fancybreak{* * *}
+%D \input linden
+%D
+%D \stop
+%D
+%D \extras
+%D   {color}
+%D
+%D \subsubject{The “color” key}
+%D
+%D \starttyping
+%D \setupfancybreak[color=red]
+%D
+%D Had our solar system included two suns, the problem would ...
+%D \fancybreak{* * *}
+%D Had our solar system included two suns, the problem would ...
+%D \stoptyping
+%D
+%D \start
+%D
+%D \setupfancybreak[color=red,spacebefore=medium]
+%D
+%D \input thuan
+%D \fancybreak{* * *}
+%D \input thuan
+%D
+%D \stop
+%D
+%D \extras
+%D   {indentnext}
+%D
+%D \subsubject{The “indentnext” key}
+%D
+%D \starttyping
+%D The Earth, as a habitat for animal life, is in old age …
+%D \fancybreak{$* * *$}
+%D The Earth, as a habitat for animal life, is in old age …
+%D \fancybreak[indentnext=no]{$* * *$}
+%D The Earth, as a habitat for animal life, is in old age …
+%D \stoptyping
+%D
+%D \start
+%D
+%D \setupindenting[yes,medium]
+%D
+%D \input ward
+%D \fancybreak{$* * *$}
+%D \input ward
+%D \fancybreak[indentnext=no]{$* * *$}
+%D \input ward
+%D
+%D \stop
+%D
+%D \macros
+%D   {fancybreak}
+%D
+%D \subsubject{The argumentless version of the \letterbackslash fancybreak command}
+%D
+%D \starttyping
+%D Imagine trying to live in a world dominated by dihydrogen oxide ...
+%D \fancybreak
+%D Imagine trying to live in a world dominated by dihydrogen oxide ...
+%D \stoptyping
+%D
+%D \input bryson
+%D \fancybreak
+%D \input bryson
+%D
+%D \extras
+%D   {spaceinbetween}
+%D
+%D \subsubject{The “spaceinbetween” key}
+%D
+%D \starttyping
+%D \setupfancybreak[spaceinbetween=3*line]
+%D
+%D If [in 2600] you stacked all the new books being published ...
+%D \fancybreak
+%D If [in 2600] you stacked all the new books being published ...
+%D \stoptyping
+%D
+%D \start
+%D
+%D \setupfancybreak[spaceinbetween=3*line]
+%D
+%D \input hawking
+%D \fancybreak
+%D \input hawking
+%D
+%D \stop
+%D
+%D \extras
+%D   {symbol}
+%D
+%D \subsubject{The “symbol” key}
+%D
+%D \starttyping
+%D \setupfancybreak[symbol=star]
+%D
+%D This nation, turning 100 years old, had no {\em Odyssey}, ...
+%D \fancybreak
+%D This nation, turning 100 years old, had no {\em Odyssey}, ...
+%D \stoptyping
+%D
+%D \start
+%D
+%D \setupfancybreak[symbol=star]
+%D
+%D \input davis
+%D \fancybreak
+%D \input davis
+%D
+%D \stop
+%D
+%D \macros
+%D   {startfancybreak}
+%D
+%D \subsubject{The fancybreak environment}
+%D
+%D \starttyping
+%D \useMPlibrary[txt]
+%D
+%D \setupMPvariables[EnglishRule][width=.6\hsize]
+%D
+%D \setupfancybreak[spacebefore=line,spaceafter=line]
+%D
+%D The Earth, as a habitat for animal life, is in old age …
+%D
+%D \startfancybreak
+%D \dontleavehmode\useMPgraphic{EnglishRule}
+%D \stopfancybreak
+%D
+%D The Earth, as a habitat for animal life, is in old age …
+%D \stoptyping
+%D
+%D \start
+%D
+%D \setupfancybreak[spacebefore=line,spaceafter=line]
+%D
+%D \useMPlibrary[txt]
+%D
+%D \setupMPvariables[EnglishRule][width=.6\hsize]
+%D
+%D \input ward
+%D
+%D \startfancybreak
+%D \dontleavehmode\useMPgraphic{EnglishRule}
+%D \stopfancybreak
+%D
+%D \input ward
+%D
+%D \stop
+%D
+%D \macros
+%D   {definefancybreak}
+%D
+%D \subsubject{How to create new \letterbackslash fancybreak commands}
+%D
+%D \starttyping
+%D \definefancybreak[starbreak]  [symbol=star]
+%D \definefancybreak[squarebreak][symbol=square]
+%D
+%D The Earth, as a habitat for animal life, is in old age …
+%D \starbreak
+%D The Earth, as a habitat for animal life, is in old age …
+%D \squarebreak
+%D The Earth, as a habitat for animal life, is in old age …
+%D \stoptyping
+%D
+%D \start
+%D
+%D \definefancybreak[starbreak]  [symbol=star]
+%D \definefancybreak[squarebreak][symbol=square]
+%D
+%D \input ward
+%D \starbreak
+%D \input bryson
+%D \squarebreak
+%D \input zapf
+%D
+%D \stop
+%D
+%D \subject{Implementation}
+
+\writestatus{loading}{ConTeXt User Module / Fancybreak}
+
+\unprotect
+
+\startinterface all
+  \setinterfacevariable {fancybreak} {fancybreak}
+\stopinterface
+
+\installnamespace {fancybreak}
+\installnamespace {fancybreakalternative}
+\installnamespace {fancybreakrenderings}
+
+\installcommandhandler \????fancybreak            {fancybreak}            \????fancybreak
+\installcommandhandler \????fancybreakalternative {fancybreakalternative} \????fancybreakalternative
+
+%D \macros
+%D   {setupfancybreak}
+%D
+%D \subsubject{\letterbackslash setupfancybreak}
+%D
+%D With the command \type{\setupfancybreak} one can change the settings of
+%D a previous created command, the two argument version change only the values
+%D of a certain command while the one argument version change the values of
+%D all commands.
+%D
+%D \showsetup{setupfancybreak}
+%D
+%D \macros
+%D   {definefancybreak}
+%D
+%D \subsubject{\letterbackslash definefancybreak}
+%D
+%D The command \type{\fancybreak} is not hardcoded in the module but created with
+%D \type{\definefancybreak}. The command takes two arguments, the first is the name
+%D of the new command and the second parameter to change the style of the commands
+%D content and distances to the surrounding text.
+%D
+%D In \MKII\ users can only change the spacing before and after the content and
+%D the alignment of it while \MKIV\ user can also change the style and color of it.
+%D
+%D \showsetup{definefancybreak}
+
+\appendtoks
+  \setuevalue        {\currentfancybreak}{\fancybreak     [\currentfancybreak]}%
+  \setuevalue{\e!start\currentfancybreak}{\startfancybreak[\currentfancybreak]}%
+  \setuevalue{\e!stop \currentfancybreak}{\stopfancybreak                     }%
+\to \everydefinefancybreak
+
+%D \macros
+%D   {fancybreak}
+%D
+%D \subsubject{\letterbackslash fancybreak}
+%D
+%D The main macro of the module is the \type{\fancybreak} command (or a user defined
+%D variant of it), it takes one argument which can be optional.
+%D
+%D \showsetup{fancybreak}
+%D \showsetup{startfancybreak}
+
+\definefancybreakalternative [\s!default] [\c!renderingsetup=\????fancybreakrenderings:\s!default]
+
+\startsetups[\????fancybreakrenderings:\s!default]
+  \blank[\fancybreakparameter\c!spacebefore]
+  \flushnextbox
+  \blank[\fancybreakparameter\c!spaceafter ]
+\stopsetups
+
+\definefancybreakalternative [\v!test] [\c!renderingsetup=\????fancybreakrenderings:\v!test]
+
+\startsetups[\????fancybreakrenderings:\v!test]
+  \setbox\scratchboxone\vbox{\blank[\fancybreakparameter\c!spacebefore]}
+  \setbox\scratchboxtwo\vbox{\blank[\fancybreakparameter\c!spaceafter ]}
+  \ifzeropt\pagetotal
+    % begin of new page
+  \else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<\dimexpr\nextboxhtdp+\ht\scratchboxone+\ht\scratchboxtwo\relax
+      \page % not enough space for the content
+    \else
+      \texsetup{\????fancybreakrenderings:\s!default}
+    \fi
+  \fi
+\stopsetups
+
+\definefancybreakalternative [\v!auto] [\c!renderingsetup=\????fancybreakrenderings:\v!auto]
+
+\startsetups[\????fancybreakrenderings:\v!auto]
+  \setexpandedfancybreakparameter\c!spacebefore{\the\dimexpr\nextboxhtdp/2\relax}
+  \setexpandedfancybreakparameter\c!spaceafter {\the\dimexpr\nextboxhtdp  \relax}
+  \texsetup{\????fancybreakrenderings:\v!test}
+\stopsetups
+
+\unexpanded\def\fancybreak
+  {\par
+   \begingroup
+   \dodoubleempty\fancybreak_direct}
+
+\def\fancybreak_direct
+  {\ifsecondargument
+     \expandafter\fancybreak_direct_double
+   \else\iffirstargument
+     \doubleexpandafter\fancybreak_direct_single
+   \else
+     \doubleexpandafter\fancybreak_direct_zero
+   \fi\fi}
+
+\def\fancybreak_direct_double[#environment][#parameters]%
+  {\edef\currentfancybreak{#environment}%
+   \ifcsname\currentfancybreakhash\s!parent\endcsname
+     % the current environment does exist
+   \else
+     \let\currentfancybreak\empty
+   \fi
+   \doifassignmentelse{#parameters}
+     {\setupcurrentfancybreak[#parameters]}
+     {\setfancybreakparameter\c!spaceinbetween{#parameters}}%
+   \doifnextbgroupelse\fancybreak_direct_yes\fancybreak_direct_nop}
+
+\def\fancybreak_direct_single[#environment][#parameters]%
+  {\doifassignmentelse{#environment}
+     {\let\currentfancybreak\empty
+      \setupcurrentfancybreak[#environment]}
+     {\edef\currentfancybreak{#environment}%
+      \ifcsname\currentfancybreakhash\s!parent\endcsname
+        % the argument is the name of a environment
+      \else
+        \let\currentfancybreak\empty
+        \setfancybreakparameter\c!spaceinbetween{#parameters}
+      \fi}%
+   \doifnextbgroupelse\fancybreak_direct_yes\fancybreak_direct_nop}
+
+\def\fancybreak_direct_zero[#environment][#parameters]%
+  {\let\currentfancybreak\empty
+   \doifnextbgroupelse\fancybreak_direct_yes\fancybreak_direct_nop}
+
+\def\fancybreak_direct_yes
+  {\forgetparindent
+   \dowithnextboxcontent
+     {\dostarttagged\t!division\currentfancybreak
+      \usealignparameter\fancybreakparameter
+      \usefancybreakstyleandcolor\c!style\c!color}
+     {\edef\currentfancybreakalternative{\fancybreakparameter\c!alternative}%
+      \ifcsname\currentfancybreakalternativehash\s!parent\endcsname
+        % valid argument for the alternative key
+      \else
+        \let\currentfancybreakalternative\s!default
+      \fi
+      \edef\p_fancybreak_renderingsetup{\fancybreakalternativeparameter\c!renderingsetup}%
+      \texsetup\p_fancybreak_renderingsetup
+      \dostoptagged
+      \checknextindentation[\fancybreakparameter\c!indentnext]%
+      \endgroup
+      \dorechecknextindentation}
+     \vbox}
+
+\def\fancybreak_direct_nop
+  {\doifsymboldefinedelse{\fancybreakparameter\c!symbol}
+     {\fancybreak_direct_yes{\symbol[\fancybreakparameter\c!symbol]}}
+     {\blank[\fancybreakparameter\c!spaceinbetween]%
+      \checknextindentation[\fancybreakparameter\c!indentnext]%
+      \endgroup
+      \dorechecknextindentation}}
+
+\unexpanded\def\startfancybreak
+  {\par
+   \begingroup
+   \dodoubleempty\fancybreak_start}
+
+\def\fancybreak_start
+  {\ifsecondargument
+     \expandafter\fancybreak_start_double
+   \else\iffirstargument
+     \doubleexpandafter\fancybreak_start_single
+   \else
+     \doubleexpandafter\fancybreak_start_zero
+   \fi\fi}
+
+\def\fancybreak_start_double[#environment][#parameters]%
+  {\edef\currentfancybreak{#environment}%
+   \ifcsname\currentfancybreakhash\s!parent\endcsname
+     % the current environment does exist
+   \else
+     \let\currentfancybreak\empty
+   \fi
+   \setupcurrentfancybreak[#parameters]%
+   \fancybreak_direct_yes\bgroup}
+
+\def\fancybreak_start_single[#environment][#parameters]%
+  {\doifassignmentelse{#environment}
+     {\let\currentfancybreak\empty
+      \setupcurrentfancybreak[#parameters]}
+     {\edef\currentfancybreak{#environment}%
+      \ifcsname\currentfancybreakhash\s!parent\endcsname
+        % the current environment does exist
+      \else
+        \let\currentfancybreak\empty
+      \fi}%
+   \fancybreak_direct_yes\bgroup}
+
+\def\fancybreak_start_zero[#environment][#parameters]%
+  {\let\currentfancybreak\empty
+   \fancybreak_direct_yes\bgroup}
+
+\unexpanded\def\stopfancybreak
+  {\egroup}
+
+\setupfancybreak
+  [   \c!spacebefore=,
+       \c!spaceafter=\v!nowhite,
+   \c!spaceinbetween=\v!line,
+            \c!align=\v!middle,
+       \c!indentnext=\v!yes,
+           \c!symbol=]
+
+\protect \endinput

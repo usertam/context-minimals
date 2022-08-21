@@ -1,0 +1,1058 @@
+%D \module
+%D   [     file=s-cor-00,
+%D      version=2015.08.24,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Correspondence,
+%D       author=Wolfgang Schuster,
+%D         date=\currentdate,
+%D    copyright=Wolfgang Schuster,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2011 Wolfgang Schuster
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C (at your option) any later version.
+%C
+%C This program is distributed in the hope that it will be useful,
+%C but WITHOUT ANY WARRANTY; without even the implied warranty of
+%C MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%C GNU General Public License for more details.
+%C
+%C You should have received a copy of the GNU General Public License
+%C along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+\unprotect
+
+% Lua functions for the core and also for the frontend modules
+
+\ctxloadluafile{s-cor-00}
+
+% Constants and variables
+ 
+\startinterface all
+  \setinterfaceconstant {whitespace}      {whitespace}
+  \setinterfaceconstant {backgroundimage} {backgroundimage}
+  \setinterfaceconstant {fromname}        {fromname}
+  \setinterfaceconstant {fromaddress}     {fromaddress}
+  \setinterfaceconstant {attention}       {attention}
+  \setinterfaceconstant {subject}         {subject}
+  \setinterfaceconstant {closing}         {closing}
+  \setinterfaceconstant {signature}       {signature}
+  \setinterfaceconstant {copy}            {copy}
+  \setinterfaceconstant {enclosure}       {enclosure}
+  \setinterfaceconstant {postscript}      {postscript}
+  \setinterfaceconstant {dispatch}        {dispatch}
+  \setinterfaceconstant {toname}          {toname}
+  \setinterfaceconstant {toaddress}       {toaddress}
+  \setinterfaceconstant {backaddress}     {backaddress}
+  \setinterfaceconstant {opening}         {opening}
+  \setinterfaceconstant {fromphone}       {fromphone}
+  \setinterfaceconstant {fromfax}         {fromfax}
+  \setinterfaceconstant {frommail}        {frommail}
+  \setinterfaceconstant {fromurl}         {fromurl}
+  \setinterfaceconstant {salutation}      {salutation}
+  \setinterfaceconstant {language}        {language}
+  \setinterfaceconstant {leftalign}       {leftalign}
+  \setinterfaceconstant {rightalign}      {rightalign}
+  \setinterfaceconstant {datestyle}       {datestyle}
+  \setinterfaceconstant {datecolor}       {datecolor}
+  \setinterfaceconstant {subtitlestyle}   {subtitlestyle}
+  \setinterfaceconstant {subtitlecolor}   {subtitlecolor}
+  \setinterfaceconstant {street}          {street}
+  \setinterfaceconstant {city}            {city}
+  \setinterfaceconstant {phone}           {phone}
+  \setinterfaceconstant {email}           {email}
+  \setinterfaceconstant {bankname}        {bankname}
+  \setinterfaceconstant {banknumber}      {banknumber}
+  \setinterfaceconstant {accountnumber}   {accountnumber}
+  \setinterfaceconstant {room}            {room}
+  \setinterfaceconstant {yourref}         {yourref}
+  \setinterfaceconstant {yourmail}        {yourmail}
+  \setinterfaceconstant {myref}           {myref}
+  \setinterfaceconstant {mymail}          {mymail}
+  \setinterfaceconstant {customer}        {customer}
+  \setinterfaceconstant {invoice}         {invoice}
+  \setinterfaceconstant {fax}             {fax}
+  \setinterfaceconstant {url}             {url}
+  \setinterfaceconstant {bank}            {bank}
+  \setinterfaceconstant {organization}    {organization}
+  \setinterfaceconstant {zip}             {zip}
+  \setinterfaceconstant {country}         {country}
+  \setinterfaceconstant {addressentry}    {addressentry}
+  \setinterfaceconstant {rulewidth}       {rulewidth}
+\stopinterface
+
+\startinterface all
+  % all
+  \setinterfacevariable {correspondence}  {correspondence}
+  \setinterfacevariable {nexthead}        {nexthead}
+  \setinterfacevariable {lefthead}        {lefthead}
+  \setinterfacevariable {righthead}       {righthead}
+  \setinterfacevariable {foot}            {foot}
+  \setinterfacevariable {nextfoot}        {nextfoot}
+  \setinterfacevariable {leftfoot}        {leftfoot}
+  \setinterfacevariable {rightfoot}       {rightfoot}
+  \setinterfacevariable {topmark}         {topmark}
+  \setinterfacevariable {botmark}         {botmark}
+  \setinterfacevariable {cutmark}         {cutmark}
+  \setinterfacevariable {endmark}         {endmark}
+  \setinterfacevariable {usermark}        {usermark}
+  % letter
+  \setinterfacevariable {letter}          {letter}
+  \setinterfacevariable {lettermain}      {lettermain}
+  \setinterfacevariable {letternext}      {letternext}
+  \setinterfacevariable {address}         {address}
+  \setinterfacevariable {backaddress}     {backaddress}
+  \setinterfacevariable {location}        {location}
+  \setinterfacevariable {opening}         {opening}
+  \setinterfacevariable {closing}         {closing}
+  \setinterfacevariable {secondpage}      {secondpage}
+  \setinterfacevariable {copy}            {copy}
+  \setinterfacevariable {enclosure}       {enclosure}
+  \setinterfacevariable {french}          {french}
+  \setinterfacevariable {specialnotation} {specialnotation}
+  \setinterfacevariable {e}               {e}
+  \setinterfacevariable {place}           {place}
+  \setinterfacevariable {gbrief}          {gbrief}
+  \setinterfacevariable {fullblock}       {fullblock}
+  \setinterfacevariable {semiblock}       {semiblock}
+  \setinterfacevariable {simplified}      {simplified}
+  \setinterfacevariable {modified}        {modified}
+  \setinterfacevariable {blockstyle}      {blockstyle}
+  \setinterfacevariable {knuth}           {knuth}
+  \setinterfacevariable {generic}         {generic}
+  % memo
+  \setinterfacevariable {memo}            {memo}
+  \setinterfacevariable {memomain}        {memomain}
+  \setinterfacevariable {memonext}        {memonext}
+  % resume
+  \setinterfacevariable {resume}          {resume}
+  \setinterfacevariable {resumemain}      {resumemain}
+  \setinterfacevariable {resumenext}      {resumenext}
+  \setinterfacevariable {casual}          {casual}
+  \setinterfacevariable {classic}         {classic}
+  % frames
+  \setinterfacevariable {frames}          {frames}
+  \setinterfacevariable {framesmain}      {framesmain}
+  \setinterfacevariable {framesnext}      {framesnext}
+\stopinterface
+
+% Messages
+
+\definemessageconstant {correspondence}
+
+\startinterface all
+  \setinterfacemessage{correspondence}{title}{correspondence}
+  \setinterfacemessage{correspondence}{1}    {Undefined layer       '--' for the '--' environment}
+  \setinterfacemessage{correspondence}{2}    {Undefined section     '--' for the '--' environment}
+  \setinterfacemessage{correspondence}{3}    {Undefined description '--' for the '--' environment}
+\stopinterface
+
+% Namespaces
+
+\installnamespace {correspondence}
+\installnamespace {correspondencebuffer}
+\installnamespace {correspondenceoverlay}
+\installnamespace {correspondencelayer}
+\installnamespace {correspondencelayerrenderings}
+\installnamespace {correspondencelayeralternative}
+\installnamespace {correspondencelayerstate}
+\installnamespace {correspondenceframe}
+\installnamespace {correspondencesection}
+\installnamespace {correspondencesectionrenderings}
+\installnamespace {correspondencesectionalternative}
+\installnamespace {correspondenceoption}
+\installnamespace {correspondencedescription}
+\installnamespace {correspondencedescriptionlocation}
+\installnamespace {correspondencedescriptionformat}
+\installnamespace {correspondencestyle}
+\installnamespace {correspondenceelement}
+\installnamespace {correspondenceelements}
+\installnamespace {correspondencelayout}
+\installnamespace {correspondencehead}
+\installnamespace {correspondenceheadbuffer}
+\installnamespace {correspondenceheadrenderings}
+\installnamespace {correspondenceheadalternative}
+\installnamespace {correspondenceparagraph}
+\installnamespace {correspondenceparagraphbuffer}
+\installnamespace {correspondenceparagraphrenderings}
+\installnamespace {correspondenceparagraphalternative}
+\installnamespace {correspondenceparagraphsetups}
+
+% Itemgroup
+
+\defineitemgroup[\v!correspondence]
+
+% Environment
+
+\installcommandhandler \????correspondence {correspondence} \????correspondence
+
+\unexpanded\def\correspondence_start[#environment]%
+  {\starttext
+   \begingroup
+   \def\currentcorrespondence{#environment}%
+   \dosingleempty\correspondence_start_parameters}
+
+\def\correspondence_start_parameters[#parameters]%
+  {\iffirstargument
+     \setupcurrentcorrespondence[#parameters]%
+   \fi
+   \grabbufferdatadirect{\????correspondencebuffer\currentcorrespondence}{\e!start\currentcorrespondence}{\e!stop\currentcorrespondence}}
+
+\unexpanded\def\correspondence_stop[#environment]%
+  {\correspondence_place[#environment]%
+   \endgroup
+   \stoptext}
+
+\appendtoks
+  \setuevalue{\e!start\currentcorrespondence}{\correspondence_start[\currentcorrespondence]}%
+  \setuevalue{\e!stop \currentcorrespondence}{\correspondence_stop [\currentcorrespondence]}%
+\to \everydefinecorrespondence
+
+\unexpanded\def\correspondence_content_start[#environment]%
+  {\begingroup
+   \edef\currentcorrespondence{#environment}%
+   \grabbufferdatadirect{\????correspondencebuffer\currentcorrespondence}{\e!start\currentcorrespondence\v!content}{\e!stop\currentcorrespondence\v!content}}
+
+\unexpanded\def\correspondence_content_stop[#environment]%
+  {\endgroup}
+
+\unexpanded\def\correspondence_content_get[#environment]%
+  {\edef\currentcorrespondence{#environment}%
+   \getbufferdata[\????correspondencebuffer\currentcorrespondence]}
+
+\appendtoks
+  \setuevalue{\e!start\currentcorrespondence\v!content}{\correspondence_content_start[\currentcorrespondence]}%
+  \setuevalue{\e!stop \currentcorrespondence\v!content}{\correspondence_content_stop [\currentcorrespondence]}%
+  \setuevalue{\e!get  \currentcorrespondence\v!content}{\correspondence_content_get  [\currentcorrespondence]}%
+\to \everydefinecorrespondence
+
+\unexpanded\def\correspondence_parameters#environment#element%
+  {\edef\currentcorrespondenceenvironment{#environment}%
+   \edef\currentcorrespondenceelement    {#element}%
+   \edef\currentcorrespondencelayer      {#environment:#element}%
+   \edef\currentcorrespondenceframe      {#environment:#element}%
+   \edef\currentcorrespondencesection    {#environment:#element}%
+   \edef\currentcorrespondencedescription{#environment:#element}%
+   \edef\currentcorrespondencehead       {#environment:#element}%
+   \edef\currentcorrespondenceparagraph  {#environment:#element}}
+
+% Setup
+
+\unexpanded\def\correspondence_setup[#environment]%
+  {\edef\currentcorrespondence{#environment}%
+   \setupcurrentcorrespondence}
+
+\appendtoks
+  \setuevalue{\e!setup\currentcorrespondence\e!endsetup}{\dodoubleargument\correspondence_setup[\currentcorrespondence]}%
+\to \everydefinecorrespondence
+
+% Placement
+
+\newtoks\t_correspondence_before
+\newtoks\t_correspondence_between
+\newtoks\t_correspondence_after
+
+\unexpanded\def\correspondence_place[#environment]%
+  {\begingroup
+   \edef\currentcorrespondence{#environment}%
+   \let \currentcorrespondenceoption\currentcorrespondence
+   \the\t_correspondence_before
+   \page
+   \setuplayout[\c!method=\v!correspondence]%
+   \setupheader[\c!state=\v!stop]%
+   \setupfooter[\c!state=\v!stop]%
+   \edef\p_correspondence_bodyfont       {\correspondenceoptionparameter\c!bodyfont       }%
+   \edef\p_correspondence_whitespace     {\correspondenceoptionparameter\c!whitespace     }%
+   \edef\p_correspondence_interlinespace {\correspondenceoptionparameter\c!interlinespace }%
+   \edef\p_correspondence_language       {\correspondenceoptionparameter\c!language       }%
+   \edef\p_correspondence_backgroundcolor{\correspondenceoptionparameter\c!backgroundcolor}%
+   \ifx\p_correspondence_bodyfont       \empty \else \setupbodyfont      [\p_correspondence_bodyfont      ]\fi
+   \ifx\p_correspondence_whitespace     \empty \else \setupwhitespace    [\p_correspondence_whitespace    ]\fi
+   \ifx\p_correspondence_interlinespace \empty \else \setupinterlinespace[\p_correspondence_interlinespace]\fi
+   \ifx\p_correspondence_language       \empty \else \mainlanguage       [\p_correspondence_language      ]\fi
+   \the\t_correspondence_between
+   \ifx\p_correspondence_backgroundcolor\empty \else
+     \setupbackgrounds[\v!paper][\c!background=\v!color,\c!backgroundcolor=\p_correspondence_backgroundcolor]%
+   \fi
+   \setupbackgrounds[\v!page ][\c!background={\????correspondenceoverlay\c!backgroundimage,\????correspondenceoverlay\c!background,\????correspondenceoverlay\v!layer}]%
+   \setuppagenumbering[\c!alternative=\v!singlesided,\c!location=]%
+   \setupsubpagenumber[\c!way=\v!text,\c!state=\v!start]%
+   \resetsubpagenumber
+   \normalexpanded{\processcommalist[\correspondence_elements_access\currentcorrespondence\v!section]}{\correspondence_section_place\currentcorrespondence}%
+   \page
+   \resetsubpagenumber
+   \setuplayout[\v!reset]%
+   \the\t_correspondence_after
+   \endgroup}
+
+%D Besides the normal letter environment there are three different ways to flush
+%D the content of a letter after the text was set with a buffer etc.
+%D
+%D \startitemize
+%D \item \type{\setups[letter:place]}
+%D \item \type{\placeletter}
+%D \item \type{\placecorrespondence[letter]}
+%D \stopitemize
+
+\let\placecorrespondence\correspondence_place
+
+\appendtoks
+  \global\c_correspondence_page\zerocount
+\to \t_correspondence_before
+
+\appendtoks
+  \setuevalue{\e!place\currentcorrespondence}{\correspondence_place[\currentcorrespondence]}%
+\to \everydefinecorrespondence
+
+% Layers
+
+\installsimplecommandhandler       \????correspondencelayer            {correspondencelayer}            \????correspondencelayer
+\installsimpleframedcommandhandler \????correspondenceframe            {correspondenceframe}            \????correspondenceframe
+\installcommandhandler             \????correspondencelayeralternative {correspondencelayeralternative} \????correspondencelayeralternative
+
+\unexpanded\def\correspondence_layer_define[#environment][#element]%
+  {\def\currentcorrespondencelayer{#environment:#element}%
+   \let\currentcorrespondenceframe\currentcorrespondencelayer
+   \checkcorrespondencelayerparent
+   \checkcorrespondenceframeparent}
+
+\unexpanded\def\correspondence_layer_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_layer_command#element%
+     {\edef\currentcorrespondencelayer{#environment:#element}%
+      \setupcurrentcorrespondencelayer[#parameters]}%
+   \processcommacommand[#elements]\correspondence_layer_command}
+
+\unexpanded\def\correspondence_frame_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_frame_command#element%
+     {\edef\currentcorrespondenceframe{#environment:#element}%
+      \setupcurrentcorrespondenceframe[#parameters]}%
+   \processcommacommand[#elements]\correspondence_frame_command}
+
+\setvalue{\????correspondencelayerstate         }{\!!doneafalse \!!donebfalse \!!donecfalse}
+\setvalue{\????correspondencelayerstate\v!start }{\!!doneatrue  \!!donebfalse \!!donecfalse}
+\setvalue{\????correspondencelayerstate\v!stop  }{\!!doneafalse \!!donebfalse \!!donecfalse}
+\setvalue{\????correspondencelayerstate\v!next  }{\!!doneafalse \!!donebtrue  \!!donectrue }
+\setvalue{\????correspondencelayerstate\v!repeat}{\!!doneatrue  \!!donebtrue  \!!donectrue }
+\setvalue{\????correspondencelayerstate\v!left  }{\!!doneafalse \!!donebfalse \!!donectrue }
+\setvalue{\????correspondencelayerstate\v!right }{\!!doneafalse \!!donebtrue  \!!donecfalse}
+\setvalue{\????correspondencelayerstate\v!even  }{\!!doneafalse \!!donebfalse \!!donectrue }
+\setvalue{\????correspondencelayerstate\v!odd   }{\!!doneafalse \!!donebtrue  \!!donecfalse}
+
+\definelayer  [\????correspondenceoverlay\v!layer][\c!width=\overlaywidth,\c!height=\overlayheight  ]
+\defineoverlay[\????correspondenceoverlay\v!layer][\correspondence_layer_place\currentcorrespondence]
+
+\unexpanded\def\correspondence_layer_place#environment%
+  {\def\correspondence_layer_state#element%
+     {\correspondence_parameters{#environment}{#element}%
+      \expandcheckedcsname\????correspondencelayerstate{\correspondencelayerparameter\c!state}\v!stop
+      \ifnum\c_correspondence_page=\plusone
+        \if!!donea\correspondence_layer_direct\fi
+      \else\ifodd\c_correspondence_page
+        \if!!doneb\correspondence_layer_direct\fi
+      \else
+        \if!!donec\correspondence_layer_direct\fi
+      \fi\fi}%
+   \processcommacommand[\correspondence_elements_access\currentcorrespondence\v!layer]\correspondence_layer_state
+   \tightlayer[\????correspondenceoverlay\v!layer]}
+
+\unexpanded\def\correspondence_layer_direct
+  {\setlayer
+     [\????correspondenceoverlay\v!layer]
+     [     \c!x=\correspondencelayerparameter\c!x,
+           \c!y=\correspondencelayerparameter\c!y,
+      \c!preset=\correspondencelayerparameter\c!preset]
+     {\inheritedcorrespondenceframeframed
+        {\doifsomething{\correspondencelayerparameter\c!bodyfont      }{\switchtobodyfont   [\correspondencelayerparameter\c!bodyfont      ]}%
+         \doifsomething{\correspondencelayerparameter\c!interlinespace}{\setupinterlinespace[\correspondencelayerparameter\c!interlinespace]}%
+         \usecorrespondencelayerstyleandcolor\c!style\c!color
+         \doadaptleftskip {\correspondencelayerparameter\c!leftmargin }%
+         \doadaptrightskip{\correspondencelayerparameter\c!rightmargin}%
+         \doifsymboldefinedelse{\correspondencelayerparameter\c!symbol}%
+           {\symbol[\correspondencelayerparameter\c!symbol]}
+           {\correspondence_layer_alternative_place}}}}
+
+\unexpanded\def\correspondence_layer_check[#environment][#element]%
+  {\def\currentcorrespondencelayer{#environment:#element}%
+   \ifcsname\currentcorrespondencelayerhash\s!parent\endcsname \else
+     \showmessage\m!correspondence{2}{#element,#environment}%
+   \fi}
+
+\unexpanded\def\correspondence_layer_alternative_define[#environment][#self][#parent][#parameters]%
+  {\iffourthargument
+     \definecorrespondencelayeralternative[#environment:#self][#environment:#parent][#parameters]%
+   \else
+     \definecorrespondencelayeralternative[#environment:#self][#parent]%
+   \fi}
+
+\unexpanded\def\correspondence_layer_alternative_setup[#environment][#name][#parameters]%
+  {\setupcorrespondencelayeralternative[#environment:#name][#parameters]}
+
+\unexpanded\def\correspondence_layer_alternative_place
+  {\edef\p_correspondence_layer_alternative{\correspondencelayerparameter\c!alternative}%
+   \ifcsname\namedcorrespondencelayeralternativehash{\currentcorrespondencelayer:\p_correspondence_layer_alternative}\s!parent\endcsname
+     \edef\currentcorrespondencelayeralternative{\currentcorrespondencelayer:\p_correspondence_layer_alternative}%
+   \else\ifcsname\namedcorrespondencelayeralternativehash{\currentcorrespondenceenvironment:\p_correspondence_layer_alternative}\s!parent\endcsname
+     \edef\currentcorrespondencelayeralternative{\currentcorrespondenceenvironment:\p_correspondence_layer_alternative}%
+   \else
+     \let\currentcorrespondencelayeralternative\p_correspondence_layer_alternative
+   \fi\fi
+   \edef\p_correspondence_layer_renderingsetup{\correspondencelayeralternativeparameter\c!renderingsetup}%
+   \autosetups\p_correspondence_layer_renderingsetup}
+
+\definecorrespondencelayeralternative[\v!setups][\c!renderingsetup=\????correspondencelayerrenderings:\v!setups]
+
+\startsetups[\????correspondencelayerrenderings:\v!setups]
+  \autosetups{\currentcorrespondenceenvironment:\v!layer:\currentcorrespondenceelement}
+\stopsetups
+
+\setupcorrespondencelayer
+  [      \c!state=\v!start,
+             \c!x=\zeropoint,
+             \c!y=\zeropoint,
+   \c!alternative=\s!default,
+      \c!distance=\lineheight,
+     \c!separator=\crlf]
+
+\setupcorrespondenceframe
+  [ \c!frame=\v!off,
+   \c!offset=\zeropoint,
+    \c!align=\v!flushleft]
+
+% Sections
+
+\installsimplecommandhandler \????correspondencesection            {correspondencesection}            \????correspondencesection
+\installcommandhandler       \????correspondencesectionalternative {correspondencesectionalternative} \????correspondencesectionalternative
+
+\unexpanded\def\correspondence_section_define[#environment][#element]%
+  {\def\currentcorrespondencesection{#environment:#element}%
+   \checkcorrespondencesectionparent}
+
+\unexpanded\def\correspondence_section_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_section_command#element%
+     {\edef\currentcorrespondencesection{#environment:#element}%
+      \setupcurrentcorrespondencesection[#parameters]}%
+   \processcommacommand[#elements]\correspondence_section_command}
+
+\unexpanded\def\correspondence_section_place#environment#element%
+  {\begingroup
+   \correspondence_parameters{#environment}{#element}%
+   \ifcsname\currentcorrespondencesectionhash\s!parent\endcsname
+     \doifsomethingelse{\correspondencesectionparameter\c!spacebefore}{\blank[\correspondencesectionparameter\c!spacebefore]}\endgraf
+     \correspondencesectionparameter\c!before
+     \doadaptleftskip {\correspondencesectionparameter\c!leftmargin }%
+     \doadaptrightskip{\correspondencesectionparameter\c!rightmargin}%
+     \doifsomething{\correspondencesectionparameter\c!align    }{\setupalign    [\correspondencesectionparameter\c!align    ]}%
+     \doifsomething{\correspondencesectionparameter\c!indenting}{\setupindenting[\correspondencesectionparameter\c!indenting]}%
+     \usecorrespondencesectionstyleandcolor\c!style\c!color
+     \correspondence_section_alternative_place
+     \correspondencesectionparameter\c!after
+     \doifsomethingelse{\correspondencesectionparameter\c!spaceafter }{\blank[\correspondencesectionparameter\c!spaceafter ]}\endgraf
+   \else
+     \showmessage\m!correspondence{2}{#element,#environment}%
+   \fi
+   \endgroup}
+
+\unexpanded\def\correspondence_section_alternative_define[#environment][#self][#parent][#parameters]%
+  {\iffourthargument
+     \definecorrespondencesectionalternative[#environment:#self][#environment:#parent][#parameters]%
+   \else
+     \definecorrespondencesectionalternative[#environment:#self][#parent]%
+   \fi}
+
+\unexpanded\def\correspondence_section_alternative_setup[#environment][#name][#parameters]%
+  {\setupcorrespondencesectionalternative[#environment:#name][#parameters]}
+
+\unexpanded\def\correspondence_section_alternative_place
+  {\edef\p_correspondence_section_alternative{\correspondencesectionparameter\c!alternative}%
+   \ifcsname\namedcorrespondencesectionalternativehash{\currentcorrespondencesection:\p_correspondence_section_alternative}\s!parent\endcsname
+     \edef\currentcorrespondencesectionalternative{\currentcorrespondencelayer:\p_correspondence_section_alternative}%
+   \else\ifcsname\namedcorrespondencesectionalternativehash{\currentcorrespondenceenvironment:\p_correspondence_section_alternative}\s!parent\endcsname
+     \edef\currentcorrespondencesectionalternative{\currentcorrespondenceenvironment:\p_correspondence_section_alternative}%
+   \else
+     \let\currentcorrespondencesectionalternative\p_correspondence_section_alternative
+   \fi\fi
+   \edef\p_correspondence_section_renderingsetup{\correspondencesectionalternativeparameter\c!renderingsetup}%
+   \autosetups\p_correspondence_section_renderingsetup}
+
+\definecorrespondencesectionalternative[\v!setups][\c!renderingsetup=\????correspondencesectionrenderings:\v!setups]
+
+\startsetups[\????correspondencesectionrenderings:\v!setups]
+  \autosetups{\currentcorrespondenceenvironment:\v!section:\currentcorrespondenceelement}
+\stopsetups
+
+\setupcorrespondencesection
+  [   \c!spacebefore=\v!line,
+       \c!spaceafter=\v!line,
+   \c!spaceinbetween={\v!samepage,\v!line},
+      \c!alternative=\s!default,
+        \c!separator=\crlf]
+
+% Options
+
+\installsimplecommandhandler \????correspondenceoption {correspondenceoption} \????correspondenceoption
+
+\unexpanded\def\correspondence_option_setup[#environment]%
+  {\edef\currentcorrespondenceoption{#environment}%
+   \setupcurrentcorrespondenceoption}%
+
+\defineoverlay
+  [\????correspondenceoverlay\c!backgroundimage]
+  [\doifsomething{\correspondenceoptionparameter\c!backgroundimage}
+     {\overlayfigure{\correspondenceoptionparameter\c!backgroundimage}}]
+
+\defineoverlay
+  [\????correspondenceoverlay\c!background]
+  [\correspondenceoptionparameter\c!background]
+
+% Descriptions
+
+\installsimplecommandhandler \????correspondencedescription            {correspondencedescription}            \????correspondencedescription
+\installcommandhandler       \????correspondencedescriptionalternative {correspondencedescriptionalternative} \????correspondencedescriptionalternative
+
+\let\m_correspondence_description_format\empty
+\let\m_correspondence_description_items \empty
+
+\unexpanded\def\correspondence_description_define[#environment][#element]%
+  {\def\currentcorrespondencedescription{#environment:#element}%
+   \checkcorrespondencedescriptionparent}
+
+\unexpanded\def\correspondence_description_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_description_command#element%
+     {\edef\currentcorrespondencedescription{#environment:#element}
+      \setupcurrentcorrespondencedescription[#parameters]}%
+   \processcommacommand[#elements]\correspondence_description_command}
+
+\unexpanded\def\correspondence_description_place#environment#element%
+  {\begingroup
+   \correspondence_parameters{#environment}{#element}%
+   \ifcsname\currentcorrespondencedescriptionhash\s!parent\endcsname
+     \doifsomethingelse{\correspondencedescriptionparameter\c!textcommand}\donetrue\donefalse
+     \ifdone
+       \doifsomethingelse{\correspondencedescriptionparameter\c!spacebefore}{\blank[\correspondencedescriptionparameter\c!spacebefore]}\endgraf
+       \correspondencedescriptionparameter\c!before
+       \setbox\scratchbox\hbox
+         {\usecorrespondencedescriptionstyleandcolor\c!headstyle\c!headcolor
+          \correspondencedescriptionparameter\c!headcommand}%
+       \assignwidth
+         {\correspondencedescriptionparameter\c!width}
+         {\scratchdimen}
+         {\unhcopy\scratchbox}
+         {\correspondencedescriptionparameter\c!distance}%
+       \ctxlua{thirddata.correspondence.description_split(\!!bs\correspondencedescriptionparameter\c!textcommand\!!es)}%
+       \expandcheckedcsname\????correspondencedescriptionlocation{\correspondencedescriptionparameter\c!location}\v!left
+       \correspondencedescriptionparameter\c!after
+       \doifsomethingelse{\correspondencedescriptionparameter\c!spaceafter}{\blank[\correspondencedescriptionparameter\c!spaceafter]}\endgraf
+     \fi
+   \else
+     \showmessage\m!correspondence{3}{#element,#environment}%
+   \fi
+   \endgroup}
+
+% \unexpanded\def\correspondence_description_alternative_define[#environment][#self][#parent][#parameters]%
+%   {\iffourthargument
+%      \definecorrespondencedescriptionalternative[#environment:#self][#environment:#parent][#parameters]%
+%    \else
+%      \definecorrespondencedescriptionalternative[#environment:#self][#parent]%
+%    \fi}
+%
+% \unexpanded\def\correspondence_description_alternative_setup[#environment][#name][#parameters]%
+%   {\setupcorrespondencedescriptionalternative[#environment:#name][#parameters]}
+%
+% \unexpanded\def\correspondence_description_alternative_place
+%   {\edef\p_correspondence_description_alternative{\correspondencedescriptionparameter\c!alternative}%
+%    \ifcsname\namedcorrespondencedescriptionalternativehash{\currentcorrespondencedescription:\p_correspondence_description_alternative}\s!parent\endcsname
+%      \edef\currentcorrespondencedescriptionalternative{\currentcorrespondencedescription:\p_correspondence_description_alternative}%
+%    \else\ifcsname\namedcorrespondencedescriptionalternativehash{\currentcorrespondenceenvironment:\p_correspondence_description_alternative}\s!parent\endcsname
+%      \edef\currentcorrespondencedescriptionalternative{\currentcorrespondenceenvironment:\p_correspondence_description_alternative}%
+%    \else
+%      \let\currentcorrespondencedescriptionalternative\p_correspondence_description_alternative
+%    \fi\fi
+%    \edef\p_correspondence_description_renderingsetup{\correspondencedescriptionalternativeparameter\c!renderingsetup}%
+%    \autosetups\p_correspondence_description_renderingsetup}
+
+\setvalue{\????correspondencedescriptionlocation\v!left}%
+  {\doadaptleftskip\scratchdimen
+   \setbox\scratchbox\hbox to \scratchdimen{\box\scratchbox\hss}%
+   \noindent\llap{\box\scratchbox}\correspondence_description_place_text}
+
+\setvalue{\????correspondencedescriptionlocation\v!top}%
+  {\noindent\box\scratchbox
+   \doifsomethingelse{\correspondencedescriptionparameter\c!spaceinbetween}
+     {\blank[\correspondencedescriptionparameter\c!spaceinbetween]}
+     {\nobreak\endgraf}%
+   \doadaptleftskip {\correspondencedescriptionparameter\c!leftmargin }%
+   \doadaptrightskip{\correspondencedescriptionparameter\c!rightmargin}%
+   \correspondence_description_place_text}
+
+\setvalue{\????correspondencedescriptionlocation\v!text}%
+  {\noindent\box\scratchbox\correspondence_description_place_text}
+
+\unexpanded\def\correspondence_description_place_text
+  {\expandcheckedcsname\????correspondencedescriptionformat\m_correspondence_description_format\v!none}
+
+\setvalue{\????correspondencedescriptionformat\v!list}% todo: use a simplified version of the itemize code
+  {\def\correspondence_description_format_item#text{\startitem#text\stopitem}%
+   \dontleavehmode\vtop\bgroup
+     \leftskip\zeropoint % prevent additional offset when “location=left” is used
+     \doif{\correspondencedescriptionparameter\c!symbol}\v!none{\setupitemgroup[\v!correspondence][\v!each][\c!width=\zeropoint,distance=\zeropoint]}%
+     \startitemgroup[\v!correspondence][\v!packed,\correspondencedescriptionparameter\c!symbol]%
+     \processcommacommand[\m_correspondence_description_items]\correspondence_description_format_item
+     \stopitemgroup
+   \egroup}
+
+\setvalue{\????correspondencedescriptionformat\v!none}%
+  {\m_correspondence_description_items}
+
+% \def\correspondence_description_item#text%
+%   {\begingroup
+%    \setbox\scratchbox\hbox
+%      {\usecorrespondencedescriptionstyleandcolor\c!symbolstyle\c!symbolcolor
+%       \symbol{\correspondencedescriptionparameter\c!symbol}}%
+%    \assignwidth
+%      {\correspondencedescriptionparameter\c!symbolwidth}
+%      {\scratchdimen}
+%      {\unhcopy\scratchbox}
+%      {\correspondencedescriptionparameter\c!symboldistance}%
+%    \endgroup}
+
+\setupcorrespondencedescription
+  [   \c!width=\v!fit,
+   \c!distance=1em,
+     \c!symbol=dash]
+
+% Paragraphs
+
+\installsimplecommandhandler \????correspondenceparagraph            {correspondenceparagraph}            \????correspondenceparagraph
+\installcommandhandler       \????correspondenceparagraphalternative {correspondenceparagraphalternative} \????correspondenceparagraphalternative
+
+% \newtoks\t_correspondence_paragraphs
+%
+% \appendtoks
+%   \the\t_correspondence_paragraphs
+% \to \t_correspondence_before
+%
+% \unexpanded\def\correspondence_paragraph_define[#environment][#element]%
+%   {\def\currentcorrespondenceparagraph{#environment:#element}%
+%    \checkcorrespondenceparagraphparent
+%    \t_correspondence_paragraphs\expandafter{\the\t_correspondence_paragraphs\correspondence_paragraph_commands[#environment][#element]}}
+
+\unexpanded\def\correspondence_paragraph_define[#environment][#element]%
+  {\def\currentcorrespondenceparagraph{#environment:#element}%
+   \checkcorrespondenceparagraphparent
+   \correspondence_paragraph_commands[#environment][#element]}
+
+\unexpanded\def\correspondence_paragraph_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_paragraph_command#element%
+     {\edef\currentcorrespondenceparagraph{#environment:#element}%
+      \setupcurrentcorrespondenceparagraph[#parameters]}%
+   \processcommacommand[#elements]\correspondence_paragraph_command}
+
+\unexpanded\def\correspondence_paragraph_commands[#environment][#element]%
+  {\setuevalue{\e!start#element}{\correspondence_paragraph_start[#environment][#element]}%
+   \setuevalue{\e!stop #element}{\correspondence_paragraph_stop [#environment][#element]}}
+
+% \unexpanded\def\correspondence_paragraph_start[#environment][#element]%
+%   {\begingroup
+%    \correspondence_parameters{#environment}{#element}%
+%    \dodoubleempty\correspondence_paragraph_start_parameters}%
+% 
+% \unexpanded\def\correspondence_paragraph_start_parameters[#parameters][#dummy]% #dummy removes the linebreak before the first line
+%   {\iffirstargument
+%      \setupcurrentcorrespondenceparagraph[#parameters]%
+%    \fi
+%    \grabbufferdatadirect{\????correspondenceparagraphbuffer\currentcorrespondenceparagraph}{\e!start\currentcorrespondenceelement}{\e!stop\currentcorrespondenceelement}}
+
+\unexpanded\def\correspondence_paragraph_start[#environment][#element]%
+  {\begingroup
+   \correspondence_parameters{#environment}{#element}%
+   \dosingleempty\correspondence_paragraph_start_parameters}%
+
+\unexpanded\def\correspondence_paragraph_start_parameters[#parameters]%
+  {\iffirstargument
+     \setupcurrentcorrespondenceparagraph[#parameters]%
+   \fi
+   \grabbufferdatadirect{\????correspondenceparagraphbuffer\currentcorrespondenceparagraph}{\e!start\currentcorrespondenceelement}{\e!stop\currentcorrespondenceelement}}
+
+\unexpanded\def\correspondence_paragraph_stop[#environment][#element]%
+  {\doifsomethingelse{\correspondenceparagraphparameter\c!spacebefore}{\blank[\correspondenceparagraphparameter\c!spacebefore]}\endgraf
+   \correspondence_paragraph_alternative_place
+   \doifsomethingelse{\correspondenceparagraphparameter\c!spaceafter }{\blank[\correspondenceparagraphparameter\c!spaceafter ]}\endgraf
+   \endgroup}
+
+\unexpanded\def\correspondence_paragraph_alternative_define[#environment][#self][#parent][#parameters]%
+  {\iffourthargument
+     \definecorrespondenceparagraphalternative[#environment:#self][#environment:#parent][#parameters]%
+   \else
+     \definecorrespondenceparagraphalternative[#environment:#self][#parent]%
+   \fi}
+
+\unexpanded\def\correspondence_paragraph_alternative_setup[#environment][#name][#parameters]%
+  {\setupcorrespondenceparagraphalternative[#environment:#name][#parameters]}
+
+\unexpanded\def\correspondence_paragraph_alternative_place
+  {\edef\p_correspondence_paragraph_alternative{\correspondenceparagraphparameter\c!alternative}%
+   \ifcsname\namedcorrespondenceparagraphalternativehash{\currentcorrespondenceparagraph:\p_correspondence_paragraph_alternative}\s!parent\endcsname
+     \edef\currentcorrespondenceparagraphalternative{\currentcorrespondenceparagraph:\p_correspondence_paragraph_alternative}%
+   \else\ifcsname\namedcorrespondenceparagraphalternativehash{\currentcorrespondenceenvironment:\p_correspondence_paragraph_alternative}\s!parent\endcsname
+     \edef\currentcorrespondenceparagraphalternative{\currentcorrespondenceenvironment:\p_correspondence_paragraph_alternative}%
+   \else
+     \let\currentcorrespondenceparagraphalternative\p_correspondence_paragraph_alternative
+   \fi\fi
+   \edef\p_correspondence_paragraph_renderingsetup{\correspondenceparagraphalternativeparameter\c!renderingsetup}%
+   \autosetups\p_correspondence_paragraph_renderingsetup}
+
+\definecorrespondenceparagraphalternative[\s!default   ][\c!renderingsetup=\????correspondenceparagraphrenderings:\s!default   ]
+\definecorrespondenceparagraphalternative[\v!columns   ][\c!renderingsetup=\????correspondenceparagraphrenderings:\v!columns   ]
+\definecorrespondenceparagraphalternative[\c!lefttext  ][\c!renderingsetup=\????correspondenceparagraphrenderings:\c!lefttext  ]
+\definecorrespondenceparagraphalternative[\c!middletext][\c!renderingsetup=\????correspondenceparagraphrenderings:\c!middletext]
+\definecorrespondenceparagraphalternative[\c!righttext ][\c!renderingsetup=\????correspondenceparagraphrenderings:\c!righttext ]
+
+\startsetups[\????correspondenceparagraphrenderings:\s!default]
+  \ifdefined\currentparentcorrespondenceparagraph
+    \getbufferdata[\????correspondenceparagraphbuffer\currentparentcorrespondenceparagraph]
+  \else
+    \getbufferdata[\????correspondenceparagraphbuffer\currentcorrespondenceparagraph      ]
+  \fi
+\stopsetups
+
+\newbox  \b_correspondence_paragraph
+\newcount\c_correspondence_paragraph
+
+\unexpanded\def\correspondence_paragraph_columns_start
+  {\begingroup
+   \global\c_correspondence_paragraph\zerocount
+   \edef\p_correspondence_paragraph_n       {\correspondenceparagraphparameter\c!n       }%
+   \edef\p_correspondence_paragraph_distance{\correspondenceparagraphparameter\c!distance}%
+   \letcorrespondenceparagraphparameter\c!alternative\v!default
+   \dontleavehmode\hbox\bgroup}
+
+\unexpanded\def\correspondence_paragraph_columns_stop
+  {\egroup
+   \endgroup}
+
+\unexpanded\def\correspondence_paragraph_columns_place
+  {\begingroup
+   \global\advance\c_correspondence_paragraph\plusone
+   \let\currentparentcorrespondenceparagraph\currentcorrespondenceparagraph
+   \chaintocurrentcorrespondenceparagraph{\currentparentcorrespondenceparagraph:\number\c_correspondence_paragraph}%
+   \edef\currentcorrespondenceparagraph  {\currentparentcorrespondenceparagraph:\number\c_correspondence_paragraph}%
+   \edef\p_correspondence_columns_width  {\correspondenceparagraphparameter\c!width}%
+   \setbox\b_correspondence_paragraph\vtop\bgroup
+     \ifx\p_correspondence_columns_width\empty \else \hsize\p_correspondence_columns_width \fi
+     \usealignparameter\correspondenceparagraphparameter
+     \begstrut
+     \usecorrespondenceparagraphstyleandcolor\c!style\c!color
+     \correspondence_paragraph_alternative_place
+     \endstrut
+   \egroup
+   \ifzeropt\p_correspondence_columns_width \else
+     \ifnum\c_correspondence_paragraph>\p_correspondence_paragraph_n
+       % more columns are used than specified
+     \else\ifnum\c_correspondence_paragraph=\p_correspondence_paragraph_n
+       \box\b_correspondence_paragraph
+     \else
+       \box\b_correspondence_paragraph
+       \hskip\p_correspondence_paragraph_distance
+     \fi\fi
+   \fi
+   \endgroup}
+
+\startsetups[\????correspondenceparagraphrenderings:\v!columns]
+
+  \correspondence_paragraph_columns_start
+  \dorecurse\p_correspondence_paragraph_n\correspondence_paragraph_columns_place
+  \correspondence_paragraph_columns_stop
+
+\stopsetups
+
+\startsetups[\????correspondenceparagraphrenderings:\c!lefttext]
+
+  \correspondenceparagraphparameter\c!lefttext
+
+\stopsetups
+
+\startsetups[\????correspondenceparagraphrenderings:\c!middletext]
+
+  \correspondenceparagraphparameter\c!middletext
+
+\stopsetups
+
+\startsetups[\????correspondenceparagraphrenderings:\c!righttext]
+
+  \correspondenceparagraphparameter\c!righttext
+
+\stopsetups
+
+\setupcorrespondenceparagraph
+  [\c!spacebefore=\v!line,
+    \c!spaceafter=\v!line,
+   \c!alternative=\s!default,
+      \c!distance=\zeropoint,
+         \c!width=\zeropoint,
+             \c!n=3]
+
+% Heading
+
+\installframedcommandhandler \????correspondencehead            {correspondencehead}            \????correspondencehead
+\installcommandhandler       \????correspondenceheadalternative {correspondenceheadalternative} \????correspondenceheadalternative
+
+\appendtoks
+  \definelist   [\currentcorrespondencehead]% \definelist   [\????correspondenceheadlist   \currentcorrespondencehead]
+  \definemarking[\currentcorrespondencehead]% \definemarking[\????correspondenceheadmarking\currentcorrespondencehead]
+\to \everydefinecorrespondencehead
+
+% \newtoks\t_correspondence_headings
+%
+% \appendtoks
+%   \the\t_correspondence_headings
+% \to \t_correspondence_before 
+%
+% \unexpanded\def\correspondence_head_define[#environment][#element]%
+%   {\def\currentcorrespondencehead{#environment:#element}%
+%    \checkcorrespondenceheadparent
+%    \t_correspondence_headings\expandafter{\the\t_correspondence_headings\correspondence_head_commands[#environment][#element]}}
+
+\unexpanded\def\correspondence_head_define[#environment][#element]%
+  {\def\currentcorrespondencehead{#environment:#element}%
+   \checkcorrespondenceheadparent
+   \correspondence_head_commands[#environment][#element]}
+
+\unexpanded\def\correspondence_head_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_head_command#element%
+     {\edef\currentcorrespondencehead{#environment:#element}%
+      \setupcurrentcorrespondencehead[#parameters]}%
+   \processcommacommand[#elements]\correspondence_head_command}
+
+\unexpanded\def\correspondence_head_commands[#environment][#element]%
+  {%setuevalue        {#element}{\correspondence_head_direct[#environment][#element]}%
+   \setuevalue{\e!start#element}{\correspondence_head_start [#environment][#element]}%
+   \setuevalue{\e!stop #element}{\correspondence_head_stop  [#environment][#element]}}
+
+% \unexpanded\def\correspondence_head_direct[#environment][#element]%
+%   {\begingroup
+%    \correspondence_parameters{#environment}{#element}%
+%    \doifnextbgroupelse{\dosinglegroupempty\correspondence_head_direct_argument}{\dosingleempty\correspondence_head_direct_parameters}}
+%
+% \unexpanded\def\correspondence_head_direct_argument#title%
+%   {\setcorrespondenceheadparameter\c!title{#title}%
+%    \correspondence_head_alternative_place
+%    \endgroup}
+%
+% \unexpanded\def\correspondence_head_direct_parameters[#parameters]%
+%   {\iffirstargument
+%      \setupcurrentcorrespondencehead[#parameters]%
+%    \fi
+%    \correspondence_head_alternative_place
+%    \endgroup}
+
+\unexpanded\def\correspondence_head_start[#environment][#element]%
+  {\begingroup
+   \correspondence_parameters{#environment}{#element}%
+   \dodoubleempty\correspondence_head_start_parameters}
+
+\unexpanded\def\correspondence_head_start_parameters[#parameters][#dummy]%
+  {\iffirstargument
+     \setupcurrentcorrespondencehead[#parameters]%
+   \fi
+   \correspondenceheadparameter\c!beforesection
+   \correspondence_head_alternative_place}
+
+\unexpanded\def\correspondence_head_stop[#environment][#element]%
+  {\correspondenceheadparameter\c!aftersection
+   \endgroup}
+
+\unexpanded\def\correspondence_head_alternative_define[#environment][#self][#parent][#parameters]%
+  {\iffourthargument
+     \definecorrespondenceheadalternative[#environment:#self][#environment:#parent][#parameters]%
+   \else
+     \definecorrespondenceheadalternative[#environment:#self][#parent]%
+   \fi}
+
+\unexpanded\def\correspondence_head_alternative_setup[#environment][#name][#parameters]%
+  {\setupcorrespondenceheadalternative[#environment:#name][#parameters]}
+
+\unexpanded\def\correspondence_head_alternative_place
+  {\edef\p_correspondence_head_alternative{\correspondenceheadparameter\c!alternative}%
+   \ifcsname\namedcorrespondenceheadalternativehash{\currentcorrespondencehead:\p_correspondence_head_alternative}\s!parent\endcsname
+     \edef\currentcorrespondenceheadalternative{\currentcorrespondencehead:\p_correspondence_head_alternative}%
+   \else\ifcsname\namedcorrespondenceheadalternativehash{\currentcorrespondenceenvironment:\p_correspondence_head_alternative}\s!parent\endcsname
+     \edef\currentcorrespondenceheadalternative{\currentcorrespondenceenvironment:\p_correspondence_head_alternative}%
+   \else
+     \let\currentcorrespondenceheadalternative\p_correspondence_head_alternative
+   \fi\fi
+   \edef\p_correspondence_section_renderingsetup{\correspondenceheadalternativeparameter\c!renderingsetup}%
+   \autosetups\p_correspondence_section_renderingsetup}
+
+\unexpanded\def\correspondenceheadtitle
+  {\begingroup
+     \usecorrespondenceheadstyleandcolor\c!style\c!color
+     \correspondenceheadparameter\c!textcommand{\begstrut\correspondenceheadparameter\c!title\endstrut}%
+   \endgroup}
+
+\definecorrespondenceheadalternative[\s!default ][\c!renderingsetup=\????correspondenceheadrenderings:\s!default ]
+\definecorrespondenceheadalternative[\v!margin  ][\c!renderingsetup=\????correspondenceheadrenderings:\v!margin  ]
+\definecorrespondenceheadalternative[\v!inmargin][\c!renderingsetup=\????correspondenceheadrenderings:\v!inmargin]
+
+\startsetups[\????correspondenceheadrenderings:\s!default]
+
+  \edef\p_spacebefore{\correspondenceheadparameter\c!spacebefore}
+  \edef\p_spaceafter {\correspondenceheadparameter\c!spaceafter }
+
+  \ifx\p_spacebefore\empty \else
+    \blank[\p_spacebefore]
+  \fi
+
+  \vbox\bgroup
+    \usealignparameter\correspondenceheadparameter
+    \correspondenceheadtitle
+  \egroup
+
+  \ifx\p_spaceafter\empty \else
+    \blank[\p_spaceafter]
+  \fi
+
+\stopsetups
+
+\startsetups[\????correspondenceheadrenderings:\v!margin]
+
+  \dontleavehmode\llap\bgroup
+    \vtop\bgroup
+      \hsize\leftmarginwidth
+      \usealignparameter\correspondenceheadparameter
+      \correspondenceheadtitle
+    \egroup
+    \hskip\leftmargindistance
+  \egroup
+
+  \blank[\v!overlay]
+
+\stopsetups
+
+\setupcorrespondencehead
+  [   \c!spacebefore=\v!line,
+       \c!spaceafter={\v!samepage,\v!line},
+      \c!alternative=\s!default,
+            \c!align=\v!middle,
+            \c!style=\v!bold]
+
+% Elements
+
+\unexpanded\def\correspondence_element_define[#environment][#type][#element][#name]%
+  {\edef\m_correspondence_element_type{#type}%
+   \ifx\m_correspondence_element_type\v!section
+     \expandafter\correspondence_element_define_section
+   \else
+     \expandafter\correspondence_element_define_layer
+   \fi[#environment][#type][#element][#name]}
+
+\def\correspondence_element_define_section[#environment][#type][#element][#name]#content%
+  {\definecorrespondencesectionalternative[#environment:#element:#name][\c!renderingsetup=\????correspondencesectionrenderings:\v!command]%
+   \setvalue{\????correspondenceelement:#environment:#type:#element:#name}{#content}}
+
+\def\correspondence_element_define_layer[#environment][#type][#element][#name]#content%
+  {\definecorrespondencelayeralternative[#environment:#element:#name][\c!renderingsetup=\????correspondencelayerrenderings:\v!command]%
+   \setvalue{\????correspondenceelement:#environment:#type:#element:#name}{#content}}
+
+\startsetups[\????correspondencesectionrenderings:\v!command]
+  \correspondence_element_place[\currentcorrespondenceenvironment][\v!section][\currentcorrespondenceelement][\correspondencesectionparameter\c!alternative]
+\stopsetups
+
+\startsetups[\????correspondencelayerrenderings:\v!command]
+  \correspondence_element_place[\currentcorrespondenceenvironment][\v!layer][\currentcorrespondenceelement][\correspondencelayerparameter\c!alternative]
+\stopsetups
+
+\unexpanded\def\correspondence_element_place[#environment][#type][#element][#name]%
+  {\expandcheckedcsname{\????correspondenceelement:#environment:#type:#element:}{#name}\s!default}
+
+% Files
+
+\unexpanded\def\correspondence_file_load[#environment][#names]%
+  {\def\correspondence_file_command#name%
+     {\ctxlua{thirddata.correspondence.file("#environment","#name")}}%
+   \processcommacommand[#names]\correspondence_file_command}
+
+% Style
+
+\installsimplecommandhandler \????correspondencestyle {correspondencestyle} \????correspondencestyle
+
+\unexpanded\def\correspondence_style_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_style_command#element%
+     {\edef\currentcorrespondencestyle{#environment:#element}%
+      \setupcurrentcorrespondencestyle[#parameters]}%
+   \processcommacommand[#elements]\correspondence_style_command}
+
+\unexpanded\def\correspondence_style_width#environment#element#content%
+  {\edef\currentcorrespondencestyle  {#environment:#element}%
+   \edef\p_correspondence_style_width{\correspondencestyleparameter\c!width}%
+   \hbox \ifx\p_correspondence_style_width\empty \else to \p_correspondence_style_width \fi{#content\hss}}
+
+\unexpanded\def\formattedcorrespondenceparameter#element%
+  {\begingroup
+     \edef\currentcorrespondenceelement{#element}%
+     \edef\currentcorrespondencestyle  {\currentcorrespondence:#element}%
+     \usecorrespondencestylestyleandcolor\c!style\c!color
+     \correspondenceparameter\currentcorrespondenceelement
+   \endgroup}
+
+%D \section{Layout}
+%D
+%D \startitemize[packed]
+%D \item firstpage,
+%D \item secondpage,
+%D \item leftpage and
+%D \item rightpage.
+%D \stopitemize
+
+\newcount\c_correspondence_page
+
+\installlayoutmethod \v!correspondence
+  {\global\advance\c_correspondence_page\plusone
+   \ifnum\c_correspondence_page=\plusone
+     \changetolayout{\????correspondencelayout\currentcorrespondence\v!firstpage}%
+   \else\ifodd\c_correspondence_page
+     \changetolayout{\????correspondencelayout\currentcorrespondence\v!rightpage}%
+   \else
+     \changetolayout{\????correspondencelayout\currentcorrespondence\v!leftpage }%
+   \fi\fi}
+
+\unexpanded\def\correspondence_layout_define
+  {\dotripleempty\correspondence_layout_define_indeed}
+
+\unexpanded\def\correspondence_layout_define_indeed[#environment][#self][#parent]%
+  {\def\m_correspondence_layout_self  {#environment#self}%
+   \def\m_correspondence_layout_parent{#environment#parent}%
+   \ifthirdargument
+     \definelayout[\????correspondencelayout\m_correspondence_layout_self][\????correspondencelayout\m_correspondence_layout_parent]%
+   \else
+     \definelayout[\????correspondencelayout\m_correspondence_layout_self]%
+   \fi}
+
+\unexpanded\def\correspondence_layout_setup[#environment][#elements][#parameters]%
+  {\def\correspondence_layout_command#element%
+     {\def\m_correspondence_layout_current{#environment#element}%
+      \setuplayout[\????correspondencelayout\m_correspondence_layout_current][#parameters]}%
+   \processcommacommand[#elements]\correspondence_layout_command}
+
+\appendtoks
+  \correspondence_layout_define[\currentcorrespondence][\v!firstpage ]%
+  \correspondence_layout_define[\currentcorrespondence][\v!secondpage]%
+  \correspondence_layout_define[\currentcorrespondence][\v!leftpage  ][\v!secondpage]%
+  \correspondence_layout_define[\currentcorrespondence][\v!rightpage ][\v!secondpage]%
+\to \everydefinecorrespondence
+
+% Lists
+
+\def\correspondence_elements_define[#environment][#name][#list]%
+  {\setvalue{\????correspondenceelements#environment:#name}{#list}}
+
+\def\correspondence_elements_access#environment#name%
+  {\begcsname\????correspondenceelements#environment:#name\endcsname}
+
+% Extras
+
+\definesymbol[\v!cutmark][{\blackrule[\c!width=4mm,\c!height=\linewidth]}]
+
+\protect \endinput

@@ -1,0 +1,459 @@
+\setupoutput[pdftex]
+\loadmapfile[texnansi-public-lm]
+\loadmapfile[cork-public-lm]
+\loadmapfile[original-ams-euler]
+\loadmapfile[hoekwater]
+
+%\enablemode[onecolumn]
+%\enablemode[realfonts]
+\usemodule[map-se]
+\usemodule[lettri]
+\setupcolors[state=start,conversion=yes]
+\usemodule[set-11]
+\hbadness=10000
+\setuplettrine[T][Findent=0.2em,Nindent=0.2em,Oversize=.05,Hang=.15]
+
+\startbuffer[setuplettrine]
+<cd:command name="setuplettrine">
+  <cd:sequence>
+    <cd:string value="setuplettrine"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:keywords optional="yes">
+      <cd:constant type="cd:text"/>
+    </cd:keywords>
+    <cd:assignments list="yes">
+      <cd:parameter name="Lines">
+        <cd:constant type="cd:number"/>
+      </cd:parameter>
+      <cd:parameter name="Hang">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="Oversize">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="Raise">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="Findent">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="Nindent">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="Slope">
+        <cd:constant type="cd:dimension"/>
+      </cd:parameter>
+      <cd:parameter name="Ante">
+        <cd:constant type="cd:text"/>
+      </cd:parameter>
+      <cd:parameter name="FontHook">
+        <cd:constant type="cd:command"/>
+      </cd:parameter>
+      <cd:parameter name="TextFont">
+        <cd:constant type="cd:command"/>
+      </cd:parameter>
+      <cd:parameter name="Image">
+        <cd:constant type="yes"/>
+        <cd:constant type="no" default="yes"/>
+      </cd:parameter>
+    </cd:assignments>
+  </cd:arguments>
+</cd:command>
+\stopbuffer
+
+\startbuffer[lettrine]
+<cd:command name="lettrine" file="core-mis.tex">
+  <cd:sequence>
+    <cd:string value="lettrine"/>
+  </cd:sequence>
+  <cd:arguments>
+    <cd:assignments list="yes" optional="yes">
+      <cd:inherit name="setuplettrine"/>
+    </cd:assignments>
+    <cd:content/>
+    <cd:content/>
+  </cd:arguments>
+</cd:command>
+\stopbuffer
+
+\def\emph#1{#1}
+
+\starttext
+\startArticle[%
+        Author=Taco Hoekwater,
+	Email=taco@elvenkind.com,
+        Title=Lettrines for Con\TeX{}t,
+        Page=26,
+        Category=context]
+
+\startKeywords
+lettrines, module, initials, dropped capitals, Con\TeX{}t
+\stopKeywords
+
+\startAbstract
+The \ConTeXt\ module \type{lettri} is port of the \LaTeX\ package
+\type{lettrine} by Daniel Flipo that provides a way to typeset dropped 
+capitals at the beginning of paragraphs.
+\stopAbstract
+
+\section{Introduction}
+
+Daniel Flipo's \LaTeX\ package ``lettrine.sty'' provides the command
+\type{\lettrine} for the creation of dropped capitals at the beginning
+of a paragraph. Various parameters are provided to control the size
+and layout of the dropped capital, using a key||value system to
+specify the options.
+
+Last februari, Gerben Wierda asked on the \ConTeXt\ mailing list if
+``Would someone be able to take lettrine.sty as an example and produce
+a version that works with \ConTeXt\ (and plain \TeX)?''. I never
+considered making a version for plain \TeX, but a \ConTeXt\ version
+was doable. So I've created the `lettri' module, for use in a
+\type{\usemodule} command.
+
+\section{Commands}
+
+The module defines two user||level commands, one for setup and one for
+actual use. Most of the parameter names are a bit different from their
+\LaTeX{} counterparts. There are two reasons for this, both a side||effect 
+of the implementation in \ConTeXt.
+\startitemize
+\item The first reason is my laziness, I did not want to create lots of 
+new constants for internationalization of the interface, so I just used 
+an initial uppercase character. This makes the keywords impervious to
+differences in the \ConTeXt\ language interfaces.
+\item The second reason is that some parameter names seemed a bit odd, 
+probably because of name\-space conflicts within \LaTeX, and I sanitized
+those names where that was possible without confusing the users.
+\stopitemize
+\noindent
+So, for example, the \LaTeX\ parameter keyword \type{lhang} became the
+\ConTeXt\ parameter \type{Hang}.
+
+\subsection{Usage command: \type{\lettrine}}
+
+The command \type{\lettrine} uses an optional parameter for 
+settings, and two required arguments that are texts to be typeset.
+
+\processXMLbuffer[lettrine]
+
+\lettrine{T}{he two} typeset arguments are the dropped capital and 
+the run||in text following it; the \TeX\ source of this paragraph 
+started with ``\type{\lettrine{T}{he two} typeset}''. The optional
+parameter is explained below.
+
+
+\subsection{Setup command: \type{\setuplettrine}}
+
+\processXMLbuffer[setuplettrine]
+
+\startitemize
+\item \type{Lines} controls how many lines the dropped capital 
+   will occupy (the default value is~2);
+\item \type{Hang} sets how much of the dropped capital's width 
+   should hang into the margin (the default is 0, values should be
+   between 0 and 1);
+\item \type{Oversize} enlarges or decreases the dropped capital's height: 
+   with \type{Oversize=0.1}. its height is enlarged by 10\% so that
+   it raises above the top paragraph's line (default=0, values should 
+   be between $-$1 and 1);
+\item \type{Raise} does not affect the dropped  capital's height, but 
+   moves it up (if positive) or down (if negative); useful with capitals 
+   like \type{J} or \type{Q} which have a positive depth (default=0,
+   values should be between $-$1 and 1);
+\item \type{Findent} (positive or negative) controls the horizontal gap 
+   between the dropped capital and the indented block of text (default=0pt);
+\item \type{Nindent} shifts the indented lines, starting from the second line,
+   horizontally by the specified amount (default=0.5em);
+\item \type{Slope} can be used with dropped
+   capitals like \type{A} or \type{V} to add an extra shift
+   (positive or  negative) to the indentation of each line
+   starting from the third one (no effect if \type{Lines=2}, default=0pt);
+\item \type{Ante} can be used to typeset something
+   \emph{before} the dropped capital (typical use is for French 
+   guillemets starting the paragraph).
+\item \type{Image} will force  \type{\lettrine} 
+  to replace the letter normally used as dropped capital by an image.
+  \type{\lettrine[Image=yes]{A}{n exemple}} will load \type{A.eps} or
+  \type{A.pdf} instead of letter~A.
+\item \type{FontHook} can be used to change the font and/or color of 
+   the dropped capital (default: empty)
+\item \type{TextFont} can be used to change the font and/or color of 
+   the run||in text  (default: \type{\sc})
+\stopitemize
+
+\noindent
+The first, optional argument to the \type{\setuplettrine} command
+allows you to create presets: The settings that follow will apply only
+if the first text argument of \type{\lettrine} (see below) matches
+this string exactly. I~have used this command at the top of this
+article:
+\starttyping
+\setuplettrine[T][Findent=0.2em,Nindent=0.2em,
+                 Oversize=.05,Hang=.15]]
+\stoptyping
+because otherwise the example on the previous page would not have 
+been as nice as it is.
+
+\section{Examples}
+The following examples were all adapted from the file \type{demo.tex}
+that is part of Daniel Flipo's original distribution. I've been forced 
+to make some changes here and there because the font for the Maps is
+quite different from the font in the original examples, but I~have not
+made changes to the original french text.
+
+\subsection{Standard options (using 2 lines)}
+
+\starttyping
+\lettrine{E}{n} plein marais...
+\stoptyping
+
+\begingroup
+\language[fr]
+\lettrine{E}{n} plein marais de la Souteyranne, \`a quelques kilom\`etres
+au nord d'Aigues-Mortes, se trouve la Tour Carbonni\`ere.  Construite
+au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des |<<|abbayes de sel|>>| dont il ne reste que quelques
+vestiges.
+\par
+\endgroup
+
+\subsection{Lettrine on a single line}
+
+\starttyping
+\lettrine[Lines=1]{E}{n} plein marais...
+\stoptyping
+
+\begingroup
+\language[fr]
+\lettrine[Lines=1]{E}{n} plein marais de la Souteyranne,
+\`a quelques kilom\`etres au nord d'Aigues-Mortes, se trouve 
+la Tour Carbonni\`ere.
+\par
+\endgroup
+
+\subsection{Lettrine on a three lines}
+\starttyping
+\lettrine[Lines=3]{E}{n} plein marais...
+\stoptyping
+
+\begingroup
+\language[fr]
+\lettrine[Lines=3]{E}{n} plein marais de la Souteyranne, 
+\`a quelques kilom\`etres au nord d'Aigues-Mortes, 
+se trouve la Tour Carbonni\`ere.
+Construite au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des\break |<<|abbayes de sel|>>| dont il ne reste que quelques vestiges.
+\par
+\endgroup
+
+\subsection{Lettrine in the margin}
+\starttyping
+\lettrine[Hang=1, Nindent=0pt, Lines=3]
+         {J}{ustement},...
+\stoptyping
+
+\setupnarrower[middle=6pt]
+\begingroup
+\language[fr]
+\startnarrower
+\lettrine[Hang=1, Nindent=0pt, Lines=3]{J}{ustement}, 
+\`a quelques kilom\`etres au nord d'Aigues-Mortes, 
+se trouve la Tour Carbonni\`ere.  Construite au XIII\high{e}~si\`ecle,
+elle contr\^olait l'unique voie d'acc\`es terrestre de la ville
+fortifi\'ee, celle qui menait \`a Psalmody, l'une des
+|<<|abbayes de sel|>>| dont il ne reste que quelques vestiges.  L'abbaye \'etait
+ravitaill\'ee ---~dit-on ~--- par un souterrain qui la reliait au
+ch\^ateau de Treillan.
+\stopnarrower
+\par
+\endgroup
+
+
+\subsection{Lettrine oversised, and partly in the margin}
+\starttyping
+\lettrine[Lines=3,Hang=0.2,Oversize=0.25]
+         {E}{n} ...
+\stoptyping
+
+\begingroup
+\language[fr]
+\lettrine[Lines=3, Hang=0.2, Oversize=0.25]{E}{n} 
+plein marais de la Souteyranne,
+\`a quelques kilom\`etres au nord d'Aigues-Mortes la Tour Carbonni\`ere.
+Construite au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des |<<|abbayes de sel|>>| \dots
+% dont il ne reste que des vestiges.
+\par
+\endgroup
+
+\subsection{A guillemet in front of the lettrine}
+\starttyping
+\lettrine[Ante={<<}]{E}{n} plein marais ...
+\stoptyping
+
+\begingroup
+\language[fr]
+\lettrine[Ante={<<}]{E}{n} plein marais de la Souteyranne,
+\`a quelques kilom\`etres au nord d'Aigues-Mortes, se trouve 
+la Tour Carbonni\`ere.
+Construite au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des\break |<<|abbayes de sel|>>| \dots
+% dont il ne reste que des vestiges.
+\par
+\endgroup
+
+\blank
+The following four lettrines have all been typeset after changing the
+default settings with the following command:
+
+\starttyping
+\setuplettrine[Lines=4,FontHook={\color[gray]}]
+\stoptyping
+
+\setuplettrine[Lines=4,FontHook={\color[gray]}]
+
+\subsection{A somewhat smaller and slightly raised lettrine}
+
+\starttyping
+\lettrine[Oversize=-0.15, Raise=0.15]
+         {Q} {u'en plein marais} ...
+\stoptyping
+
+\begingroup
+\language[fr]
+\lettrine[Oversize=-0.15, Raise=0.15]{Q}{u'en plein marais}
+ de la Souteyranne, \`a quel\-ques kilom\`etres au nord d'Aigues-Mortes, 
+se trouve la Tour Carbonni\`ere, surprend les visiteurs.
+Construite au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des |<<|abbayes de sel|>>| dont il ne reste que quelques vestiges.
+L'abbaye \'etait ravitaill\'ee par un souterrain qui
+la reliait au ch\^ateau de Treillan.
+\par
+\endgroup
+
+\subsection{The same lettrine, without corrections}
+
+\starttyping
+\lettrine{Q}{u'en plein marais} de ...
+\stoptyping
+
+\begingroup
+\language[fr]
+\lettrine{Q}{u'en plein marais} de la Souteyranne,
+\`a quelques kilom\`etres au nord d'Aigues-\break Mortes, 
+se trouve la Tour Carbonni\`ere, surprend les visiteurs.
+Construite au XIII\high{e}\break si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des |<<|abbayes de sel|>>| dont il ne reste que quelques vestiges.
+L'abbaye \'etait ravitaill\'ee par un souterrain qui
+la reliait au ch\^ateau de Treillan.
+\par
+\endgroup
+
+\subsection{Using the Slope option for the following lines}
+\starttyping
+\lettrine[Slope=0.4em,Findent=-0.5em,
+          Nindent=0.4em]
+         {\`A}{quelques kilom\`etres}...
+\stoptyping
+
+\kern -12pt
+
+\begingroup
+\language[fr]
+\lettrine[Slope=0.4em, Findent=-0.5em, Nindent=0.4em]{\`A} {quelques 
+kilom\`etres} au nord d'Aigues-Mortes, se trouve  la Tour Carbonni\`ere.
+Construite au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des |<<|abbayes de sel|>>| dont il ne reste que quelques vestiges.
+L'abbaye \'etait ravitaill\'ee ---~dit-on~--- par un souterrain qui
+la reliait au ch\^ateau de Treillan.
+\par
+\endgroup
+
+\kern 24pt
+\subsection{Using the Slope option for the opposite effect} 
+
+Also note the move into the margin
+
+\starttyping
+\lettrine[Slope=-0.5em,Hang=0.5,Findent=0.2em]
+         {V}{oici} \`a...
+\stoptyping
+
+\begingroup
+\language[fr]
+\startnarrower
+\lettrine[Slope=-0.5em, Hang=0.5, Findent=0.2em]{V}{oici}
+\`a quelques kilom\`etres au nord d'Aigues-Mortes la Tour Carbonni\`ere.
+Construite au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie
+d'acc\`es terrestre de la ville fortifi\'ee, celle qui menait \`a
+Psalmody, l'une des |<<|abbayes de sel|>>| dont il ne reste que
+quelques vestiges.  L'abbaye \'etait ravitaill\'ee ---~dit-on~--- par
+un souterrain qui la reliait au ch\^ateau de Treillan.
+\stopnarrower
+\par
+\endgroup
+
+\subsection{Using a different font by using the FontHook}
+
+\starttyping
+\def\myhook
+  {\definefontsynonym[LettrineFont][SansBold]}
+\lettrine[FontHook={\myhook}, 
+          Hang=.2, Findent=.3em] 
+         {E}{n} plein marais...
+\stoptyping
+
+\def\myhook
+  {\definefontsynonym[LettrineFont][SansBold]}
+
+\begingroup
+\language[fr]
+\lettrine[FontHook={\myhook},Hang=.2,Findent=.3em]{E}{n} plein 
+marais de la Souteyranne, \`a quelques
+kilom\`etres au nord d'Aigues-Mortes, se trouve la Tour Carbonni\`ere.
+Construite au XIII\high{e}~si\`ecle, elle contr\^olait l'unique voie d'acc\`es
+terrestre de la ville fortifi\'ee, celle qui menait \`a Psalmody,
+l'une des |<<|abbayes de sel|>>| dont il ne reste que quelques vestiges.
+L'abbaye \'etait ravitaill\'ee par un souterrain qui
+la reliait au ch\^ateau de Treillan.
+\par
+\endgroup
+
+\subsection{Use of an image instead of an actual letter}
+
+\setuplettrine[FontHook={}]
+
+\starttyping
+\lettrine[Image=yes,Hang=.1, Oversize=.25, 
+          Findent=0.1em, Raise=-.1]
+          {W} {er} reitet ...
+\stoptyping
+
+{\switchtobodyfont[eul]
+\lettrine[Image=yes,Hang=.1, Oversize=.25, Findent=0.1em, Raise=-.1]
+{W}{er} reitet so sp\"at durch Nacht und Wind?\crlf
+Es ist der Vater mit seinem Kind;\crlf
+Er hat den Knaben wohl in dem Arm,\crlf
+Er fa{\SS}t ihn sicher, er h\"alt ihn warm.
+\par}%
+
+\section{Availability}
+
+The module can be downloaded from the new \ConTeXt\ module repository,
+at\crlf
+\hyphenatedurl{http://modules.contextgarden.net}.
+
+\blank
+I have released this module into the public domain.
+
+\stopArticle
+\stoptext

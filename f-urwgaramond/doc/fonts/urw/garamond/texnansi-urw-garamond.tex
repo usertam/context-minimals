@@ -1,0 +1,80 @@
+% output=pdftex interface=en
+
+\usemodule[fnt-01]
+
+\loadmapfile[texnansi-urw-garamond.map]
+
+\starttext
+
+\ShowFont[GaramondNo8-Med][texnansi-ugmm8a][texnansi]
+\ShowFont[GaramondNo8-MedIta][texnansi-ugmmi8a][texnansi]
+\ShowFont[GaramondNo8-Reg][texnansi-ugmr8a][texnansi]
+\ShowFont[GaramondNo8-Ita][texnansi-ugmri8a][texnansi]
+
+\setupheadertexts[\tttf example definitions]
+
+\starttyping
+texfont --encoding=texnansi --fontroot=/home/peter/tmp/garamond/texmf --ma --in --ve=urw --co=garamond --show
+\stoptyping
+
+\starttyping
+/home/peter/tmp/garamond/texmf/fonts/map/pdftex/context/texnansi-urw-garamond.map
+\stoptyping
+
+\starttyping
+\definefontsynonym[GaramondNo8-Med][texnansi-ugmm8a][encoding=texnansi]
+\definefontsynonym[GaramondNo8-MedIta][texnansi-ugmmi8a][encoding=texnansi]
+\definefontsynonym[GaramondNo8-Reg][texnansi-ugmr8a][encoding=texnansi]
+\definefontsynonym[GaramondNo8-Ita][texnansi-ugmri8a][encoding=texnansi]
+\stoptyping
+
+\page
+
+\setupheadertexts[\tttf texnansi-urw-garamond.map]
+
+\starttyping
+texnansi-raw-ugmm8a GaramondNo8-Med 4 < ugmm8a.pfb texnansi.enc
+texnansi-raw-ugmmi8a GaramondNo8-MedIta 4 < ugmmi8a.pfb texnansi.enc
+texnansi-raw-ugmr8a GaramondNo8-Reg 4 < ugmr8a.pfb texnansi.enc
+texnansi-raw-ugmri8a GaramondNo8-Ita 4 < ugmri8a.pfb texnansi.enc
+\stoptyping
+
+
+%appended section
+
+\page
+
+\ShowFont[GaramondNo8-Med][texnansi-ugmm8a][texnansi]
+\ShowFont[GaramondNo8-MedIta][texnansi-ugmmi8a][texnansi]
+\ShowFont[GaramondNo8-Reg][texnansi-ugmr8a][texnansi]
+\ShowFont[GaramondNo8-Ita][texnansi-ugmri8a][texnansi]
+
+\setupheadertexts[\tttf example definitions]
+
+\starttyping
+texfont --encoding=texnansi --fontroot=/home/peter/tmp/garamond/texmf --ma --in --ve=urw --co=garamond --show
+\stoptyping
+
+\starttyping
+/home/peter/tmp/garamond/texmf/fonts/map/pdftex/context/texnansi-urw-garamond.map
+\stoptyping
+
+\starttyping
+\definefontsynonym[GaramondNo8-Med][texnansi-ugmm8a][encoding=texnansi]
+\definefontsynonym[GaramondNo8-MedIta][texnansi-ugmmi8a][encoding=texnansi]
+\definefontsynonym[GaramondNo8-Reg][texnansi-ugmr8a][encoding=texnansi]
+\definefontsynonym[GaramondNo8-Ita][texnansi-ugmri8a][encoding=texnansi]
+\stoptyping
+
+\page
+
+\setupheadertexts[\tttf texnansi-urw-garamond.map]
+
+\starttyping
+texnansi-raw-ugmm8a GaramondNo8-Med 4 < ugmm8a.pfb texnansi.enc
+texnansi-raw-ugmmi8a GaramondNo8-MedIta 4 < ugmmi8a.pfb texnansi.enc
+texnansi-raw-ugmr8a GaramondNo8-Reg 4 < ugmr8a.pfb texnansi.enc
+texnansi-raw-ugmri8a GaramondNo8-Ita 4 < ugmri8a.pfb texnansi.enc
+\stoptyping
+
+\stoptext

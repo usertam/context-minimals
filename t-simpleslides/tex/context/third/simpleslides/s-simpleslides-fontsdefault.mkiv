@@ -1,0 +1,180 @@
+%D \module
+%D   [      file=simpleslides-f-default,
+%D        version=2009.03.30
+%D          title=\CONTEXT\ Style File,
+%D       subtitle=Presentation Module simpleslides --- Default font setup,
+%D         author=Aditya Mahajan and Thomas A. Schmitz,
+%D           date=\currentdate,
+%D      copyright={Aditya Mahajan and Thomas A. Schmitz}]
+%C
+%C Copyright 2007 Aditya Mahajan and Thomas A. Schmitz
+%C This file may be distributed under the GNU General Public License v. 2.0.
+
+\writestatus{simpleslides}{loading default font setup}
+
+\startmodule[s-simpleslides-fontsdefault]
+
+\unprotect
+
+\setupbodyfontenvironment[default][em=italic] 
+
+%D The fontsize is set via the \type{size}||key; it will be used in numerous
+%D setup||commands. In earlier versions, I had used the \tex{processaction}
+%D mechanism to define the \tex{NormalSize} and \tex{TitleSize}, but Aditya
+%D rightly pointed out that this is somewhat inflexible. I now set the font
+%D dimensions directly; \tex{TitleSize} is calculated from \tex{NormalSize}. I
+%D do a few tests to get nice sizes. 
+
+\newdimen\simpleslidesNormalSize  
+\newdimen\simpleslidesTitleSize  
+\newdimen\simpleslidesSlideTitleSize  
+
+\simpleslidesNormalSize=\moduleparameter{simpleslides}{size}\relax
+
+\ifdim\simpleslidesNormalSize<16pt%
+	\simpleslidesTitleSize=1.6\simpleslidesNormalSize\relax%
+\else%
+	\ifdim\simpleslidesNormalSize<20pt%
+		\simpleslidesTitleSize=1.4142\simpleslidesNormalSize\relax%
+	\else%
+		\simpleslidesTitleSize=30pt\relax%
+	\fi%
+\fi%
+
+\simpleslidesSlideTitleSize = \simpleslidesTitleSize
+
+\def\NormalSize     {\the\simpleslidesNormalSize}
+\def\TitleSize      {\the\simpleslidesTitleSize}
+\def\SlideTitleSize {\the\simpleslidesSlideTitleSize}
+
+%D The bodyfont needs to be defined so \CONTEXT\ can calculate size switches,
+%D math formulas, etc.
+
+\starttypescript [serif] [default] [size] 
+\definebodyfont [14pt,15pt,16pt,17pt,20pt,25pt,\NormalSize,\TitleSize] [rm] [default] 
+\stoptypescript
+
+\starttypescript [sans] [default] [size] 
+\definebodyfont [14pt,15pt,16pt,17pt,20pt,25pt,\NormalSize,\TitleSize] [ss] [default] 
+\stoptypescript
+
+\starttypescript [mono] [default] [size] 
+\definebodyfont [14pt,15pt,16pt,17pt,20pt,25pt,\NormalSize,\TitleSize] [tt] [default] 
+\stoptypescript
+
+
+\definebodyfontenvironment[\NormalSize]
+\definebodyfontenvironment[\TitleSize]
+
+%D Setups define which font will be used. The module provides simple keywords
+%D for using a small set of predefined fonts: Latin Modern, Latin Modern Sans,
+%D Adventor (the TeXGyre clone of Gothic), Schola (the TeXGyre clone of
+%D Schoolbook), Bonum (the TeXGyre clone of Bookman), Termes (the TeXGyre clone
+%D of Times), Pagella (the TeXGyre clone of Palatino), Heros (the TeXGyre clone
+%D of Helvetica), and Chancery (the TeXGyre clone of Chancery). Since the
+%D definition of typescripts etc. varies according to the \TeX-engine used, we
+%D have to branch the code here. This is awkward, but for the time being, I see
+%D no other way.
+
+\startsetups simpleslides:font:LatinModern
+\setupbodyfont[\NormalSize]
+\stopsetups
+
+\startsetups simpleslides:font:LatinModernSans
+\setupbodyfont[ss,\NormalSize]
+\stopsetups
+
+\usetypescriptfile[type-otf] %Isn't this included by default?
+
+%AM: For all the fonts, I have used traditional names rather than TeX Gyre
+%names.
+
+%D It is difficult to write a typescript that will work with both \MKII\ and
+%D \MKIV. If the sixth argument is absent, \CONTEXT\ does the right thing. When
+%D the sixth argument is present, e.g., \type{rscale=1.1}, then we also need
+%D \type{encoding=something} for the style to work in \MKII. We hope that \MKIV\
+%D simply ignores the \type{encoding} setting.
+
+\startsetups simpleslides:font:Bookman
+  \starttypescript[bookman]
+    \definetypeface [bookman] [rm] [serif] [bookman] [default]
+    \definetypeface [bookman] [ss] [sans]  [adventor] [default]
+    \definetypeface [bookman] [tt] [mono]  [modern]   [default] [rscale=1.075]
+    \definetypeface [bookman] [mm] [math]  [pagella] [default]
+  \stoptypescript
+  \usetypescript[bookman]
+  \setupbodyfont[bookman,\NormalSize]
+\stopsetups
+
+%AM: Was Chorus
+\startsetups simpleslides:font:Chancery
+\starttypescript[serif] [chancery]
+  \definefontsynonym [ChanceryRoman]          [file:texgyrechorus-mediumitalic]  [features=default]
+\stoptypescript
+
+  \starttypescript [serif] [chancery]
+    \definefontsynonym [Serif]           [ChanceryRoman] [features=default]
+    \definefontsynonym [SerifItalic]     [Serif]
+    \definefontsynonym [SerifBold]       [Serif]
+    \definefontsynonym [SerifBoldItalic] [Serif]
+    \definefontsynonym [SerifCaps]       [Serif]
+  \stoptypescript
+
+  \starttypescript [chancery]
+    \definetypeface [chancery] [rm] [serif] [chancery] [default]
+  \stoptypescript 
+  \usetypescript[chancery]
+  \setupbodyfont[chancery,\NormalSize]
+\stopsetups
+
+\startsetups simpleslides:font:Gothic
+  \starttypescript[gothic]
+    \definetypeface [gothic] [rm] [serif] [schola] [default]
+    \definetypeface [gothic] [ss] [sans]  [adventor] [default]
+    \definetypeface [gothic] [tt] [mono]  [modern]   [default]
+                    [encoding=\defaultencoding,rscale=1.075]
+    \definetypeface [gothic] [mm] [math]  [palatino] [default]
+  \stoptypescript
+  \usetypescript[gothic]
+  \setupbodyfont[gothic,ss,\NormalSize]
+\stopsetups
+
+
+\startsetups simpleslides:font:Helvetica
+  \usetypescript[postscript]
+  \setupbodyfont[postscript,ss,\NormalSize]
+\stopsetups
+
+
+%AM: Was Pagella
+\startsetups simpleslides:font:Palatino
+  \usetypescript[palatino]
+  \setupbodyfont[palatino,\NormalSize]
+\stopsetups
+
+\startsetups simpleslides:font:Schoolbook
+  \starttypescript[schoolbook]
+    \definetypeface [schoolbook] [rm] [serif] [schola] [default]
+    \definetypeface [schoolbook] [ss] [sans]  [adventor] [default]
+    \definetypeface [schoolbook] [tt] [mono]  [modern]   [default] [rscale=1.075]
+    \definetypeface [schoolbook] [mm] [math]  [pagella] [default]
+  \stoptypescript
+  \usetypescript[schoolbook]
+  \setupbodyfont[schoolbook,\NormalSize]
+\stopsetups
+
+\startsetups simpleslides:font:Times
+  \usetypescript[postscript]
+  \setupbodyfont[postscript,\NormalSize]
+\stopsetups
+
+\doifsetupselse{simpleslides:font:\moduleparameter{simpleslides}{font}}
+     {\setups{simpleslides:font:\moduleparameter{simpleslides}{font}}}
+     {\setups{simpleslides:font:LatinModern}%
+      \message{There is no setup for
+      "font=\moduleparameter{simpleslides}{font}". Latin Modern Sans will be
+      used as a fallback}}
+
+\protect
+
+\stopmodule

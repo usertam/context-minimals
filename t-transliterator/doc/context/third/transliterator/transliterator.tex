@@ -1,0 +1,898 @@
+\setuppapersize [A5] [A5]
+
+\definecolor [gutenred] [x=bf221f] % rubrication from digitized_Göttingen Gutenberg bible
+
+\setupinteraction [
+  state=start,
+  color=gutenred, % rubricate, don’t viridificate
+  contrastcolor=gutenred,
+]
+
+\setupcombinedlist[content][interaction=text,focus=standard]
+
+\setupindenting[yes,next,medium]
+
+%\showgrid
+\setuphead[chapter][
+  align=middle,
+  number=no,
+  style={\rm\tfa\setcharacterkerning[capitals]\WORD},
+  before={\blank[5*line]},
+  after={\blank[2*line,force]}
+]
+
+\setuphead[section][
+  align=middle,
+  number=no,
+  style={\rm\setcharacterkerning[capitals]\WORD},
+  before={\blank[line,force]},
+  after={\blank[line]}
+]
+
+\setuphead[subsection][
+  align=middle,
+  number=no,
+  style={\tf\sc\word},
+  before={\blank[line,force]},
+  after={\blank[line]}
+]
+
+\setuplist[chapter][
+  alternative=c,
+  interaction=text,
+  style={\word\sc},
+]
+\setuplist[section,subsection][
+  alternative=a,
+  style=\tfx\italic,
+  interaction=text,
+  margin=2em,
+  numberstyle=,
+  textstyle=,
+  numberstyle=\tfx,
+]
+
+\setuplist[subsection][
+  margin=4em,
+]
+
+\setuplistalternative
+
+\definecharacterkerning [capitals] [factor=.05]
+
+\definefontfeature [default][default][
+  protrusion=quality,
+  expansion=quality,
+  %mode=node,
+  script=latn,
+  onum=yes,
+  %dlig=yes,
+  liga=yes,
+]
+
+\definefontfeature [smallcaps] [default] [smcp=yes]
+\def\sc{\addff{smallcaps}\setcharacterkerning[capitals]}
+
+\setupbodyfontenvironment [default] [em=italic]
+
+\starttypescript [serif] [bukyvede]
+  \setups [font:fallback:serif]
+  \definefontsynonym [Serif]        [name:Bukyvede]         [features=default]
+  \definefontsynonym [SerifItalic]  [name:Bukyvede-Italic]  [features=default]
+\stoptypescript
+\usetypescript [bukyvede]
+\definetypeface [hlaholice] [rm] [serif] [bukyvede]     [default] [encoding=ec]
+\definetypeface [cyrilice]  [rm] [serif] [bukyvede]     [default] [encoding=ec]
+\definetypeface [lmstd]     [rm] [serif] [latin-modern] [default] [encoding=texnansi]
+
+\usetypescriptfile[type-cmu]
+\usetypescript[computer-modern-unicode]
+\setupbodyfont[computer-modern-unicode,9pt]
+
+\usetypescript  [serif]   [hz] [highquality]
+\setupalign     [hanging,hz]
+
+\usemodule[bib]
+\usemodule[bibl-tra]
+\usemodule[transliterator]
+
+%\setupcite[authoryear][compress=no]
+
+\setuppublications[%
+  alternative=apa,%
+  refcommand=authoryear,%
+  sorttype=bbl,%
+  numbering=yes,%
+  autohang=yes%
+]%
+
+\setuppublicationlist[%
+  artauthor=\invertedauthor%
+]
+
+% == REFERENCES ===============================================================
+
+\startpublication[
+  k=aks,
+  t=book,
+  a={{Birnbaum/Schaeken}},
+  y=1999,
+  n=4,
+  u=http://www.schaeken.nl/lu/research/online/publications/akslstud/index.htm,
+  s={Studien},
+]
+\author[]{Henrik}[H.]{}{Birnbaum}
+\author[]{Jos}[J.]{}{Schaeken}
+\pubyear{1999}
+\title{Altkirchenslavische Studien}
+\volume{2}
+\city{München}
+\stoppublication
+
+\startpublication[
+  k=bornemann,
+  t=book,
+  a={{Bornemann/Risch}},
+  y=1978,
+  n=2,
+  s={Grammatik},
+]
+\author[]{Eduard}[]{}{Bornemann}
+\author[]{Ernst}[]{}{Risch}
+\pubyear{1978}
+\title{Griechische Grammatik}
+\city{Frankfurt am Main}
+\edition{2.}
+\stoppublication
+
+\startpublication[
+  k=bh,
+  t=book,
+  a={{Bringhurst}},
+  y=2008,
+  n=4,
+  s={Bringhurst},
+]
+\author[]{Robert}[R]{}{Bringhurst}
+\pubyear{2008}
+\title{The Elements of Typographic Style}
+\edition{3.2}
+\city{Point Roberts WA, Vancouver}
+\stoppublication
+
+\startpublication[
+  k=dintb,
+  t=book,
+  a={{DIN}},
+  y=2001,
+  n=5,
+  s={DIN},
+]
+\editor[]{}[]{}{DIN Deutsches Institut für Normung e.~V.}
+\pubyear{2001}
+\title{Bibliotheks und Dokumentationswesen}
+\city{Berlin/Wien/Zürich}
+\stoppublication
+
+\startpublication[
+  k=duden,
+  t=book,
+  a={{Drosdowski/Müller/Scholze-Stubenrecht/Wermke}},
+  y=1952,
+  n=1,
+  s={DUDEN},
+]
+\editor[]{Günther}[]{}{Drosdowski}
+\editor[]{Wolfgang}[]{}{Müller}
+\editor[]{Werner}[]{}{Schulze-Stubenrecht}
+\editor[]{Matthias}[]{}{Wermke}
+\pubyear{1991}
+\title{DUDEN Rechtschreibung der deutschen Sprache}
+\city{Mannheim et al}
+\edition{20.}
+\stoppublication
+
+\startpublication[
+  k=kirschbaum,
+  t=book,
+  a={{Kirschbaum}},
+  y=2001,
+  n=3,
+  s={Grammatik},
+]
+\author[]{Ernst Georg}[]{}{Kirschbaum}
+\pubyear{2001}
+\title{Grammatik der russischen Sprache}
+\city{Berlin}
+\stoppublication
+
+\startpublication[
+  k=iso,
+  t=inbook,
+  a={{ISO}},
+  y=1995,
+  n=6,
+  s={ISO~9},
+]
+\editor[]{}[]{}{{{\sc iso} International Organization for Standardization}}
+\pubyear{1995}
+\title{Information and documentation -- Transliteration of Cyrillic characters into Latin characters -- Slavic and non-Slavic languages}
+\edition{2.}
+\crossref{dintb}
+\pages{230--245}
+\stoppublication
+
+%==============================================================================
+
+\setupframed[
+  frame=off,
+  align=normal,
+  location=top,
+]
+
+\defineframed[displayouter][
+  location=top,
+  align={normal,verytolerant},
+  frame=off,
+  style=\tfx,
+]
+\defineframed[displayinner][displayouter][
+  offset=1ex,
+  width=.47\textwidth,
+]
+
+\definenumber[excnt]
+\setnumber[excnt][1]
+
+% This should rather be done using key-value args but I'm too lazy now.
+% 1: mode; 2: hyphenate original; 3: hyphenate transliteration;
+% 4: font for original; 5: caption; 6: original text.
+\def\trlex#1#2#3#4#5#6{%
+  \setuplocalinterlinespace[line=8pt]%
+  \startplacefigure [
+    location=force,
+    title={\type{[mode=#1,hyphenate=#3]}\hskip 1em{\italic #5}}
+  ]%
+    \displayouter{%
+      \displayinner{%
+        \setupbodyfont[#4]%
+        \tfx
+        %\setuptolerance[verytolerant, stretch]
+        \setuptolerance[verytolerant]
+        \unskip\language[#2]#6\par
+      }%
+      \displayinner{%
+        \tfx
+        \transliterate[mode=#1,hyphenate=#3]{#6\par}%
+      }
+    }
+  \stopplacefigure
+  \incrementnumber[excnt]%
+}
+
+\defineframedtext[CenteredText][width=fit,frame=off,align=middle]
+
+\usemodule[int-load]
+\loadsetups[t-transliterator.xml] 
+
+
+\setupwhitespace[medium]
+\language[en]
+
+\starttext
+
+\setuppagenumbering[state=stop]
+
+\blank[3cm,force]
+
+
+%\showframe
+\startstandardmakeup[location=middle]
+
+\setuplayout[width=middle]
+\raggedcenter
+\vfill
+  {\setupbodyfont[19pt]
+  {\em The}
+  \blank [2*big]
+  {\tfc\sc transliterator}
+  \blank [2*big]
+  {\em for \CONTEXT}
+  \blank [9*big]
+  {\tfa\sc manual}
+  }
+\vfill
+\stopstandardmakeup
+
+\startstandardmakeup
+\vfill
+\framed [frame=off,topframe=on] {%
+\tfxx\ss\setupinterlinespace[small]%
+\startlines
+The {\em Transliterator} module and mini-manual,
+by Philipp Gesang, Radebeul.
+Mail any patches or suggestions to
+
+{\tt philipp -dot- gesang -at- alumni -dot- uni-heidelberg -dot- de}
+\useurl[me][https://phi-gamma.net]
+\from[me]%
+\stoplines
+}
+\stopstandardmakeup
+
+\setuppagenumbering[%
+  location=middle,
+  state=start,
+  style=\tfc
+]
+
+\setuppagenumber[number=1]
+\completecontent
+\chapter{Usage and Functionality}
+\section{Overview}
+The Transliterator provides two commands: \type{\setuptransliterator}
+preferably goes into the preamble and allows for global configuration.
+The Transliterator is invoked locally by \type{\transliterate} which does the
+actual transliteration of text passages.
+
+\setup{setuptransliterator}
+
+\setup{transliterate}
+
+\section{Loading and Configuring the Module}
+In order to use the Transliterator in a document we put the following somewhere before
+\type{\starttext}.
+\starttyping
+\usemodule[transliterator]
+\stoptyping
+Although it has some defaults already set at this point they will most likely
+not correspond to what is needed in the document.
+To override the presets we use the command \type{\setuptransliterator[#1]}.
+It takes a comma separated list of two key-value pairs: \type{mode} and
+\type{hyphenate}.
+Through {\em mode} we specify the transliteration method.
+By the time of this writing this can be one of the following set:
+
+\startplacetable[location=top,title=Transliteration modes.]
+  \tfx
+  \starttabulate[|l|p|]
+    \HL
+    \NC mode \NC description \NC\NR
+    \HL
+    \NC \type{all}              \NC {\sc iso}~9 complete \NC\NR
+    \NC \type{bg_de}            \NC Bulgarian, German „scientific“ transliteration\NC\NR
+    \NC \type{gr}               \NC transliteration for Greek \NC\NR
+    \NC \type{gr_n}             \NC transliteration for Greek obeying nasalizations \NC\NR
+    \NC \type{iso9_ocs}         \NC == \type{all} plus non-{\sc iso} additions for Old (Church) Slavonic \NC\NR
+    \NC \type{ocs}              \NC “scientific” transliteration for Old (Church) Slavonic\NC\NR
+    \NC \type{ocs_cz}           \NC Czech transcription for Old (Church) Slavonic\NC\NR
+    \NC \type{ocs_gla}          \NC “scientific” transliteration for Old (Church) Slavonic / Glagolitic alphabet\NC\NR
+    \NC \type{ru}               \NC {\sc iso}~9 Russian \NC\NR
+    \NC \type{ru_cz}            \NC Czech transcription for Russian\NC\NR
+    \NC \type{ru_old}           \NC {\sc iso}~9 Russian plus pre-1918 chars (the default)\NC\NR
+    \NC \type{ru_transcript_de} \NC German transcription for Russian \NC\NR
+    \NC \type{ru_transcript_en} \NC English transcription for Russian \NC\NR
+    \NC \type{sr_tocy}          \NC Serbian, Latin to Cyrillic \NC\NR
+    \NC \type{sr_tolt}          \NC Serbian, Cyrillic to Latin \NC\NR
+    \HL
+  \stoptabulate
+\stopplacetable
+
+
+{\em Nota bene}: The description at this point only serves as a placeholder as the
+transliteration modes are discussed in detail later in this document.
+
+Through the \type{hyphenate} argument it is possible to adjust the language
+that is used for hyphenation.
+Specifying \type{\setuptransliterator[hyphenate=nl]} will let every transliterated
+part of the document be processed according to dutch rules, leaving the overall
+\type{\language[#1]} configuration unchanged for the rest of the content.
+
+Another argument, \type{deficient_font} can be used in
+combination with the modes \type{all}, \type{ru_old} and
+\type{iso9_ocs}. It lets you circumvent the deficiency that some
+fonts show concerning the characters that {\sc iso}~9 assigns to
+cyrillic “ь” and “ъ”. Set it to {\em true} to enable it.
+
+The actual transliteration is done using the macro
+\type{\transliterate[#1]} \type{{#2}}.
+The second argument takes the raw string in the original language that we want
+to process, while the first, optional argument accepts local adjustments for
+\type{mode} and \type{hyphenate}.
+Thus, we would typeset one of Epicuros' sayings like this:
+{\setuptolerance[verytolerant]
+\starttyping
+\transliterate[mode=gr]{κακὸν ἀνάγκη, ἀλλ' οὐδεμία ἀνάγκη ζῆν 
+  μετὰ ἀνάγκης}
+\stoptyping
+\noindentation which yields \quotation{\transliterate[mode=gr]{κακὸν ἀνάγκη, ἀλλ' οὐδεμία ἀνάγκη ζῆν
+μετὰ ἀνάγκης}} in the {\sc pdf} output.
+}
+Alternatively there is an environment, \type{\starttransliterate[#1]}, as well,
+that takes the same arguments.
+
+There are two special switches for the {\em Serbian} patterns,
+\type{hinting} and \type{sr_exceptions}, allowing for a little
+more fine-tuning.
+If activated, hinting provides the special character “\type{*}” as
+a means to indicate positions, where the sequences “lj” and “nj”
+are to be treated as separate consonants.
+E.~g. \type{\transliterate[mode=sr_tocy]{in*jekcija}} is
+correctly transliterated as \transliterate[mode=sr_tocy]{in*jekcija},
+and not \transliterate[mode=sr_tocy,sr_exceptions=no]{injekcija}.
+Likewise, further exceptions that are internally represented as
+a lookup table can be toggled off or on by the
+\type{sr_exceptions} switch.
+This pertains to words like “nadživeti” (result: \transliterate[mode=sr_tocy]{nadživeti})
+but may lead to accidental false positives in cases that the
+module author didn’t foresee.
+By default both hinting and lexical exceptions are set to
+\type{yes}.
+
+For orientation purposes the Transliterator comes with two macros that allow
+for closer inspection of the internal tables.
+\type{\showOneTranslitTab{#1}} outputs, obviously, a single table; their
+identifiers
+can be found in the \type{trans_}
+\type{tables_*.lua} files in the transliterator
+directory.
+The lazy alternative is \type{\showTranslitTabs} which prints all registered
+tables in a row nicely formatted as indexable sections.
+(Be warned, this may take some time.)
+
+\chapter{Introduction}
+
+\hfil\framed[width=\hsize,align=left]{%
+  \inframed[bottomframe=on]{\it What's all this, then?}
+  \blank[medium]
+  {\sc Graham Chapman}
+}
+\blank[2*big]
+
+\noindentation  At the first glance, {\em transliteration} -- the accurate representation of letters from one
+alphabet in another -- seems obsolete after the advent of Unicode
+which made its way even into \TeX\ lately.
+Why not just go on and write down everything in the original script?
+But still there are lots of situations where transliteration is desirable,
+e.~g. some scholarly habits might prescribe it in the main text with citations in
+footnotes left in the original alphabet; or transliteration might alleviate
+comparison within one language that happens to be written in different scripts;
+finally, including text in a foreign script might be impossible if there is no
+appropriate font which fits the main text.
+However, it is still most convenient for the writer to keep the
+untransliterated original in the document source as this allows for reusing it in
+another context where different transliterations rules might apply.
+The Transliterator module is meant to provide both: have the original in the
+source and a transliteration only in the final document.
+
+Another way of handling foreign languages is {\em transcription}.
+It aims at producing some representation that does not rely on symbolisms
+alien to the language and thus to be at least \quotation{pronouncable}
+without further know\-ledge.
+As transcription methods are language specific and highly idiosyncratic they
+complicate the restoration of the original phrase because information may be lost.
+The Transliterator provides means of transcription as well but in most cases
+you should refrain from using them (\type{[mode=ru_transcript_en]},
+\type{[mode=ru_transcript_de]}). 
+
+For Cyrillic scripts the best quality is achieved using the standardized
+transliteration according to {\sc iso~9}.\footnote{\cite[authoryear][iso].}
+This method not only covers all contemporary languages that are written in
+a variety of Cyrillic but provides a bijective mapping on latin characters as
+well.
+Consequently, you can unambiguously revert the transliteration into
+its original form which was impossible with previous versions of {\sc
+iso}~9 because
+they contained several exceptions depending on the original language.
+Although fifteen years old it has not yet made its way into scholarly
+publications at large so it might not immediately look familiar.\footnote{
+  A hasty glance at the latest issues of around 20~journals in a local library
+  revealed that 2~of them actually are using {\sc iso}~9, these are {\em Przegląd
+  wschodni} as of Nr. X, 3 (2008) and {\em Kwartalnik historyczny} as of CXVI,
+  3 (2009); the latter even contains a table on p.~218 showing a subset of the
+  {\sc iso}~9 transliteration rules.
+}
+The diacritics are not identical to the \quotation{scientific}
+transliteration used in Slavic studies but as long as your editor does not
+enforce its traditional method you should always prefer {\sc iso}~9
+(\type{[mode=ru]}, \type{[mode=ru_old]}, \type{[mode=all]}).
+
+But {\sc iso}~9, too, has its shortcomings.
+It has no definitions for historical forms of the cyrillic script like 
+pre-XVIII-century Russian and Old (Church) Slavonic while those are covered by
+the scholarly transliterations.
+To amend the situation the Transliterator provides an extension to {\sc
+iso}~9 for
+Old Slavonic containing the glyphs 
+\startluacode
+local translit = thirddata.translit
+environment.loadluafile("trans_tables_scntfc")
+local cnt, len = 0, 0 
+for i,j in pairs(translit.ocs_add_low) do
+  len = len + 1
+end
+
+for k,v in pairs(translit.ocs_add_low) do
+  cnt = cnt + 1
+  context.bgroup() 
+    context.setupbodyfont({"cyrilice"})
+    context(k)
+  context.egroup() 
+  if cnt < len -1 then
+    context(", ") 
+  elseif cnt < len then
+    context("\\ and ")
+  end
+end
+\stopluacode
+\ taken from the scientific transliteration (\type{[mode=iso9_ocs]}).
+If you prefer more coherency you might want to use pure \quotation{scientific}
+transliteration (\type{[mode=ocs]}).
+This method is complemented by \type{[mode=ocs_gla]}, the only option the
+Transliterator offers for the Glagolitic alphabet; they can be used consistently
+along each other as they were taken from the same
+book.\footnote{\cite[authoryear][aks] p.~77 \cite[url][aks].}
+
+As far as I know there is no standardized transliteration for Greek so I had to
+resort to the one that is used in scholarly literature.
+Its main drawback is that it has no representation for diacritics apart from
+(rough) breathing, but it respects specific rules for diphthongs and vowels in
+initial positions (\type{[mode=gr]}).
+There is one alternative mode for those who prefer their {\em γ} phonetically
+resolved to /{\em n}/ before velars ({\em γ}, {\em κ}, {\em χ} and {\em ξ};
+\type{[mode=gr_n]}).
+
+Concerning the hyphenation within transliterated passages the default is set to
+to \type{[hyphenate=cs]} (Czech) which produces reasonable results when using
+\type{all}, \type{iso9_ocs} or \type{ru_cz}.
+For stuff like the English and German transcription use their respective native
+hyphenation.\footnote{%
+  You'll have to specify this through \type{\setuptransliterator}
+  or locally because the default hyphenation is {\em not} the same as your
+  documents'.
+}
+However, as there is no hyphenation pattern I know of that closely resembles the
+transliteration of Greek you might have to resort to putting \type{\discretionary}
+hyphens when line breaking does not satisfy.
+
+The Transliterator as a whole is nothing more than a bunch of dictionaries
+containing substitution rules for tokens that may occur in the text.
+These tokens may be single characters or strings of more than one character.
+As there is no simple way to impose order onto those dictionaries the rules for
+one transliteration method are, if needed, distributed over more than one table
+which will be applied successively to ensure that multi-character rules
+are processed first.
+
+
+\setupfloats[spacebefore=small,spaceafter=small]
+\startplacetable[location=left,title={
+  Processing time for corpus {\language[cs]Evgenij Onegin} according to
+  GNU time(1) and the \CONTEXT\ stats.
+}]
+  \starttabulate[|l|cg(.)|cg(.)|]
+    \HL%····················································%
+    \NC mode \NC time(1) in $s$ \NC \CONTEXT \NC \NR
+    \NC <none>                  \NC  8.98 \NC  8.82 \NC \NR
+    \NC \type{all}              \NC  8.37 \NC  8.25 \NC \NR
+    \NC \type{ru_cz}            \NC  8.61 \NC  8.48 \NC \NR
+    \NC \type{ru_transcript_en} \NC  9.26 \NC  9.10 \NC \NR
+    \NC \type{ru_transcript_de} \NC 14.83 \NC 14.71 \NC \NR
+    \HL%····················································%
+  \stoptabulate
+\stopplacetable
+\setuptolerance[tolerant]
+Following suggestions from the mailing list, the Transliterator uses {\em LPeg}
+when substituting.
+This means a huge speed improvement for most substitution modes when compared
+to the older mechanism that used \type{string.gsub} iteratively.
+In ordinary use when transliterating single words or short phrases the
+Transliterator should have little impact on document processing time at large,
+with the exception of the German transcription mode, perhaps.\footnote{
+  The problem lies within the rule set for the German transcription which
+  dictates different instructions depending on the environment of a character;
+  these may conflict, i.~e. it is impossible to substitute a character stream
+  in a single run as some rules may apply only to the result of previous rule.
+  Let me know if there's a way to tell LPeg to backtrack to the last character
+  of a match and not to continue on the next.
+}
+Transliterating (and typesetting in MKIV) \transliterate{Александр Пушкин}'s verse novel
+\transliterate{Евгений Онегин}, a corpus of about 27000 words, in
+\type{[mode=all]} shows little to no delay at all.
+In fact, typesetting cyrillic letters with russian hyphenation seems slow
+things down so much that transliteration may be faster and uses slightly less
+memory.\footnote{%
+  On an IBM T43: \tt 2.6.32-ARCH \#1 SMP PREEMPT Tue Feb 9 14:46:08 UTC 2010
+  i686 Intel(R) Pentium(R) M processor 1.60GHz GenuineIntel GNU/Linux.
+}
+
+
+
+
+\chapter[ex]{Examples}
+\section{Cyrillic scripts}
+\subsection{{\sc iso}~9 and derivatives}
+
+Several transliteration rules are either strictly {\sc iso}~9 compliant
+(\type{ru}, \type{ru_old}, \type{all}) or contain {\sc iso}~9 as a
+subset (\type{iso9_ocs}).\footnote{%
+  Unfortunately \CONTEXT\ still lacks language files for some of them
+  so please excuse the inadequate hyphenation in these cases.%
+}
+
+\trlex{ru}{ru}{cs}{computer-modern-unicode}{%
+  Transliteration rules for the contemporary russian alphabet.%
+}{%
+  В~ворота гостиницы губернского города NN въехала довольно красивая рессорная
+  небольшая бричка, в~какой ездят холостяки: отставные подполковники,
+  штабс-капитаны, помещики, имеющие около сотни душ крестьян, — словом, все те, 
+  которых называют господами средней руки. 
+  В~бричке сидел господин, не красавец, но и~не дурной наружности, ни слишком
+  толст, ни слишком тонок; нельзя сказать, чтобы стар, однако ж~и~не так чтобы
+  слишком молод.
+}
+
+\trlex{ru_old}{ru}{cs}{computer-modern-unicode}{%
+  With aditional characters for pre-1981 Russian orthography (100~per
+  cent {\sc iso}~9).%
+}{%
+  А~сведется віра, убьютъ сотцкого в~селѣ, ино тебѣ взяти полтіна, а~не
+  сотцкого,
+  ино четырѣ гривны, а~намъ віръ не таити в~Новѣгородѣ; а~о~убіствѣ віръ нѣтъ.
+  А~что волости, честны король, новгородцкіе, ино тебѣ не держати своими мужи,
+  а~держати мужми новогородцкими.
+  А~что пошлина в~Торжку и~на Волоцѣ, тівунъ свои держати на своеи чясті,
+  а~Новугороду на своеи чясти посадника держаті.
+  А~се волости новогородцкіе: Волокъ со всѣми волостми, Торжокъ, Бѣжіці,
+  Городець
+  Палець, Шіпинъ, Мелеця, Егна, Заволочье, Тиръ, Пермь, Печера, Югра, Вологда
+  с~волостмі.
+}
+
+\trlex{all}{ru}{cs}{computer-modern-unicode}{%
+  The complete cyrillic mapping from {\sc iso}~9; transliterating Belarusian.%
+}{%
+  Беларуская мова, мова беларусаў, уваходзіць у~сям’ю індаеўрапейскіх моў, яе
+  славянскай групы і~ўсходнеславянскіх моваў падгрупы, на якой размаўляюць
+  у~Беларусі і~па ўсім свеце, галоўным чынам у~Расіі, Украіне, Польшчы.
+  Б.~м. падзяляе шмат граматычных і~лексічных уласцівасцяў з~іншымі
+  ўсходнеславянскімі мовамі (гл. таксама: Іншыя назвы беларускай мовы і~Узаемныя
+  ўплывы усходнеславянскіх моваў).
+}
+
+\trlex{all}{uk}{cs}{computer-modern-unicode}{%
+  The complete cyrillic mapping from {\sc iso}~9; transliterating Ukrainian.%
+}{%
+  Украї́нська мова (застарілі назви -- руська мова, проста мова […]) --
+  слов'янська мова, державна в~Україні та одна з~трьох «офіційних мов на рівних
+  засадах» у~не\-ви\-зна\-ній Придністровській Молдавській Республіці.
+  За різними оцінками загалом у~світі українською мовою говорить від 41~млн.
+  до 45~млн. осіб, вона входить до третього десятка найпоширеніших мов
+  світу.
+}
+
+\trlex{all}{ru}{cs}{computer-modern-unicode}{%
+  The complete cyrillic mapping from {\sc iso}~9; transliterating Serbian.%
+}{%
+  Српски језик је један од словенских језика из породице индоевропских језика.
+  Први писани споменици у~српској редакцији старословенског језика потичу из XI
+  и~XII века.
+  Српски језик је стандардни језик у~службеној употреби у~Србији, Босни
+  и~Херцеговини и~Црној Гори, а~у~употреби је и~у другим земљама гдје живе
+  Срби, међу осталима и~у~Хрватској.
+}
+
+\trlex{iso9_ocs}{ru}{cs}{cyrilice}{%
+  Transliteration rules according to {\sc iso}~9 with additions for Old (Church)
+  Slavonic.%
+}{%
+  Что сѧ дѣѥтѣ по вѣремьнемь~: то ѿидето по вѣрьмьнемь~: приказано бѹдѣте
+  добрымъ людѣмъ~: а любо грамотою ѹтвѣрдѧть~: како то бѹдѣте всемъ вѣдомъ~:
+  или кто посль живыи ѡстанѣть сѧ~: того лѣт͠ коли алъбрахтъ~: влд͠ка ризкии
+  ѹмьрлъ~: ѹздѹмалъ кнѧзѣ смольнескыи~: мьстиславъ~: двд͠въ сн͠ъ~: прислалъ въ
+  ригѹ своѥго лѹчьшего попа~: ѥрьмея~: и съ нимь ѹмьна мѹжа пантелья~:
+  исвоѥго горда смольнеска~: та два была послъмь ѹ ризѣ~: из ригы ѥхали на
+  гочкыи берьго~: тамо твердити миръ~:
+}
+
+\subsection{“Scientific” transliteration}
+These transliterations are widely used among scholars, mainly linguists and, to
+a lesser extent, historians.
+They comprise large character sets in order to represent the original text
+adequately and facilitate comparison of texts of the same language written in
+different scripts; they are not, however, as easily reversible as {\sc
+iso}~9.
+
+\trlex{ocs}{ru}{cs}{cyrilice}{%
+  Transliteration for Old Slavonic used in Slavic studies, taken from the
+  excellent book of \cite [authoryear][aks].\footnote{%
+    This one and both of the following Czech transliterations, although
+    elegantly dealing with hard and weak signs by taking characters from the
+    Cyrillic alphabet, are not unquestioned from a typographical point of
+    view:
+    \quotation{If contrasting faces are used for phonetic transcriptions and
+    main text, each entire phonetic word or passage, not just the individual
+    phonetic characters, should be set in the chosen phonetic face.  Patchwork
+    typography, in which the letters of a single word come from different faces
+    and fonts, is a sign of typographic failure. […]
+    Such mixtures are almost sure to fail unless all the fonts involved have
+    been designed as a single family.}
+    (\cite [authoryear][bh])
+    From this follows that it is advisably to reconsider your font whether it indeed
+    provides the needed glyphs from Russian as well.
+  }%
+}{%
+  Се начнемъ повѣсть сию. 
+  По потопѣ . первиє снве Ноєви . раздѣлиша землю . Симъ . Хамъ . Афетъ . и~ꙗсѧ
+  въстокъ . Симови Персида . Ватрь . тоже  и~до Индикиꙗ в~долготу и~в~ширину [и
+  до Нирокоуриа] ꙗкоже рещи ѿ въстока и~до полуденьꙗ . и~Суриꙗ .
+  и~Индиа по Єфратъ рѣку . Вавилонъ . Кордуна . Асурѧне . Мисопотамира .
+  Аравиꙗ . старѣишаꙗ . Єлмаисъ . Инди . Равиꙗ . на всѧ  Д.
+}
+
+\trlex{ru_cz}{ru}{cs}{computer-modern-unicode}{%
+  Czech phonetic transcription for contemporary Russian.%
+}{%
+  Прошло семь лет после 12-го года. Взволнованное историческое море Европы
+  улеглось в свои берега. Оно казалось затихшим; но таинственные силы,
+  двигающие человечество (таинственные потому, что законы, определяющие их
+  движение, неизвестны нам), продолжали свое действие.
+  Несмотря на то, что поверхность исторического моря казалась неподвижною, так
+  же непрерывно, как движение времени, двигалось человечество. Слагались,
+  разлагались различные группы людских сцеплений; подготовлялись причины
+  образования и~разложения государств, перемещений народов.%
+}
+
+\trlex{ocs_cz}{ru}{cs}{cyrilice}{%
+  Czech phonetic transcription for Old Slavonic (superset of the corresponding
+  Russian transcription).
+}{%
+  Убьеть мужь мужа, то мьстить брату брата, или сынови отца, любо отцю сына,
+  или братучаду, любо сестрину сынови; аще не будеть кто мьстіѧ, то 40 гривенъ
+  ꙁа голову; аще будеть русинъ, любо гридинъ, любо купчина, любо іѧбетник, любо
+  мечникъ, аще иꙁъгои будеть, любо словенинъ, то 40 гривенъ положити ꙁа нь.
+}
+
+\subsection{Serbian}
+The tables for converting Serbian text between Cyrillic and Latin
+alphabets are \type{sr_tolt} and \type{sr_tocy}.
+\trlex{sr_tolt}{sr}{hr}{computer-modern-unicode}{%
+  Transliteration ћирилица \rightarrow\ латиница.%
+}{%
+  Српски језик је један од словенских језика из породице
+  индоевропских језика. Први писани споменици у српској редакцији
+  старословенског језика потичу из XI и XII века.
+
+  Српски језик је стандардни језик у службеној употреби у Србији,
+  Босни и Херцеговини и Црној Гори, а у употреби је и у другим
+  земљама где живе Срби, међу осталима и у Хрватској.%
+}
+
+\trlex{sr_tocy}{hr}{sr}{computer-modern-unicode}{%
+  Transliteration latinica \rightarrow\ ćirilica.%
+}{%
+  Srpski jezik je jedan od slovenskih jezika iz porodice
+  indoevropskih jezika. Prvi pisani spomenici u srpskoj
+  redakciji staroslovenskog jezika potiču iz XI i XII veka.
+
+  Srpski jezik je standardni jezik u službenoj upotrebi u Srbiji,
+  Bosni i Hercegovini i Crnoj Gori, a u upotrebi je i u drugim
+  zemljama gde žive Srbi, među ostalima i u Hrvatskoj.%
+}
+
+\subsection{Bulgarian}
+
+\trlex{bg_de}{bg}{cs}{computer-modern-unicode}{%
+  German scientific transliteration for Bulgarian (based on old {\sc
+  iso}~9 standard).%
+}{%
+  Българският език е индоевропейски език от групата на
+  южнославянските езици. Той е официалният език на Република
+  България и един от 23-те официални езика на Европейския съюз.
+}
+
+\subsection{Legacy national transcriptions}
+At the moment there are tables for “old school” transcription into three
+languages: English (via \type{ru_transcript_en}), German
+(\type{ru_transcript_de}) and Czech (\type{ocs_cz}).
+At least the German one is almost unreadable if used with
+strings longer than two words.
+As we have the bijective {\sc iso}~9 mapping at hand there should be no reason at all
+to use any of them.
+
+\trlex{ru_transcript_en}{ru}{en}{computer-modern-unicode}{%
+  English transcription for contemporary Russian.%
+}{%
+  Прошло семь лет после 12-го года. Взволнованное историческое море Европы
+  улеглось в свои берега. Оно казалось затихшим; но таинственные силы,
+  двигающие человечество (таинственные потому, что законы, определяющие их
+  движение, неизвестны нам), продолжали свое действие.
+  Несмотря на то, что поверхность исторического моря казалась неподвижною, так
+  же непрерывно, как движение времени, двигалось человечество. Слагались,
+  разлагались различные группы людских сцеплений; подготовлялись причины
+  образования и~разложения государств, перемещений народов.%
+}
+
+\trlex{ru_transcript_de}{ru}{deo}{computer-modern-unicode}{%
+  German transcription for contemporary Russian.\footnote{%
+    Following \cite[authoryear][duden] p.~82; all the canonical rules are
+    implemented save one: {\em -его} and {\em -ого} should resolve to {\em
+    -ewo} and {\em -owo} respectively iff genitive endings.
+    As this is a grammatical rather than graphetical criterion writing  a
+    substitution algorithm would amount to do natural language parsing.
+    To make things worse this rule is phonetically confused as it would not
+    take care of other contexts where {\em г} in those patterns is articulated
+    as /{\em v}/ like for instance in {\em сегодня} (which is a historical
+    genitive, though …).
+    So even if this could be implemented it would not be advisable to use such
+    a rule.%
+  }%
+}{%
+  Прошло семь лет после 12-го года. Взволнованное историческое море Европы
+  улеглось в свои берега. Оно казалось затихшим; но таинственные силы,
+  двигающие человечество (таинственные потому, что законы, определяющие их
+  движение, неизвестны нам), продолжали свое действие.
+  Несмотря на то, что поверхность исторического моря казалась неподвижною, так
+  же непрерывно, как движение времени, двигалось человечество. Слагались,
+  разлагались различные группы людских сцеплений; подготовлялись причины
+  образования и~разложения государств, перемещений народов.%
+}
+
+\section{Glagolitic}
+\trlex{ocs_gla}{ru}{cs}{hlaholice}{%
+  “Scientific” transliteration for Old Slavonic written in the Glagolitic
+  alphabet as used in \cite[authoryear][aks].%
+}{%
+  [ⰲⰾ] 
+  ⰰⰴⱏⰻⰽⱁ ⱍⰽ҃ⱏ ⱄⰻ ⱈⱁⱋⰵⱅⱏ ⱃⰰⰸ[ⱁⱃⰻⱅ] 
+  ⰻ ⰸⰰⰽⱁⱀⱏ ⰿⰰⱀⰰⱄⱅⱏⰻⱃⱏⱄⰽⰻ: [ⰻⰶⰵ] 
+  ⱅⱏⰻ ⱆⱄⱅⰰⰲⰻ჻ Ⱃⰵⱍⰵ ⰶⰵ ⰻⰳⱆⰿ[ⱏ] [ⱀⱏ] 
+  ⰽⰰⰽⱁ ⱈⱁⱋⰵⱅⱏ ⱃⰰⰸⱁⱃⰻⱅⰻ ⰸⰰⰽ[ⱁⱀⱏ] 
+  [.] [ⰰ] ⰵⱄⱅⱏ· ⱍⱃⱏⰲⰻ⁖ ⰻ [ⰿ] [..........] 
+  [..] ⰿⱏ ⱀⰵ ⰿⱁⰶⰵⰿⱏ ⱄⰵⰳⱁ ⱅⱃⱏⱂⱑⱅ[ⰻ] 
+  [ⰴⰰ] ⰾⱆⰱⱁ ⱄⰵⰳⱁ ⰻⰿⱑⰻ ⱄⱏⰴⱑ჻ ⰰ ⰿⱏⰻ ⱁ 
+  [ⱅⰻ]ⰴⰵⰿⱏ: ⰾⱆⰱⱁ ⱄⰵⰳⱁ ⱂⱆⱄⱅⰻ: ⰴⰰ ⱁⱅ 
+  [ⰻⰴ]ⰵⱅⱏ ⰻⰶⰵ ⰵⱄⱅⱏ ⱂⱃⰻⱎⱏⰾⱏ: ⱄ[ⰵ] 
+}
+
+\section{Greek}
+The Transliterator offers two modes for handling Greek: \type{gr} and
+\type{gr_n}.
+They differ only on one aspect.
+\type{gr} transliterates the canonical Greek alphabet as well as the
+special glyphs Digamma, Quoppa and Sampi.
+\type{gr_n} behaves exactly the same way except that nasalization is observed
+such that \type{γ+[γ|κ]} yields \type{n+[g|k]}.
+
+\trlex{gr}{agr}{de}{computer-modern-unicode}{%
+  Transliteration for Greek -- standard.
+}{%
+  οἴνῳ δὲ κάρτα προσκέαται, καί σφι οὐκ ἐμέσαι ἔξεστι, οὐκὶ οὐρῆσαι ἀντίον
+  ἄλλου.
+  ταῦτα μέν νυν οὕτω φυλάσσεται, μεθυσκόμενοι δὲ ἐώθασι βουλεύεσθαι τὰ
+  σπουδαιέστατα τῶν πρηγμάτων: τὸ δ᾽ ἂν ἅδῃ σφι βουλευομένοισι, τοῦτο τῇ
+  ὑστεραίῃ νήφουσι προτιθεῖ ὁ στέγαρχος, ἐν τοῦ ἂν ἐόντες βουλεύωνται, καὶ ἢν
+  μὲν
+  ἅδῃ καὶ νήφουσι, χρέωνται αὐτῷ, ἢν δὲμὴ ἅδῃ, μετιεῖσι. τὰ δ᾽ ἂν νήφοντες
+  προβουλεύσωνται, μεθυσκόμενοι ἐπιδιαγινώσκουσι.
+}%
+
+\trlex{gr_n}{agr}{de}{computer-modern-unicode}{%
+  Transliteration for Greek -- alternative respecting nasalization.
+}{%
+  ταῦτα καὶ νεωτέρῳ καὶ πρεσβυτέρῳ ὅτῳ ἂν ἐντυγχάνω ποιήσω, καὶ ξένῳ καὶ ἀστῷ,
+  μᾶλλον δὲ τοῖς ἀστοῖς, ὅσῳ μου ἐγγυτέρω ἐστὲ γένει.
+}%
+   
+
+\chapter{References}
+%\cite[authoryear][iso]
+\nocite[duden]
+\nocite[bornemann]
+\nocite[kirschbaum]
+\nocite[iso]
+\nocite[aks]
+\nocite[dintb]
+\placepublications [criterium=all]
+
+\stoptext
+%   vim:ft=context

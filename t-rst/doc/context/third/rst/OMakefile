@@ -1,0 +1,41 @@
+## Subdirectory omake makefile for the reStructuredText module
+## for Context. See the root OMakefile for details.
+## https://bitbucket.org/phg/context-rst/src/tip/OMakefile
+.PHONY: manual clean nuke
+
+name		= manual
+
+manual_src	= $(name).tex
+manual_rst	= documentation.rst
+manual_pdf	= $(name).pdf
+manual_tmp	= doc.tex
+manual_junk[]	= $(addprefix $(name), .tuc .log)
+manual_spam	= $(name)-termout.log
+
+## The manual is itself written in reStructuredText. This leads to
+## a precarious situation: the module is required to be present in
+## order for the manual to be built. We’re going to have to find
+## some solution for smooth bootstrapping, but at the moment that’s
+## a low priority goal.
+$(manual_pdf): :effects: $(manual_tmp) $(manual_junk) $(manual_spam)
+	rm -rf -- $(manual_spam)
+	echo ":: creating $(manual_tmp) from $(manual_rst)"
+	mtxrun --script rst 			\
+		--if=$(file $(manual_rst)) 	\
+		--of=$(manual_tmp) 		\
+		&> $(manual_spam)
+	echo ":: creating $@ from $(manual_src) and $(manual_tmp)"
+	context --nonstopmode $(file $(manual_src)) &>> $(manual_spam)
+
+manual: $(manual_pdf)
+
+clean:
+	rm -rf -- $(manual_junk) $(manual_tmp) $(manual_spam)
+
+nuke: clean
+	rm -rf -- $(manual_pdf)
+
+## note to self: default targets in subdirectories will
+## lead to those targets being built whenever omake is
+## invoked without arguments from the root tree as well.
+#.DEFAULT: manual
