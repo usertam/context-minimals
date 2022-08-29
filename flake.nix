@@ -63,7 +63,7 @@
             for DIR in $out/modules/*; do
               ${pkgs.xorg.lndir}/bin/lndir -silent $DIR $out/tex/texmf-modules
             done
-            rm -f $out/tex/texmf-modules/{LICENSE,README.md,VERSION}
+            find -L $out/tex/texmf-modules -maxdepth 1 -type f -delete
 
             # wrap $out/tex/texmf-system/bin/<exe> -> $out/bin/<exe>
             for FILE in $(find $out/tex/texmf-system/bin -type f -executable -follow); do
