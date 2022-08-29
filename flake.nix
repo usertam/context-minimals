@@ -30,9 +30,7 @@
           nativeBuildInputs = [ pkgs.makeWrapper ];
           dontConfigure = true;
           dontBuild = true;
-          installPhase = let
-            libPath = pkgs.lib.makeLibraryPath [ pkgs.glibc ];
-          in ''
+          installPhase = ''
             # install context to $out/tex/texmf-context
             mkdir -p $out/tex/texmf-context
             cp -a ${inputs.context}/{colors,context,doc,fonts,metapost,scripts,tex,web2c} $out/tex/texmf-context
@@ -47,11 +45,14 @@
 
             # install luametatex and luatex to $out/tex/texmf-system/bin
             install -Dm755 -t $out/tex/texmf-system/bin ${inputs.binaries}/${system}/{luametatex,luatex}
+
+          '' + pkgs.lib.optionalString pkgs.stdenv.isLinux ''
             patchelf \
               --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-              --set-rpath "${libPath}" \
+              --set-rpath "${ pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.libc ] }" \
               $out/tex/texmf-system/bin/{luametatex,luatex}
 
+          '' + ''
             # populate $out/tex/texmf-system/bin
             ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/context.lua
             ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/mtxrun.lua
