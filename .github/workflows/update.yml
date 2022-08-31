@@ -86,7 +86,29 @@ jobs:
         fi
   build:
     name: Build
-    needs: [sync-binaries, sync-modules]
+    needs: [ sync-binaries, sync-modules ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest ]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v17
+      with:
+        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz
+    - name: Update derivation version and flake lock file
+      id: update
+      run: |
+        NEW=$(curl -s https://raw.githubusercontent.com/contextgarden/context-mirror/master/tex/context/base/mkxl/cont-new.mkxl | grep newcontextversion | grep -o '[0-9].*[0-9]')
+        sed -i "s+version = .*;+version = \"$NEW\";+" flake.nix
+        echo "::set-output name=version::$NEW"
+        nix flake update
+    - name: Build derivation
+      run: |
+        nix build
+  release:
+    name: Release
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
