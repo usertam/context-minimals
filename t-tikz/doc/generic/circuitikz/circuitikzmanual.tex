@@ -3731,6 +3731,7 @@ To add the circle to a single transistor, you use the \texttt{tr circle} keys in
 \end{circuitikz}
 \end{LTXexample}
 
+You can tweak the appearance of transistor's circles and even draw it partially; see ~\ref{sec:trans-circle-custom} for details.
 
 \paragraph{Body diodes and similar things.}\label{sec:bodydiodes-anchor} For all transistors (minus \texttt{bjtnpn} and \texttt{bjtpnp})  a body diode (or freewheeling or flyback diode) can automatically be drawn. Just use the global option \texttt{bodydiode}, or for single transistors, the tikz-option \texttt{bodydiode}.
 As you can see in the next example, the text for the diode is moved if a bodydiode is present (but beware, if you change a lot the relative dimension of components, it may become misplaced):
@@ -3746,7 +3747,9 @@ As you can see in the next example, the text for the diode is moved if a bodydio
 \end{circuitikz}
 \end{LTXexample}
 
-You can use the \texttt{body ...} anchors to add more or different things to the transistors in addition (or instead) of the flyback diode.
+You can tweak the appearance of transistor's bodydiodes; see ~\ref{sec:trans-bodydiode-custom}.
+
+For more complex snubs or protections, you can use the \texttt{body ...} anchors to add more or different things to the transistors in addition (or instead) of the flyback diode.
 
 \begin{LTXexample}[varwidth=true]
 \def\snubb#1#2{% add a snubber to a transistor
@@ -3953,7 +3956,7 @@ You can create completely ``bare'' transistors (without the connection leads to 
 \end{groupdesc}
 
 
-\subsubsection{Transistor circle customization}
+\subsubsection{Transistor circle customization}\label{sec:trans-circle-custom}
 
 \paragraph{Position and size.} You can see in the following diagram where the circle is positioned --- when there is no bodydiode, it will pass through the anchors for the body diode and near the base connection. The dimension of the circle is bigger when the bodydiode is in, to encompass it.
 The anchors are present even there is no circle, so you can use them to draw different kind of circles (say, encompassing two transistors) in a coherent way.
@@ -4057,6 +4060,47 @@ The dashed line pattern can be changed by setting the key \texttt{transistor cir
     \draw[dashed] (Q1.circle bottom) -- (Q2.circle bottom);
 \end{circuitikz}
 \end{LTXexample}
+
+\subsubsection{Transistor bodydiode customization}\label{sec:trans-bodydiode-custom}
+
+You can change the style of the bodydiode\footnote{Suggested by \href{https://tex.stackexchange.com/questions/653348/drawing-mosfet-bodydiode-dashed}{user Alex Ghilas on TeX.SX}, implemented in \texttt{v1.5.4}.} in a similar way to the one used for circles (albeit with less options), by setting keys with the \verb!\ctikzset! command (or, like in the following example, directly in the node instantiation) under the \texttt{transistor bodydiode} hierarchy. The available keys are:
+
+\begin{center}
+    \begin{tabular}{>{\ttfamily}l>{\ttfamily}lp{0.5\linewidth}}
+        \toprule
+     parameter &  default & description  \\
+     \midrule
+     relative thickness & 1.0 & multiply the class thickness \\
+     color & default & stroke color: \texttt{default} is the same as the component \\
+     dash & default & dash pattern: \texttt{default} means not to change the setting for the component; \texttt{none} means unbroken line; every other input is a dash pattern.\footnotemark \\
+        \bottomrule
+    \end{tabular}
+    \footnotetext{Follows the syntax of the pattern sequence \texttt{\textbackslash pgfsetdash} --- see \TikZ{} manual for details; phase is always zero. Basically you pass pairs of dash-length -- blank-length dimensions, see the examples.}
+\end{center}
+
+The following is a quite extensive example. Obviously, a good strategy in this case is to define styles for the options.
+
+\begin{LTXexample}[varwidth=true, pos=t, basicstyle=\small\ttfamily]
+\begin{tikzpicture}[red solid thin bodydiode/.style={bodydiode,
+        circuitikz/transistor bodydiode/dash=none,
+        circuitikz/transistor bodydiode/color=red,
+        circuitikz/transistor bodydiode/relative thickness=0.3}]
+    \draw (0,0) node (mosfet1) [nigfete,anchor=D,bodydiode] {$Q_1$};
+    \draw[densely dashed]  (3,0) node (mosfet1) [nigfete,anchor=D,bodydiode] {$Q_2$};
+    \draw (6,0) node (mosfet1) [nigfete,anchor=D,bodydiode,
+        circuitikz/transistor bodydiode/color=gray] {$Q_3$};
+    \draw (0,-2) node (mosfet1) [nigfete,anchor=D,bodydiode,
+        circuitikz/transistor bodydiode/dash={{2pt}{1pt}}]  {$Q_4$};
+    \draw[densely dashed]  (3,-2) node (mosfet1) [nigfete,anchor=D,
+        red solid thin bodydiode] {$Q_5$};
+    \ctikzset{transistor bodydiode/relative thickness=.5}% from now on, in scope
+    \draw[densely dotted] (6,-2) node (mosfet1) [nigfete,anchor=D,bodydiode,
+          circuitikz/transistor bodydiode/dash=none] {$Q_6$};
+    \path (7,0); %% adjust bounding box (node text is outside it!)
+\end{tikzpicture}
+\end{LTXexample}
+
+
 
 \subsubsection{Transistors anchors}
 
@@ -4623,8 +4667,8 @@ The symbols can also be used along a path, using the transistor-path-syntax(\tex
 Transformers automatically use the inductor shape currently selected. These are the three possibilities:
 \begin{groupdesc}
     \ctikzset{inductor=cute}
-    \circuitdesc{transformer}{Transformer (cute inductor)}{}( A1/180/0.1,
-    A2/180/0.1, B1/0/0.1, B2/0/0.1,
+    \circuitdesc{transformer}{Transformer (cute inductor)}{$T_1$}( A1/180/0.1,
+    A2/180/0.1, B1/0/0.1, B2/0/0.1, north/45/0.4,
     inner dot A1/-135/0.2, inner dot A2/135/0.2, inner dot B1/-45/0.1,
     inner dot B2/45/0.1 )
     \ctikzset{inductor=american}
@@ -4648,7 +4692,15 @@ Transformers with core are also available:
     \ctikzset{inductor=cute} % reset default
 \end{groupdesc}
 
-\subsubsection{Double dipoles anchors}
+You can also build generic double bipoles\footnote{The idea of generic double bipoles was originated by user \href{https://github.com/circuitikz/circuitikz/issues/641}{erwindenboer on GitHub}.} (although it's often better to use subcircuits in this case; see section~\ref{sec:subcircuits}).
+
+\begin{groupdesc}
+    \circuitdesc{double bipole}{Generic double bipole (configurable components)}{$A_v$}(north/45/0.4, center/-90/0.6, east/45/0.2)[L.south/180/0.2, R.west/-45/0.2]
+    \ctikzset{double bipole L=fulllediodeshape, double bipole R=emptydiodeshape, double bipole R invert, diodes/scale=0.6}
+    \circuitdesc{double bipole}{Generic double bipole (this specific configuration is shown in section~\ref{sec:doublebipoles})}{$A_v$}(north/45/0.4, center/-90/0.6, east/45/0.2)[L.south/180/0.2, R.west/-45/0.2]
+\end{groupdesc}
+
+\subsubsection{Transformer anchors}
 
 All the double bipoles/quadrupoles have the four anchors, two for each port.
 The first port, to the left, is port \texttt{A}, having the anchors \texttt{A1} (up) and \texttt{A2} (down); same for port \texttt{B}.
@@ -4743,7 +4795,7 @@ Moreover, you can access the two internal coils (inductances); if your transform
 \node [ocirc] at (T.B1){}; \node [ocirc] at (T.B2){};
 \end{circuitikz}
 \end{LTXexample}
-\subsubsection{Double dipoles customization}
+\subsubsection{Transformers customization}
 
 Transformers are in the \texttt{inductors} class (also the gyrator\dots), so they scale with the key \texttt{inductors/scale}.
 
@@ -4859,6 +4911,88 @@ You can obviously define a style for a ``non-standard'' transformer. For example
 \end{LTXexample}
 
 Remember that the default \texttt{pgfkeys} directory is \texttt{/tikz} for nodes and for the options of the environment, so you \emph{have} to use the full path (with \texttt{circuitikz/}) there.
+
+\subsubsection{Generic double bipoles}\label{sec:doublebipoles}
+
+Generic double bipoles have more or less the same keys for size that the transformers (like \texttt{../width}, \texttt{.../inner} etc.) using the component name \texttt{double bipole}. Also the anchors are similar, with the main difference that the ``dot'' anchors are fixed, so they do \emph{not} adapt to the size of the component.
+Another important difference is that the class of the generic double bipole is \texttt{misc}, not \texttt{inductors} (which is reserved to transformers and, for an historical hiccup, to the gyrator).
+
+By default, the left component is a generic impedance, and the right one is an (American-style, it will not change automatically) voltage generator. You can use \texttt{quadpoles style=inner} as shown in the rightmost drawing below.
+
+\geocoord{double bipole} {\ctikzset{quadpoles style=inline}\geocoord{double bipole}}
+
+The other anchors behave similarly to the transistor's ones; you also have access to the internal components nodes by using \texttt{\emph{nodename}-R} and \texttt{\emph{nodename}-L} names for the right and left element, which is supposed to be \texttt{T} in the drawing below. Be wary that given that here you can (see later) reverse the direction of one or both of the elements, the rotation (and so the anchors) is not fixed (you can see that in the blue and green examples below).
+
+\begin{quote}
+\begin{circuitikz}[cute inductors,
+    ]
+    \def\coordx(#1)[#2:#3]#4{node[circle, #4, draw, inner sep=1pt,pin={[#4, overlay, inner sep=0.5pt, font=\scriptsize, pin distance=#2cm, pin edge={#4, overlay,}]#3:#1}](#1){}}
+    \tikzset{ddpinv/.style={double bipole, circuitikz/double bipole R invert}}
+    \foreach \comp/\pos/\case in {%
+                            double bipole/0/0%
+                            ,double bipole/4/1%
+                            ,ddpinv/8/2%
+                            }{
+        \draw (\pos, 0) node[\comp](T){};
+        \ifcase\case
+            \foreach \a/\d/\t in {inner dot A1/0.2/75, inner dot A2/0.2/-75, inner dot B1/0.1/-45, inner dot B2/0.1/45}
+            \path (T.\a) \coordx(\a)[\d:\t]{red};
+            \path (T-L.south) \coordx(T-L.south)[0.6:180]{red};
+        \or
+            \foreach \a/\d/\t in {outer dot A1/0.4/90, outer dot A2/0.4/-90, outer dot B1/0.2/45, outer dot B2/0.2/-45}
+            \path (T.\a) \coordx(\a)[\d:\t]{blue};
+            \path (T-R.a) \coordx(T-R.a)[0.6:0]{blue};
+            \path (T-R.b) \coordx(T-R.b)[0.6:0]{blue};
+            \path (T-R.south) \coordx(T-R.south)[0.6:0]{blue};
+        \or
+            \foreach \a/\t in {A1/120, A2/-120, B1/120, B2/-120, base/-90}
+            \path (T.\a) \coordx(\a)[0.2:\t]{green!50!black};
+            \path (T-R.a) \coordx(T-R.a)[0.6:0]{green!50!black};
+            \path (T-R.b) \coordx(T-R.b)[0.6:0]{green!50!black};
+            \path (T-R.north) \coordx(T-R.north)[0.6:0]{green!50!black};
+        \fi
+    }
+\end{circuitikz}
+\end{quote}
+
+Generic double bipoles are meant to be used through a style, choosing the left and right components. The keys that let you change the components are the following ones:
+\begin{itemize}
+    \item \texttt{double bipole L}, \texttt{double bipole R}: the \textbf{nodename} of the component you want on the left and right side (default: \texttt{genericshape} and \texttt{vsourceAMshape}).
+    \item \texttt{double bipole L invert}, \texttt{double bipole R invert}: controls the direction of the element inserted (default \texttt{false} for both; that means that the left bipole goes ``down'' and the second one ``up'').
+    \item \texttt{every double bipole L}, \texttt{every double bipole R}: a style that is enacted when drawing the component; by default it's void.
+\end{itemize}
+For example, the LED-diode double bipole at the start of the section could be obtained this way:
+\begin{LTXexample}[varwidth=true]
+\begin{circuitikz}[
+    led to D/.style={double bipole,
+        % at tikz level, you have to use circuitikz/ explicitly
+        circuitikz/double bipole L=fulllediodeshape,
+        circuitikz/double bipole R=emptydiodeshape,
+        circuitikz/every double bipole L/.style={diodes/scale=0.6},
+        circuitikz/every double bipole R/.style={diodes/scale=0.6},
+        circuitikz/double bipole R invert,
+        },
+    ]
+    \draw (0,0) node[led to D]{};
+\end{circuitikz}
+\end{LTXexample}
+
+As a final example, and given that the addition of generic double bipole was stimulated by an issue opened by \href{https://github.com/circuitikz/circuitikz/issues/641}{user erwindenboer on GitHub} suggesting the addition of a nullor shape, the nullor can be obtained like this:
+\begin{LTXexample}[varwidth=true]
+\begin{circuitikz}[
+    nullor/.style={double bipole,
+        % at tikz level, you have to use circuitikz/ explicitly
+        circuitikz/double bipole L=nullatorshape,
+        circuitikz/double bipole R=noratorshape,
+        circuitikz/every double bipole L/.style={sources/scale=0.5},
+        },
+    ]
+    \draw (0,0) node[nullor](T1){};
+\end{circuitikz}
+\end{LTXexample}
+although now adding currents and voltages is not as trivial as if the component is built with a subcircuit\dots
+
+
 
 \subsection{Amplifiers}\label{sec:amplifiers}
 
