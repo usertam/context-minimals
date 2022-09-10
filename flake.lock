@@ -37,11 +37,11 @@
     "modules": {
       "flake": false,
       "locked": {
-        "lastModified": 1662683682,
-        "narHash": "sha256-C8QblAF0ycweAiKvoSAOhuqd5B8KkXBZEoeW9VChVGs=",
+        "lastModified": 1662770130,
+        "narHash": "sha256-Yzrh8/flRs46NIAQc1oBeNMiHiPZs5l3OKwYt96Mouk=",
         "owner": "usertam",
         "repo": "context-minimals",
-        "rev": "62fbeae95a68267a889668882d2c4e2c11c27646",
+        "rev": "1f855e947c5f43dcdce5194c541f4a795235abf4",
         "type": "github"
       },
       "original": {
