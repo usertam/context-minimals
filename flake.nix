@@ -35,6 +35,11 @@
             mkdir -p $out/tex/texmf-context
             cp -a ${inputs.context}/{colors,context,doc,fonts,metapost,scripts,tex,web2c} $out/tex/texmf-context
 
+            # apply hotfix
+            chmod u+w $out/tex/texmf-context/tex/context/base/mkxl
+            patch -Np1 -d $out -i ${./math-ini.mkxl.patch}
+            chmod u-w $out/tex/texmf-context/tex/context/base/mkxl
+
             # install modules to populate $out/modules
             cp -a ${inputs.modules} $out/modules
 
