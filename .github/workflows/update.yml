@@ -100,16 +100,21 @@ jobs:
       with:
         name: context-minimals
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - name: Update derivation version and flake lock file
-      id: update
+    - name: Build derivation with updated dependencies
       run: |
-        NEW=$(curl -s https://raw.githubusercontent.com/contextgarden/context-mirror/master/tex/context/base/mkxl/cont-new.mkxl | grep newcontextversion | grep -o '[0-9].*[0-9]')
-        sed -i "s+version = .*;+version = \"$NEW\";+" flake.nix
-        echo "::set-output name=version::$NEW"
         nix flake update
-    - name: Build derivation
-      run: |
         nix build
+    - name: Test built derivation
+      run: |
+        cat <<EOF > test.tex
+        \usetypescriptfile[libertinus]
+        \setupbodyfont[libertinus]
+        \starttext
+        Hello world!
+        \stoptext
+        EOF
+        nix run .#context -- test.tex
+        [ -f test.pdf ]
   release:
     name: Release
     needs: build
@@ -134,9 +139,6 @@ jobs:
         sed -i "s+version = .*;+version = \"$NEW\";+" flake.nix
         echo "::set-output name=version::$NEW"
         nix flake update
-    - name: Build derivation
-      run: |
-        nix build
     - name: Commit and push if changes present
       run: |
         if [ -z "$(git status --porcelain)" ]; then
