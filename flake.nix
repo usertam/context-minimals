@@ -25,7 +25,7 @@
       in {
         default = pkgs.stdenv.mkDerivation {
           pname = "context-minimals";
-          version = "2022.09.16 14:39";
+          version = "2022.10.22 11:20";
           src = self;
           nativeBuildInputs = [ pkgs.makeWrapper ];
           dontConfigure = true;
@@ -35,10 +35,27 @@
             mkdir -p $out/tex/texmf-context
             cp -a ${inputs.context}/{colors,context,doc,fonts,metapost,scripts,tex,web2c} $out/tex/texmf-context
 
-            # apply hotfix
-            chmod u+w $out/tex/texmf-context/tex/context/base/mkxl
-            patch -Np1 -d $out -i ${./math-ini.mkxl.patch}
-            chmod u-w $out/tex/texmf-context/tex/context/base/mkxl
+            # make writable for patch temporary file
+            chmod +w $out/tex/texmf-context/scripts/context/lua \
+              $out/tex/texmf-context/scripts/context/stubs/mswin \
+              $out/tex/texmf-context/scripts/context/stubs/unix \
+              $out/tex/texmf-context/scripts/context/stubs/win64 \
+              $out/tex/texmf-context/tex/context/base/mkiv \
+              $out/tex/texmf-context/tex/context/base/mkxl \
+              $out/tex/texmf-context/tex/generic/context/luatex
+
+            # apply patches
+            patch -Np1 -d $out/tex/texmf-context -i ${./0001-remove-modification-detections.patch}
+            patch -Np1 -d $out/tex/texmf-context -i ${./0002-fix-undefined-macros-errors.patch}
+
+            # patch done, make read-only
+            chmod -w $out/tex/texmf-context/scripts/context/lua \
+              $out/tex/texmf-context/scripts/context/stubs/mswin \
+              $out/tex/texmf-context/scripts/context/stubs/unix \
+              $out/tex/texmf-context/scripts/context/stubs/win64 \
+              $out/tex/texmf-context/tex/context/base/mkiv \
+              $out/tex/texmf-context/tex/context/base/mkxl \
+              $out/tex/texmf-context/tex/generic/context/luatex
 
             # install modules to populate $out/modules
             cp -a ${inputs.modules} $out/modules
