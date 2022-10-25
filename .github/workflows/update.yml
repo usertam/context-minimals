@@ -135,8 +135,9 @@ jobs:
     - name: Update derivation version and flake lock file
       id: update
       run: |
-        echo "VERSION=$(curl -s https://raw.githubusercontent.com/contextgarden/context-mirror/master/tex/context/base/mkxl/cont-new.mkxl | grep newcontextversion | grep -o '[0-9].*[0-9]')" >> $GITHUB_ENV
-        sed -i "s+version = .*;+version = \"${{ env.VERSION }}\";+" flake.nix
+        VERSION=$(curl -s https://raw.githubusercontent.com/contextgarden/context-mirror/master/tex/context/base/mkxl/cont-new.mkxl | grep newcontextversion | grep -o '[0-9].*[0-9]')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        sed -i "s|version = .*;|version = \"$VERSION\";|" flake.nix
         nix flake update
     - name: Commit and push if changes present
       run: |
