@@ -106,14 +106,8 @@ jobs:
         nix build
     - name: Test built derivation
       run: |
-        cat <<EOF > test.tex
-        \usetypescriptfile[libertinus]
-        \setupbodyfont[libertinus]
-        \starttext
-        Hello world!
-        \stoptext
-        EOF
-        nix run .#context -- test.tex
+        echo '\starttext\input khatt-en\stoptext' > test.tex
+        nix run .#context test.tex
         [ -f test.pdf ]
   release:
     name: Release

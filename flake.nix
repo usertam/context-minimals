@@ -93,6 +93,8 @@
             done
           '';
           fixupPhase = ''
+            runHook preFixup
+
             # make cache deterministic
             export LD_PRELOAD=${pkgs.libfaketime}/lib/libfaketime.so.1
             export FAKETIME="1970-01-01 00:00:00"
@@ -102,8 +104,10 @@
             $out/bin/luatex --luaonly $out/tex/texmf-system/bin/mtxrun.lua --generate
 
             # generate necessary font cache
-            export OSFONTDIR=${pkgs.lmodern}/share/fonts:${pkgs.libertinus}/share/fonts:${pkgs.source-han-serif}/share/fonts:${pkgs.source-han-sans}/share/fonts:$OSFONTDIR
+            export OSFONTDIR=${pkgs.lmodern}/share/fonts:${pkgs.libertinus}/share/fonts:$OSFONTDIR
             $out/bin/mtxrun --script font --reload
+
+            runHook postFixup
           '';
         };
       });
