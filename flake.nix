@@ -25,7 +25,7 @@
       in {
         default = pkgs.stdenv.mkDerivation {
           pname = "context-minimals";
-          version = "2022.10.22 11:20";
+          version = "2022.11.14 22:54";
           src = self;
           nativeBuildInputs = [ pkgs.makeWrapper ];
           dontConfigure = true;
@@ -46,7 +46,6 @@
 
             # apply patches
             patch -Np1 -d $out/tex/texmf-context -i ${./0001-remove-modification-detections.patch}
-            patch -Np1 -d $out/tex/texmf-context -i ${./0002-fix-undefined-macros-errors.patch}
 
             # patch done, make read-only
             chmod -w $out/tex/texmf-context/scripts/context/lua \
