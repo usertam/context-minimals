@@ -3,11 +3,11 @@
     "binaries": {
       "flake": false,
       "locked": {
-        "lastModified": 1669940883,
-        "narHash": "sha256-pSccvvBORN6pUCXx+084BrsiHw3IR3NtsKnjyFYR46g=",
+        "lastModified": 1670286346,
+        "narHash": "sha256-TynFlLJ2BdOewEec+P95wp0OPZ+Wd9wNwpDAhwmVuOk=",
         "owner": "usertam",
         "repo": "context-minimals",
-        "rev": "28be85a9b9bd579314b088cac49b7d2bdfd3f5dd",
+        "rev": "f028a62a3f05e2678db2bd8d9a8317512e5e0952",
         "type": "github"
       },
       "original": {
@@ -20,11 +20,11 @@
     "context": {
       "flake": false,
       "locked": {
-        "lastModified": 1669898590,
-        "narHash": "sha256-6v6NNrCafpRtGPeKwrsdwhM8HJyerV1DbL2XMPcjdto=",
+        "lastModified": 1670278269,
+        "narHash": "sha256-2XOIqpiHx1eV4a/Oa66Dbh/PRJ/FvHvpH4ueF/UUdhQ=",
         "owner": "contextgarden",
         "repo": "context-mirror",
-        "rev": "08fa92c1c94d9faddee48590a1a20506e89c191c",
+        "rev": "265ba2a85e0945a37972e22f23bcaac16d6c08a1",
         "type": "github"
       },
       "original": {
