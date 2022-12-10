@@ -25,7 +25,7 @@
       in {
         default = pkgs.stdenv.mkDerivation {
           pname = "context-minimals";
-          version = "2022.12.07 20:21";
+          version = "2022.12.09 16:31";
           src = self;
           nativeBuildInputs = [ pkgs.makeWrapper ];
           dontConfigure = true;
