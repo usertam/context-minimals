@@ -26,7 +26,7 @@
         default = pkgs.callPackage ./default.nix rec {
           inherit inputs;
           pname = "context-minimals";
-          version = "2022.12.09 16:31";
+          version = "2022.12.15 17:49";
           src = self;
           fonts = [ pkgs.lmodern pkgs.libertinus ];
         };
