@@ -7,6 +7,8 @@
     binaries.flake = false;
     modules.url = "github:usertam/context-minimals/mirror/modules";
     modules.flake = false;
+    luatex-src.url = "github:TeX-Live/luatex";
+    luatex-src.flake = false;
   };
 
   outputs = { self, ... }@inputs:
@@ -22,9 +24,14 @@
     in {
       packages = forAllSystems (system: let
         pkgs = inputs.nixpkgs.legacyPackages.${system};
+        luatex = pkgs.callPackage ./pkgs/luatex/default.nix {
+          pname = "luatex";
+          version = inputs.luatex-src.shortRev;
+          src = inputs.luatex-src;
+        };
       in {
         default = pkgs.callPackage ./default.nix rec {
-          inherit inputs;
+          inherit inputs luatex;
           pname = "context-minimals";
           version = "2022.12.15 17:49";
           src = self;

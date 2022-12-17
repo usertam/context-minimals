@@ -5,6 +5,7 @@
 , version
 , src
 , libfaketime
+, luatex
 , makeWrapper
 , writeText
 , xorg
@@ -15,7 +16,7 @@
 
 stdenv.mkDerivation {
   inherit pname version src;
-  buildInputs = fonts;
+  buildInputs = [ luatex ] ++ fonts;
   nativeBuildInputs = [ makeWrapper ];
 
   dontConfigure = true;
@@ -55,16 +56,19 @@ stdenv.mkDerivation {
     ln -s $out/tex/texmf-context/web2c/context.cnf $out/tex/texmf/web2c/texmf.cnf
     ln -s $out/tex/texmf-context/web2c/contextcnf.lua $out/tex/texmf/web2c/texmfcnf.lua
 
-    # install luametatex and luatex to $out/tex/texmf-system/bin
-    install -Dm755 -t $out/tex/texmf-system/bin ${inputs.binaries}/${stdenv.hostPlatform.system}/{luametatex,luatex}
+    # install luametatex to $out/tex/texmf-system/bin
+    install -Dm755 -t $out/tex/texmf-system/bin ${inputs.binaries}/${stdenv.hostPlatform.system}/luametatex
 
     '' + lib.optionalString stdenv.isLinux ''
     patchelf \
       --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
       --set-rpath "${ lib.makeLibraryPath [ stdenv.cc.libc ] }" \
-      $out/tex/texmf-system/bin/{luametatex,luatex}
+      $out/tex/texmf-system/bin/luametatex
 
     '' + ''
+    # install luatex to $out/tex/texmf-system/bin
+    install -Dm755 -t $out/tex/texmf-system/bin ${luatex}/bin/luatex
+
     # populate $out/tex/texmf-system/bin
     ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/context.lua
     ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/mtxrun.lua
