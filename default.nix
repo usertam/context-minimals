@@ -6,9 +6,11 @@
 , src
 , libfaketime
 , makeWrapper
+, writeText
 , xorg
 , fonts
 , fpath ? lib.makeSearchPath "share/fonts" fonts
+, fcache ? []
 }:
 
 stdenv.mkDerivation {
@@ -93,9 +95,26 @@ stdenv.mkDerivation {
     $out/tex/texmf-system/bin/mtxrun --generate
     $out/tex/texmf-system/bin/luatex --luaonly $out/tex/texmf-system/bin/mtxrun.lua --generate
 
-    # generate necessary font cache
+    # generate font databases
     export OSFONTDIR=${fpath}
     $out/tex/texmf-system/bin/mtxrun --script font --reload
+
+    '' + builtins.concatStringsSep "\n" (map (font: ''
+    # generate font cache payload
+    cat <<'EOF' > "${font}.tex"
+    \definefontfamily[main][serif][${font}]
+    \setupbodyfont[main]
+    \starttext
+    Normal {\bf Bold} {\it Italic} {\sl Slanted} {\bi Bold Italic} {\bs Bold Slanted} {\sc Small Capitals}
+    \stoptext
+    EOF
+
+    # build font cache by forcing cache misses
+    $out/bin/context "${font}.tex"
+
+    '') fcache) + ''
+    # delete the formats from forcing cache misses, keep cache deterministic
+    find $out/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
 
     runHook postFixup
   '';
