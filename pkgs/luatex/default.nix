@@ -1,8 +1,7 @@
 { lib
 , stdenv
-, pname
-, version
 , src
+, runCommand
 , pkg-config
 , cairo
 , gmp
@@ -16,7 +15,12 @@
 }:
 
 stdenv.mkDerivation rec {
-  inherit pname version src;
+  inherit src;
+  pname = "luatex";
+  version = builtins.readFile (runCommand "version" {} ''
+    grep 'luatex_version_string' ${src}/source/texk/web2c/luatexdir/luatex.c \
+      | cut -d\" -f2 | tr -d "\n" > $out
+  '');
 
   nativeBuildInputs = [
     pkg-config
@@ -103,6 +107,6 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    install -Dm555 texk/web2c/luatex $out/bin/luatex
+    install -Dm555 -t $out/bin texk/web2c/luatex
   '';
 }

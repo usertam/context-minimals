@@ -1,14 +1,12 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    context.url = "github:contextgarden/context-mirror/beta";
+    context.url = "github:contextgarden/context/main";
     context.flake = false;
-    binaries.url = "github:usertam/context-minimals/mirror/binaries";
-    binaries.flake = false;
+    luatex.url = "github:TeX-Live/luatex";
+    luatex.flake = false;
     modules.url = "github:usertam/context-minimals/mirror/modules";
     modules.flake = false;
-    luatex-src.url = "github:TeX-Live/luatex";
-    luatex-src.flake = false;
   };
 
   outputs = { self, ... }@inputs:
@@ -24,19 +22,19 @@
     in {
       packages = forAllSystems (system: let
         pkgs = inputs.nixpkgs.legacyPackages.${system};
+      in rec {
         luatex = pkgs.callPackage ./pkgs/luatex/default.nix {
-          pname = "luatex";
-          version = inputs.luatex-src.shortRev;
-          src = inputs.luatex-src;
+          src = inputs.luatex;
         };
-      in {
-        default = pkgs.callPackage ./default.nix rec {
-          inherit inputs luatex;
-          pname = "context-minimals";
-          version = "2022.12.15 17:49";
+        luametatex = pkgs.callPackage ./pkgs/luametatex/default.nix {
+          src = "${inputs.context}/source/luametatex";
+        };
+        context-minimals = pkgs.callPackage ./default.nix {
+          inherit inputs luametatex luatex;
           src = self;
           fonts = [ pkgs.lmodern pkgs.libertinus ];
         };
+        default = context-minimals;
       });
 
       apps = forAllSystems (system: let
