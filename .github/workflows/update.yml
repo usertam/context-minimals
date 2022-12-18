@@ -34,7 +34,7 @@ jobs:
           git commit --allow-empty-message -m ""
           git push origin mirror/modules
         fi
-    - name: Checkout ${GITHUB_REF##*/} branch
+    - name: Checkout current branch
       run: |
         git switch ${GITHUB_REF##*/}
     - name: Update flake lock file
