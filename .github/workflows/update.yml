@@ -46,7 +46,6 @@ jobs:
           echo "BUILD=$(nix eval .#context-minimals.version)" >> $GITHUB_ENV
         fi
     - name: Upload lock file artifact
-      if: env.BUILD
       uses: actions/upload-artifact@v3
       with:
         name: flake.lock
@@ -55,7 +54,6 @@ jobs:
   build:
     name: Build
     needs: update-deps
-    if: env.BUILD
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -82,7 +80,6 @@ jobs:
   release:
     name: Release
     needs: build
-    if: env.BUILD
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
