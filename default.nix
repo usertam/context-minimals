@@ -87,9 +87,18 @@ stdenv.mkDerivation {
   fixupPhase = ''
     runHook preFixup
 
+  '' + lib.optionalString stdenv.isLinux ''
     # make cache deterministic
     export LD_PRELOAD=${libfaketime}/lib/libfaketime.so.1
     export FAKETIME="1970-01-01 00:00:00"
+
+  '' + lib.optionalString stdenv.isDarwin ''
+    # make cache deterministic
+    export DYLD_INSERT_LIBRARIES=${libfaketime}/lib/faketime/libfaketime.1.dylib
+    export DYLD_FORCE_FLAT_NAMESPACE=1
+    export FAKETIME="1970-01-01 00:00:00"
+
+  '' + ''
 
     # generate file databases
     $out/tex/texmf-system/bin/mtxrun --generate
