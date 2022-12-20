@@ -1,10 +1,11 @@
 { lib
 , stdenv
-, pname
 , inputs
-, version
 , src
+, runCommand
 , libfaketime
+, luametatex
+, luatex
 , makeWrapper
 , writeText
 , xorg
@@ -14,8 +15,14 @@
 }:
 
 stdenv.mkDerivation {
-  inherit pname version src;
-  buildInputs = fonts;
+  inherit src;
+  pname = "context-minimals";
+  version = builtins.readFile (runCommand "version" {} ''
+    grep 'newcontextversion' ${inputs.context}/tex/context/base/mkxl/cont-new.mkxl \
+      | cut -d{ -f2 | cut -d} -f1 | tr -d "\n" > $out
+  '');
+
+  buildInputs = [ luametatex luatex ] ++ fonts;
   nativeBuildInputs = [ makeWrapper ];
 
   dontConfigure = true;
@@ -56,15 +63,8 @@ stdenv.mkDerivation {
     ln -s $out/tex/texmf-context/web2c/contextcnf.lua $out/tex/texmf/web2c/texmfcnf.lua
 
     # install luametatex and luatex to $out/tex/texmf-system/bin
-    install -Dm755 -t $out/tex/texmf-system/bin ${inputs.binaries}/${stdenv.hostPlatform.system}/{luametatex,luatex}
+    install -Dm755 -t $out/tex/texmf-system/bin ${luametatex}/bin/luametatex ${luatex}/bin/luatex
 
-    '' + lib.optionalString stdenv.isLinux ''
-    patchelf \
-      --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-      --set-rpath "${ lib.makeLibraryPath [ stdenv.cc.libc ] }" \
-      $out/tex/texmf-system/bin/{luametatex,luatex}
-
-    '' + ''
     # populate $out/tex/texmf-system/bin
     ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/context.lua
     ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/mtxrun.lua
@@ -87,9 +87,18 @@ stdenv.mkDerivation {
   fixupPhase = ''
     runHook preFixup
 
+  '' + lib.optionalString stdenv.isLinux ''
     # make cache deterministic
     export LD_PRELOAD=${libfaketime}/lib/libfaketime.so.1
     export FAKETIME="1970-01-01 00:00:00"
+
+  '' + lib.optionalString stdenv.isDarwin ''
+    # make cache deterministic
+    export DYLD_INSERT_LIBRARIES=${libfaketime}/lib/faketime/libfaketime.1.dylib
+    export DYLD_FORCE_FLAT_NAMESPACE=1
+    export FAKETIME="1970-01-01 00:00:00"
+
+  '' + ''
 
     # generate file databases
     $out/tex/texmf-system/bin/mtxrun --generate

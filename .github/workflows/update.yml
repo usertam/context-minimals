@@ -4,8 +4,8 @@ on:
   schedule:
     - cron: '0 0 * * *'
 jobs:
-  sync-binaries:
-    name: Sync upstream binaries
+  update-deps:
+    name: Update dependencies
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -13,84 +13,51 @@ jobs:
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-    - name: Checkout release branch
-      run: |
-        git fetch --depth=1 origin mirror/binaries:mirror/binaries || true
-        git symbolic-ref HEAD refs/heads/mirror/binaries
-        git reset --hard
-    - name: Download binaries from https://lmtx.pragma-ade.nl/
-      run: |
-        # aarch64-linux, from "texmf-linux-aarch64"
-        mkdir -p aarch64-linux
-        curl -so aarch64-linux/luametatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-linux-aarch64/bin/luametatex &
-        curl -so aarch64-linux/luatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-linux-aarch64/bin/luatex &
-
-        # aarch64-darwin, from "texmf-osx-arm64"
-        mkdir -p aarch64-darwin
-        curl -so aarch64-darwin/luametatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-osx-arm64/bin/luametatex &
-        curl -so aarch64-darwin/luatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-osx-arm64/bin/luatex &
-
-        # i686-linux, from "texmf-linux"
-        mkdir -p i686-linux
-        curl -so i686-linux/luametatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-linux/bin/luametatex &
-        curl -so i686-linux/luatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-linux/bin/luatex &
-
-        # x86_64-darwin, from "texmf-osx-64"
-        mkdir -p x86_64-darwin
-        curl -so x86_64-darwin/luametatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-osx-64/bin/luametatex &
-        curl -so x86_64-darwin/luatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-osx-64/bin/luatex &
-
-        # x86_64-linux, from "texmf-linux-64"
-        mkdir -p x86_64-linux
-        curl -so x86_64-linux/luametatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-linux-64/bin/luametatex &
-        curl -so x86_64-linux/luatex https://lmtx.pragma-ade.nl/install-lmtx/tex/texmf-linux-64/bin/luatex &
-
-        # wait for all downloads to finish
-        wait
-    - name: Commit and push if changes present
-      run: |
-        if [ -z "$(git status --porcelain)" ]; then
-          echo "No changes present."
-        else
-          echo "Changes present."
-          git add aarch64-linux aarch64-darwin i686-linux x86_64-darwin x86_64-linux
-          git commit --allow-empty-message -m ""
-          git push origin mirror/binaries
-        fi
-  sync-modules:
-    name: Sync upstream modules
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up github-actions name and email
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-    - name: Checkout release branch
+    - uses: cachix/install-nix-action@v18
+      with:
+        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz
+    - name: Checkout modules branch
       run: |
         git fetch --depth=1 origin mirror/modules:mirror/modules || true
         git symbolic-ref HEAD refs/heads/mirror/modules
         git reset --hard
-    - name: Sync with upstream
+    - name: Sync with upstream modules
       run: |
         rsync -av rsync://contextgarden.net/minimals/current/modules/* .
-    - name: Commit and push if changes present
+    - name: Commit and push if modules changes present
       run: |
         if [ -z "$(git status --porcelain)" ]; then
-          echo "No changes present."
+          echo "No modules changes present."
         else
-          echo "Changes present."
+          echo "Modules changes present."
           git add .
           git commit --allow-empty-message -m ""
           git push origin mirror/modules
         fi
+    - name: Checkout current branch
+      run: |
+        git switch ${GITHUB_REF##*/}
+    - name: Update flake lock file
+      run: |
+        # only update nixpkgs if others dependencies are updated
+        nix flake metadata --update-input context --update-input luatex --update-input modules
+        if git status --porcelain | grep flake.lock; then
+          nix flake update
+          echo "BUILD=$(nix eval .#context-minimals.version)" >> $GITHUB_ENV
+        fi
+    - name: Upload lock file artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: flake.lock
+        path: flake.lock
+
   build:
     name: Build
-    needs: [ sync-binaries, sync-modules ]
-    runs-on: ubuntu-latest
+    needs: update-deps
     strategy:
       matrix:
         os: [ macos-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
     - uses: cachix/install-nix-action@v18
@@ -100,46 +67,37 @@ jobs:
       with:
         name: context-minimals
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - name: Build derivation with updated dependencies
-      run: |
-        nix flake update
-        nix build
-    - name: Test built derivation
+    - name: Download lock file artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: flake.lock
+    - name: Build and test derivation
       run: |
         echo '\starttext\input khatt-en\stoptext' > test.tex
         nix run .#context test.tex
         [ -f test.pdf ]
+
   release:
     name: Release
     needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v18
-      with:
-        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz
-    - uses: cachix/cachix-action@v11
-      with:
-        name: context-minimals
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Set up github-actions name and email
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-    - name: Update derivation version and flake lock file
-      id: update
-      run: |
-        VERSION=$(curl -s https://raw.githubusercontent.com/contextgarden/context-mirror/master/tex/context/base/mkxl/cont-new.mkxl | grep newcontextversion | grep -o '[0-9].*[0-9]')
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        sed -i "s|version = .*;|version = \"$VERSION\";|" flake.nix
-        nix flake update
-    - name: Commit and push if changes present
+    - name: Download lock file artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: flake.lock
+    - name: Commit and push if lock file changes present
       run: |
         if [ -z "$(git status --porcelain)" ]; then
-          echo "No changes present."
+          echo "No lock file changes present."
         else
-          echo "Changes present."
-          git add flake.nix flake.lock
-          git commit -m "context-minimals: ${{ env.VERSION }}"
+          echo "Lock file changes present."
+          git add flake.lock
+          git commit -m "context-minimals: ${{ env.BUILD }}"
           git push origin ${GITHUB_REF##*/}
         fi

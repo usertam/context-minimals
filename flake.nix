@@ -1,10 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    context.url = "github:contextgarden/context-mirror/beta";
+    context.url = "github:contextgarden/context/main";
     context.flake = false;
-    binaries.url = "github:usertam/context-minimals/mirror/binaries";
-    binaries.flake = false;
+    luatex.url = "github:TeX-Live/luatex";
+    luatex.flake = false;
     modules.url = "github:usertam/context-minimals/mirror/modules";
     modules.flake = false;
   };
@@ -22,14 +22,20 @@
     in {
       packages = forAllSystems (system: let
         pkgs = inputs.nixpkgs.legacyPackages.${system};
-      in {
-        default = pkgs.callPackage ./default.nix rec {
-          inherit inputs;
-          pname = "context-minimals";
-          version = "2022.12.15 17:49";
+      in rec {
+        luametatex = pkgs.callPackage ./pkgs/luametatex/default.nix {
+          src = "${inputs.context}/source/luametatex";
+        };
+        luatex = pkgs.callPackage ./pkgs/luatex/default.nix {
+          src = inputs.luatex;
+        };
+        libfaketime = pkgs.callPackage ./pkgs/libfaketime/default.nix {};
+        context-minimals = pkgs.callPackage ./default.nix {
+          inherit inputs luametatex luatex libfaketime;
           src = self;
           fonts = [ pkgs.lmodern pkgs.libertinus ];
         };
+        default = context-minimals;
       });
 
       apps = forAllSystems (system: let

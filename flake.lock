@@ -1,36 +1,35 @@
 {
   "nodes": {
-    "binaries": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1671150427,
-        "narHash": "sha256-ybvABWtjmVUXJOMIsqXXrNihdL4yLO8/TOJsMTcGHLA=",
-        "owner": "usertam",
-        "repo": "context-minimals",
-        "rev": "9659b6a6c6363f3c04b71e7648afbfdf09ab7ad8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "usertam",
-        "ref": "mirror/binaries",
-        "repo": "context-minimals",
-        "type": "github"
-      }
-    },
     "context": {
       "flake": false,
       "locked": {
-        "lastModified": 1671128024,
-        "narHash": "sha256-9OwL+AmqUDVhPapwqGlgGPPX7OrVaR+Xcr/aCfw+2NY=",
+        "lastModified": 1671122940,
+        "narHash": "sha256-Kiwha542wJFjXxij4Zk9pB+/iUA9NRSC3Lwlv39F3Wk=",
         "owner": "contextgarden",
-        "repo": "context-mirror",
-        "rev": "8f472c629a996f1c08281198210354a253d7f56b",
+        "repo": "context",
+        "rev": "101f43df352f7251a04d2018dda25fb664978a79",
         "type": "github"
       },
       "original": {
         "owner": "contextgarden",
-        "ref": "beta",
-        "repo": "context-mirror",
+        "ref": "main",
+        "repo": "context",
+        "type": "github"
+      }
+    },
+    "luatex": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1666461452,
+        "narHash": "sha256-bgpDlES33jZSVbNIc5kV/dtsNwDVTAzJ4SZIBD2xrV4=",
+        "owner": "TeX-Live",
+        "repo": "luatex",
+        "rev": "3f14129c06359e1a06dd2f305c8334a2964149d3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "TeX-Live",
+        "repo": "luatex",
         "type": "github"
       }
     },
@@ -69,8 +68,8 @@
     },
     "root": {
       "inputs": {
-        "binaries": "binaries",
         "context": "context",
+        "luatex": "luatex",
         "modules": "modules",
         "nixpkgs": "nixpkgs"
       }
