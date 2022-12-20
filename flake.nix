@@ -23,24 +23,15 @@
       packages = forAllSystems (system: let
         pkgs = inputs.nixpkgs.legacyPackages.${system};
       in rec {
-        luatex = pkgs.callPackage ./pkgs/luatex/default.nix {
-          src = inputs.luatex;
-        };
         luametatex = pkgs.callPackage ./pkgs/luametatex/default.nix {
           src = "${inputs.context}/source/luametatex";
         };
+        luatex = pkgs.callPackage ./pkgs/luatex/default.nix {
+          src = inputs.luatex;
+        };
+        libfaketime = pkgs.callPackage ./pkgs/libfaketime/default.nix {};
         context-minimals = pkgs.callPackage ./default.nix {
-          inherit inputs luametatex luatex;
-          libfaketime = pkgs.libfaketime.overrideAttrs (final: prev: rec {
-            version = "0.9.10";
-            src = pkgs.fetchFromGitHub {
-              owner = "wolfcw";
-              repo = "libfaketime";
-              rev = "v${version}";
-              sha256 = "sha256-DYRuQmIhQu0CNEboBAtHOr/NnWxoXecuPMSR/UQ/VIQ=";
-            };
-            patches = [];
-          });
+          inherit inputs luametatex luatex libfaketime;
           src = self;
           fonts = [ pkgs.lmodern pkgs.libertinus ];
         };
