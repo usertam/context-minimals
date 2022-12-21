@@ -43,8 +43,9 @@ stdenv.mkDerivation {
       $out/tex/texmf-context/tex/generic/context/luatex
 
     # apply patches
-    patch -Np1 -d $out/tex/texmf-context -i $src/patches/0001-remove-modification-detections.patch
-    patch -Np1 -d $out/tex/texmf-context -i $src/patches/0002-remove-timestamps-and-uuid-embedding-in-font-caches.patch
+    for PATCH in $src/patches/*.patch; do
+      patch -Np1 -d $out/tex/texmf-context -i $PATCH
+    done
 
     # patch done, make read-only
     chmod -w $out/tex/texmf-context/scripts/context/lua \

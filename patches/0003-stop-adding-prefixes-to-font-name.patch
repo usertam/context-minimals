@@ -1,0 +1,40 @@
+From 0ebce11a70f347c6ac0d5fd81d93c9573d290d4e Mon Sep 17 00:00:00 2001
+From: usertam <heiyiutam@gmail.com>
+Date: Thu, 22 Dec 2022 01:07:39 +0800
+Subject: [PATCH 3/3] stop adding prefixes to font name
+
+---
+ tex/context/base/mkxl/lpdf-emb.lmt | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/tex/context/base/mkxl/lpdf-emb.lmt b/tex/context/base/mkxl/lpdf-emb.lmt
+index 271aadd..4e9147d 100644
+--- a/tex/context/base/mkxl/lpdf-emb.lmt
++++ b/tex/context/base/mkxl/lpdf-emb.lmt
+@@ -311,22 +311,8 @@ end
+ 
+     -- Actually we can use the same as we only embed once.
+ 
+-    -- subsetname = function(name)
+-    --     return "CONTEXT" .. name
+-    -- end
+-
+-    local prefixes = { } -- todo: set fixed one
+-
+     subsetname = function(name)
+-        local prefix
+-        while true do
+-            prefix = utfchar(random(65,90),random(65,90),random(65,90),random(65,90),random(65,90),random(65,90))
+-            if not prefixes[prefix] then
+-                prefixes[prefix] = true
+-                break
+-            end
+-        end
+-        return prefix .. "+" .. name
++        return name
+     end
+ 
+ end
+-- 
+2.38.1
+
