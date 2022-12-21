@@ -1,14 +1,18 @@
 name: "Update"
 on:
   workflow_dispatch:
+  push:
+    branches:
+    - master
   schedule:
-    - cron: '0 0 * * *'
+  - cron: '0 0 * * *'
 jobs:
   update-deps:
     name: Update dependencies
     runs-on: ubuntu-latest
     outputs:
-      build: ${{ steps.update.outputs.BUILD }}
+      rebuild: ${{ steps.update.outputs.REBUILD }}
+      version: ${{ steps.update.outputs.VERSION }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up github-actions name and email
@@ -45,12 +49,12 @@ jobs:
         # only update nixpkgs if others dependencies are updated
         nix flake metadata --update-input context --update-input luatex --update-input modules
         if git status --porcelain | grep flake.lock; then
+          echo "REBUILD=1" >> $GITHUB_OUTPUT
           nix flake update
-          # set steps.update.outputs.BUILD
-          echo "BUILD=$(nix eval --raw .#context-minimals.version)" >> $GITHUB_OUTPUT
         fi
+        echo "VERSION=$(nix eval --raw .#context-minimals.version)" >> $GITHUB_OUTPUT
     - name: Upload lock file artifact
-      if: steps.update.outputs.BUILD
+      if: steps.update.outputs.REBUILD || github.event_name != 'schedule'
       uses: actions/upload-artifact@v3
       with:
         name: flake.lock
@@ -59,7 +63,7 @@ jobs:
   build:
     name: Build
     needs: update-deps
-    if: needs.update-deps.outputs.build
+    if: needs.update-deps.outputs.rebuild || github.event_name != 'schedule'
     strategy:
       matrix:
         os: [ macos-latest, ubuntu-latest ]
@@ -86,7 +90,7 @@ jobs:
   release:
     name: Release
     needs: [ update-deps, build ]
-    if: needs.update-deps.outputs.build
+    if: needs.update-deps.outputs.rebuild || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -105,6 +109,6 @@ jobs:
         else
           echo "Lock file changes present."
           git add flake.lock
-          git commit -m "context-minimals: ${{ needs.update-deps.outputs.build }}"
+          git commit -m "context-minimals: ${{ needs.update-deps.outputs.version }}"
           git push origin ${GITHUB_REF##*/}
         fi
