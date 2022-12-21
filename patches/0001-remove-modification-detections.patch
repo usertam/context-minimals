@@ -1,6 +1,6 @@
-From 10eddbf5b77ba9d33ed784f99ea9df846e922e19 Mon Sep 17 00:00:00 2001
+From c593cd23d6e14b09c5c6141728fc11a3243ebc27 Mon Sep 17 00:00:00 2001
 From: usertam <heiyiutam@gmail.com>
-Date: Fri, 21 Oct 2022 19:05:51 +0800
+Date: Wed, 21 Dec 2022 16:40:04 +0800
 Subject: [PATCH 1/2] remove modification detections
 
 In a pure environment, caches are always reproducible and correct.
@@ -9,9 +9,6 @@ detections and cache regeneration redundant. To avoid constant
 rebuilding of font caches, remove the detection routines altogether.
 ---
  scripts/context/lua/mtxrun.lua                | 29 +--------
- scripts/context/stubs/mswin/mtxrun.lua        | 29 +--------
- scripts/context/stubs/unix/mtxrun             | 29 +--------
- scripts/context/stubs/win64/mtxrun.lua        | 29 +--------
  tex/context/base/mkiv/data-sch.lua            |  2 +-
  tex/context/base/mkiv/font-one.lua            |  7 +--
  tex/context/base/mkiv/font-otl.lua            | 14 +----
@@ -26,13 +23,13 @@ rebuilding of font caches, remove the detection routines altogether.
  tex/context/base/mkxl/font-otl.lmt            | 14 +----
  tex/context/base/mkxl/grph-inc.lmt            | 15 +----
  .../context/luatex/luatex-fonts-merged.lua    | 60 ++++---------------
- 18 files changed, 53 insertions(+), 284 deletions(-)
+ 15 files changed, 44 insertions(+), 206 deletions(-)
 
 diff --git a/scripts/context/lua/mtxrun.lua b/scripts/context/lua/mtxrun.lua
-index e1f2df1..a397b63 100644
+index 4cd71b7..8e1e01d 100644
 --- a/scripts/context/lua/mtxrun.lua
 +++ b/scripts/context/lua/mtxrun.lua
-@@ -4328,9 +4328,6 @@ function lfs.isfound(name)
+@@ -4336,9 +4336,6 @@ function lfs.isfound(name)
    return (a=="file" or a=="link") and name or nil
   end
  end
@@ -42,7 +39,7 @@ index e1f2df1..a397b63 100644
  if sandbox then
   sandbox.redefine(lfs.isfile,"lfs.isfile")
   sandbox.redefine(lfs.isdir,"lfs.isdir")
-@@ -4743,7 +4740,7 @@ if not md5 then
+@@ -4751,7 +4748,7 @@ if not md5 then
  end
  local md5,file=md5,file
  local gsub=string.gsub
@@ -51,7 +48,7 @@ index e1f2df1..a397b63 100644
  local loaddata,savedata=io.loaddata,io.savedata
  do
   local patterns=lpeg and lpeg.patterns
-@@ -4762,29 +4759,9 @@ do
+@@ -4770,29 +4767,9 @@ do
  end
  local md5HEX=md5.HEX
  function file.needsupdating(oldname,newname,threshold) 
@@ -70,7 +67,7 @@ index e1f2df1..a397b63 100644
 - else
 -  return false 
 - end
-+ return false 
++ return false
  end
  file.needs_updating=file.needsupdating
 -function file.syncmtimes(oldname,newname)
@@ -82,196 +79,7 @@ index e1f2df1..a397b63 100644
  local function checksum(name)
   if md5 then
    local data=loaddata(name)
-@@ -25081,7 +25058,7 @@ local function fetch(specification)
-  local cachename=caches.setfirstwritablefile(cleanname,"schemes")
-  if not cached[original] then
-   statistics.starttiming(schemes)
--  if not io.exists(cachename) or (os.difftime(os.time(),lfs.attributes(cachename).modification)>(thresholds[protocol] or threshold)) then
-+  if not io.exists(cachename) then
-    cached[original]=cachename
-    local handler=handlers[scheme]
-    if handler then
-diff --git a/scripts/context/stubs/mswin/mtxrun.lua b/scripts/context/stubs/mswin/mtxrun.lua
-index e1f2df1..a397b63 100644
---- a/scripts/context/stubs/mswin/mtxrun.lua
-+++ b/scripts/context/stubs/mswin/mtxrun.lua
-@@ -4328,9 +4328,6 @@ function lfs.isfound(name)
-   return (a=="file" or a=="link") and name or nil
-  end
- end
--function lfs.modification(name)
-- return name and attributes(name,"modification") or nil
--end
- if sandbox then
-  sandbox.redefine(lfs.isfile,"lfs.isfile")
-  sandbox.redefine(lfs.isdir,"lfs.isdir")
-@@ -4743,7 +4740,7 @@ if not md5 then
- end
- local md5,file=md5,file
- local gsub=string.gsub
--local modification,isfile,touch=lfs.modification,lfs.isfile,lfs.touch
-+local isfile,touch=lfs.isfile,lfs.touch
- local loaddata,savedata=io.loaddata,io.savedata
- do
-  local patterns=lpeg and lpeg.patterns
-@@ -4762,29 +4759,9 @@ do
- end
- local md5HEX=md5.HEX
- function file.needsupdating(oldname,newname,threshold) 
-- local oldtime=modification(oldname)
-- if oldtime then
--  local newtime=modification(newname)
--  if not newtime then
--   return true 
--  elseif newtime>=oldtime then
--   return false 
--  elseif oldtime-newtime<(threshold or 1) then
--   return false 
--  else
--   return true 
--  end
-- else
--  return false 
-- end
-+ return false 
- end
- file.needs_updating=file.needsupdating
--function file.syncmtimes(oldname,newname)
-- local oldtime=modification(oldname)
-- if oldtime and isfile(newname) then
--  touch(newname,oldtime,oldtime)
-- end
--end
- local function checksum(name)
-  if md5 then
-   local data=loaddata(name)
-@@ -25081,7 +25058,7 @@ local function fetch(specification)
-  local cachename=caches.setfirstwritablefile(cleanname,"schemes")
-  if not cached[original] then
-   statistics.starttiming(schemes)
--  if not io.exists(cachename) or (os.difftime(os.time(),lfs.attributes(cachename).modification)>(thresholds[protocol] or threshold)) then
-+  if not io.exists(cachename) then
-    cached[original]=cachename
-    local handler=handlers[scheme]
-    if handler then
-diff --git a/scripts/context/stubs/unix/mtxrun b/scripts/context/stubs/unix/mtxrun
-index e1f2df1..a397b63 100644
---- a/scripts/context/stubs/unix/mtxrun
-+++ b/scripts/context/stubs/unix/mtxrun
-@@ -4328,9 +4328,6 @@ function lfs.isfound(name)
-   return (a=="file" or a=="link") and name or nil
-  end
- end
--function lfs.modification(name)
-- return name and attributes(name,"modification") or nil
--end
- if sandbox then
-  sandbox.redefine(lfs.isfile,"lfs.isfile")
-  sandbox.redefine(lfs.isdir,"lfs.isdir")
-@@ -4743,7 +4740,7 @@ if not md5 then
- end
- local md5,file=md5,file
- local gsub=string.gsub
--local modification,isfile,touch=lfs.modification,lfs.isfile,lfs.touch
-+local isfile,touch=lfs.isfile,lfs.touch
- local loaddata,savedata=io.loaddata,io.savedata
- do
-  local patterns=lpeg and lpeg.patterns
-@@ -4762,29 +4759,9 @@ do
- end
- local md5HEX=md5.HEX
- function file.needsupdating(oldname,newname,threshold) 
-- local oldtime=modification(oldname)
-- if oldtime then
--  local newtime=modification(newname)
--  if not newtime then
--   return true 
--  elseif newtime>=oldtime then
--   return false 
--  elseif oldtime-newtime<(threshold or 1) then
--   return false 
--  else
--   return true 
--  end
-- else
--  return false 
-- end
-+ return false 
- end
- file.needs_updating=file.needsupdating
--function file.syncmtimes(oldname,newname)
-- local oldtime=modification(oldname)
-- if oldtime and isfile(newname) then
--  touch(newname,oldtime,oldtime)
-- end
--end
- local function checksum(name)
-  if md5 then
-   local data=loaddata(name)
-@@ -25081,7 +25058,7 @@ local function fetch(specification)
-  local cachename=caches.setfirstwritablefile(cleanname,"schemes")
-  if not cached[original] then
-   statistics.starttiming(schemes)
--  if not io.exists(cachename) or (os.difftime(os.time(),lfs.attributes(cachename).modification)>(thresholds[protocol] or threshold)) then
-+  if not io.exists(cachename) then
-    cached[original]=cachename
-    local handler=handlers[scheme]
-    if handler then
-diff --git a/scripts/context/stubs/win64/mtxrun.lua b/scripts/context/stubs/win64/mtxrun.lua
-index e1f2df1..a397b63 100644
---- a/scripts/context/stubs/win64/mtxrun.lua
-+++ b/scripts/context/stubs/win64/mtxrun.lua
-@@ -4328,9 +4328,6 @@ function lfs.isfound(name)
-   return (a=="file" or a=="link") and name or nil
-  end
- end
--function lfs.modification(name)
-- return name and attributes(name,"modification") or nil
--end
- if sandbox then
-  sandbox.redefine(lfs.isfile,"lfs.isfile")
-  sandbox.redefine(lfs.isdir,"lfs.isdir")
-@@ -4743,7 +4740,7 @@ if not md5 then
- end
- local md5,file=md5,file
- local gsub=string.gsub
--local modification,isfile,touch=lfs.modification,lfs.isfile,lfs.touch
-+local isfile,touch=lfs.isfile,lfs.touch
- local loaddata,savedata=io.loaddata,io.savedata
- do
-  local patterns=lpeg and lpeg.patterns
-@@ -4762,29 +4759,9 @@ do
- end
- local md5HEX=md5.HEX
- function file.needsupdating(oldname,newname,threshold) 
-- local oldtime=modification(oldname)
-- if oldtime then
--  local newtime=modification(newname)
--  if not newtime then
--   return true 
--  elseif newtime>=oldtime then
--   return false 
--  elseif oldtime-newtime<(threshold or 1) then
--   return false 
--  else
--   return true 
--  end
-- else
--  return false 
-- end
-+ return false 
- end
- file.needs_updating=file.needsupdating
--function file.syncmtimes(oldname,newname)
-- local oldtime=modification(oldname)
-- if oldtime and isfile(newname) then
--  touch(newname,oldtime,oldtime)
-- end
--end
- local function checksum(name)
-  if md5 then
-   local data=loaddata(name)
-@@ -25081,7 +25058,7 @@ local function fetch(specification)
+@@ -25089,7 +25066,7 @@ local function fetch(specification)
   local cachename=caches.setfirstwritablefile(cleanname,"schemes")
   if not cached[original] then
    statistics.starttiming(schemes)
@@ -331,7 +139,7 @@ index 829f52e..2c7b667 100644
               -- data.resources.unicodes = nil -- consistent with otf but here we save not much
                  data = containers.write(afm.cache, name, data)
 diff --git a/tex/context/base/mkiv/font-otl.lua b/tex/context/base/mkiv/font-otl.lua
-index 9493bd0..ee1fa38 100644
+index 7114f5b..8397f08 100644
 --- a/tex/context/base/mkiv/font-otl.lua
 +++ b/tex/context/base/mkiv/font-otl.lua
 @@ -134,7 +134,6 @@ function otf.load(filename,sub,instance)
@@ -401,10 +209,10 @@ index 9493bd0..ee1fa38 100644
              specification.filename = cachename
          end
 diff --git a/tex/context/base/mkiv/font-otr.lua b/tex/context/base/mkiv/font-otr.lua
-index 339de10..61bea66 100644
+index 1e6f94e..490cff7 100644
 --- a/tex/context/base/mkiv/font-otr.lua
 +++ b/tex/context/base/mkiv/font-otr.lua
-@@ -164,11 +164,6 @@ end)
+@@ -165,11 +165,6 @@ end)
  -- date represented in number of seconds since 12:00 midnight, January 1, 1904. The value is represented as a
  -- signed 64-bit integer
  
@@ -416,7 +224,7 @@ index 339de10..61bea66 100644
  local tableversion    = 0.004
  readers.tableversion  = tableversion
  local privateoffset   = fonts.constructors and fonts.constructors.privateoffset or 0xF0000 -- 0x10FFFF
-@@ -1044,8 +1039,6 @@ readers.head = function(f,fontdata)
+@@ -1045,8 +1040,6 @@ readers.head = function(f,fontdata)
              magic             = readulong(f),
              flags             = readushort(f),
              units             = readushort(f),
@@ -425,7 +233,7 @@ index 339de10..61bea66 100644
              xmin              = readshort(f),
              ymin              = readshort(f),
              xmax              = readshort(f),
-@@ -2028,11 +2021,9 @@ local function loadtables(f,specification,offset)
+@@ -2032,11 +2025,9 @@ local function loadtables(f,specification,offset)
      local tables   = { }
      local basename = file.basename(specification.filename)
      local filesize = specification.filesize
@@ -437,7 +245,7 @@ index 339de10..61bea66 100644
          version       = readstring(f,4),
          noftables     = readushort(f),
          searchrange   = readushort(f), -- not needed
-@@ -2237,7 +2228,6 @@ local function loadfontdata(specification)
+@@ -2241,7 +2232,6 @@ local function loadfontdata(specification)
      local filename = specification.filename
      local fileattr = lfs.attributes(filename)
      local filesize = fileattr and fileattr.size or 0
@@ -445,7 +253,7 @@ index 339de10..61bea66 100644
      local f = openfile(filename,true) -- zero based
      if not f then
          report("unable to open %a",filename)
-@@ -2246,7 +2236,6 @@ local function loadfontdata(specification)
+@@ -2250,7 +2240,6 @@ local function loadfontdata(specification)
          closefile(f)
      else
          specification.filesize = filesize
@@ -453,7 +261,7 @@ index 339de10..61bea66 100644
          local version  = readstring(f,4)
          local fontdata = nil
          if version == "OTTO" or version == "true" or version == "\0\1\0\0" then
-@@ -2282,7 +2271,6 @@ local function loadfontdata(specification)
+@@ -2286,7 +2275,6 @@ local function loadfontdata(specification)
                      fontdata = {
                          filename    = filename,
                          filesize    = filesize,
@@ -461,7 +269,7 @@ index 339de10..61bea66 100644
                          version     = version,
                          subfonts    = subfonts,
                          ttcversion  = ttcversion,
-@@ -2410,7 +2398,6 @@ function readers.loadfont(filename,n,instance)
+@@ -2414,7 +2402,6 @@ function readers.loadfont(filename,n,instance)
              tableversion  = tableversion,
              creator       = "context mkiv",
              size          = fontdata.filesize,
@@ -470,7 +278,7 @@ index 339de10..61bea66 100644
              descriptions  = fontdata.descriptions,
              format        = fontdata.format,
 diff --git a/tex/context/base/mkiv/font-shp.lua b/tex/context/base/mkiv/font-shp.lua
-index cab4b75..aef1602 100644
+index feae0ba..d2c3490 100644
 --- a/tex/context/base/mkiv/font-shp.lua
 +++ b/tex/context/base/mkiv/font-shp.lua
 @@ -165,7 +165,6 @@ local function loadoutlines(cache,filename,sub,instance)
@@ -801,7 +609,7 @@ index 453f611..f117f68 100644
               -- data.resources.unicodes = nil -- consistent with otf but here we save not much
                  data = containers.write(afm.cache, name, data)
 diff --git a/tex/context/base/mkxl/font-otl.lmt b/tex/context/base/mkxl/font-otl.lmt
-index b7889fc..20560c1 100644
+index 0d654ed..25aa606 100644
 --- a/tex/context/base/mkxl/font-otl.lmt
 +++ b/tex/context/base/mkxl/font-otl.lmt
 @@ -134,7 +134,6 @@ function otf.load(filename,sub,instance)
@@ -853,7 +661,7 @@ index b7889fc..20560c1 100644
                      }
                  end
                  if cleanup > 1 then
-@@ -607,14 +600,13 @@ local function checkconversion(specification)
+@@ -594,14 +587,13 @@ local function checkconversion(specification)
          local name = file.removesuffix(base)
          local attr = lfs.attributes(filename)
          local size = attr and attr.size or 0
@@ -904,10 +712,10 @@ index e55ac47..c4dc3dd 100644
                  if io.exists(newname) and io.size(newname) > 0 then
                      specification.foundname = oldname
 diff --git a/tex/generic/context/luatex/luatex-fonts-merged.lua b/tex/generic/context/luatex/luatex-fonts-merged.lua
-index 480f4ef..078f73e 100644
+index d3fd3db..7000b5a 100644
 --- a/tex/generic/context/luatex/luatex-fonts-merged.lua
 +++ b/tex/generic/context/luatex/luatex-fonts-merged.lua
-@@ -2576,9 +2576,6 @@ function lfs.isfound(name)
+@@ -2584,9 +2584,6 @@ function lfs.isfound(name)
    return (a=="file" or a=="link") and name or nil
   end
  end
@@ -917,7 +725,7 @@ index 480f4ef..078f73e 100644
  if sandbox then
   sandbox.redefine(lfs.isfile,"lfs.isfile")
   sandbox.redefine(lfs.isdir,"lfs.isdir")
-@@ -11393,10 +11390,6 @@ directives.register("fonts.streamreader",function()
+@@ -11392,10 +11389,6 @@ directives.register("fonts.streamreader",function()
    return lower(stripstring(readstring(f,4)))
   end
  end)
@@ -928,7 +736,7 @@ index 480f4ef..078f73e 100644
  local tableversion=0.004
  readers.tableversion=tableversion
  local privateoffset=fonts.constructors and fonts.constructors.privateoffset or 0xF0000
-@@ -11847,8 +11840,6 @@ readers.head=function(f,fontdata)
+@@ -11846,8 +11839,6 @@ readers.head=function(f,fontdata)
     magic=readulong(f),
     flags=readushort(f),
     units=readushort(f),
@@ -937,7 +745,7 @@ index 480f4ef..078f73e 100644
     xmin=readshort(f),
     ymin=readshort(f),
     xmax=readshort(f),
-@@ -12697,11 +12688,9 @@ local function loadtables(f,specification,offset)
+@@ -12696,11 +12687,9 @@ local function loadtables(f,specification,offset)
   local tables={}
   local basename=file.basename(specification.filename)
   local filesize=specification.filesize
@@ -949,7 +757,7 @@ index 480f4ef..078f73e 100644
    version=readstring(f,4),
    noftables=readushort(f),
    searchrange=readushort(f),
-@@ -12871,7 +12860,6 @@ local function loadfontdata(specification)
+@@ -12870,7 +12859,6 @@ local function loadfontdata(specification)
   local filename=specification.filename
   local fileattr=lfs.attributes(filename)
   local filesize=fileattr and fileattr.size or 0
@@ -957,7 +765,7 @@ index 480f4ef..078f73e 100644
   local f=openfile(filename,true) 
   if not f then
    report("unable to open %a",filename)
-@@ -12880,7 +12868,6 @@ local function loadfontdata(specification)
+@@ -12879,7 +12867,6 @@ local function loadfontdata(specification)
    closefile(f)
   else
    specification.filesize=filesize
@@ -965,7 +773,7 @@ index 480f4ef..078f73e 100644
    local version=readstring(f,4)
    local fontdata=nil
    if version=="OTTO" or version=="true" or version=="\0\1\0\0" then
-@@ -12916,7 +12903,6 @@ local function loadfontdata(specification)
+@@ -12915,7 +12902,6 @@ local function loadfontdata(specification)
       fontdata={
        filename=filename,
        filesize=filesize,
@@ -973,7 +781,7 @@ index 480f4ef..078f73e 100644
        version=version,
        subfonts=subfonts,
        ttcversion=ttcversion,
-@@ -13031,7 +13017,6 @@ function readers.loadfont(filename,n,instance)
+@@ -13030,7 +13016,6 @@ function readers.loadfont(filename,n,instance)
     tableversion=tableversion,
     creator="context mkiv",
     size=fontdata.filesize,
@@ -981,7 +789,7 @@ index 480f4ef..078f73e 100644
     glyphs=fontdata.glyphs,
     descriptions=fontdata.descriptions,
     format=fontdata.format,
-@@ -21351,7 +21336,6 @@ function otf.load(filename,sub,instance)
+@@ -21399,7 +21384,6 @@ function otf.load(filename,sub,instance)
   local name=file.removesuffix(base) 
   local attr=lfs.attributes(filename)
   local size=attr and attr.size or 0
@@ -989,7 +797,7 @@ index 480f4ef..078f73e 100644
   if sub=="" then
    sub=false
   end
-@@ -21364,7 +21348,7 @@ function otf.load(filename,sub,instance)
+@@ -21412,7 +21396,7 @@ function otf.load(filename,sub,instance)
   end
   hash=containers.cleanname(hash)
   local data=containers.read(otf.cache,hash)
@@ -998,7 +806,7 @@ index 480f4ef..078f73e 100644
   if forceload then
    report_otf("forced reload of %a due to hard coded flag",filename)
    reload=true
-@@ -21384,14 +21368,11 @@ function otf.load(filename,sub,instance)
+@@ -21432,14 +21416,11 @@ function otf.load(filename,sub,instance)
     if svgshapes then
      resources.svgshapes=nil
      if otf.svgenabled then
@@ -1013,7 +821,7 @@ index 480f4ef..078f73e 100644
       }
      end
      if cleanup>1 then
-@@ -21403,14 +21384,11 @@ function otf.load(filename,sub,instance)
+@@ -21451,14 +21432,11 @@ function otf.load(filename,sub,instance)
     if pngshapes then
      resources.pngshapes=nil
      if otf.pngenabled then
@@ -1028,7 +836,7 @@ index 480f4ef..078f73e 100644
       }
      end
      if cleanup>1 then
-@@ -21716,14 +21694,13 @@ local function checkconversion(specification)
+@@ -21764,14 +21742,13 @@ local function checkconversion(specification)
    local name=file.removesuffix(base)
    local attr=lfs.attributes(filename)
    local size=attr and attr.size or 0
@@ -1045,7 +853,7 @@ index 480f4ef..078f73e 100644
     end
     specification.filename=cachename
    end
-@@ -34800,19 +34777,17 @@ local function initializesvg(tfmdata,kind,value)
+@@ -34846,19 +34823,17 @@ local function initializesvg(tfmdata,kind,value)
   if value and otf.svgenabled then
    local svg=tfmdata.properties.svg
    local hash=svg and svg.hash
@@ -1066,7 +874,7 @@ index 480f4ef..078f73e 100644
     })
    end
    pdftovirtual(tfmdata,pdfshapes,"svg")
-@@ -34886,19 +34861,17 @@ local function initializepng(tfmdata,kind,value)
+@@ -34932,19 +34907,17 @@ local function initializepng(tfmdata,kind,value)
   if value and otf.pngenabled then
    local png=tfmdata.properties.png
    local hash=png and png.hash
@@ -1087,7 +895,7 @@ index 480f4ef..078f73e 100644
     })
    end
    pdftovirtual(tfmdata,pdfshapes,"png")
-@@ -35356,20 +35329,17 @@ function afm.load(filename)
+@@ -35402,20 +35375,17 @@ function afm.load(filename)
    local data=containers.read(afm.cache,name)
    local attr=lfs.attributes(filename)
    local size=attr and attr.size or 0
@@ -1109,7 +917,7 @@ index 480f4ef..078f73e 100644
     report_afm("reading %a",filename)
     data=afm.readers.loadfont(filename,pfbname)
     if data then
-@@ -35378,9 +35348,7 @@ function afm.load(filename)
+@@ -35424,9 +35394,7 @@ function afm.load(filename)
      otfreaders.stripredundant(data)
      otfreaders.pack(data)
      data.size=size
@@ -1119,7 +927,7 @@ index 480f4ef..078f73e 100644
      report_afm("saving %a in cache",name)
      data=containers.write(afm.cache,name,data)
      data=containers.read(afm.cache,name)
-@@ -37266,17 +37234,15 @@ local function loadoutlines(cache,filename,sub,instance)
+@@ -37312,17 +37280,15 @@ local function loadoutlines(cache,filename,sub,instance)
   local kind=file.suffix(filename)
   local attr=lfs.attributes(filename)
   local size=attr and attr.size or 0
@@ -1138,7 +946,7 @@ index 480f4ef..078f73e 100644
      packoutlines(data)
      containers.write(cache,hash,data)
      data=containers.read(cache,hash) 
-@@ -37286,12 +37252,11 @@ local function loadoutlines(cache,filename,sub,instance)
+@@ -37332,12 +37298,11 @@ local function loadoutlines(cache,filename,sub,instance)
   elseif size>0 and (kind=="pfb") then
    local hash=containers.cleanname(base) 
    data=containers.read(cache,hash)
@@ -1152,7 +960,7 @@ index 480f4ef..078f73e 100644
      packoutlines(data)
      containers.write(cache,hash,data)
      data=containers.read(cache,hash) 
-@@ -37302,7 +37267,6 @@ local function loadoutlines(cache,filename,sub,instance)
+@@ -37348,7 +37313,6 @@ local function loadoutlines(cache,filename,sub,instance)
    data={
     filename=filename,
     size=0,
@@ -1160,7 +968,7 @@ index 480f4ef..078f73e 100644
     format="unknown",
     units=1000,
     glyphs={}
-@@ -37320,12 +37284,11 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37366,12 +37330,11 @@ local function loadstreams(cache,filename,sub,instance)
   local kind=lower(file.suffix(filename))
   local attr=lfs.attributes(filename)
   local size=attr and attr.size or 0
@@ -1174,7 +982,7 @@ index 480f4ef..078f73e 100644
     data=otf.readers.loadshapes(filename,sub,instance,true)
     if data then
      local glyphs=data.glyphs
-@@ -37344,14 +37307,13 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37390,14 +37353,13 @@ local function loadstreams(cache,filename,sub,instance)
      data.glyphs=nil
      data.size=size
      data.format=data.format or (kind=="otf" and "opentype") or "truetype"
@@ -1190,7 +998,7 @@ index 480f4ef..078f73e 100644
     local names,encoding,streams,metadata=pfb.loadvector(filename,false,true)
     if streams then
      local fontbbox=metadata.fontbbox or { 0,0,0,0 }
-@@ -37361,7 +37323,6 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37407,7 +37369,6 @@ local function loadstreams(cache,filename,sub,instance)
      data={
       filename=filename,
       size=size,
@@ -1198,7 +1006,7 @@ index 480f4ef..078f73e 100644
       format="type1",
       streams=streams,
       fontheader={
-@@ -37406,7 +37367,6 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37452,7 +37413,6 @@ local function loadstreams(cache,filename,sub,instance)
    data={
     filename=filename,
     size=0,
@@ -1207,5 +1015,5 @@ index 480f4ef..078f73e 100644
     streams={}
    }
 -- 
-2.36.1
+2.38.1
 

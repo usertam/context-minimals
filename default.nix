@@ -3,7 +3,6 @@
 , inputs
 , src
 , runCommand
-, libfaketime
 , luametatex
 , luatex
 , makeWrapper
@@ -29,27 +28,26 @@ stdenv.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
-    # install context to $out/tex/texmf-context
+    # install context source to $out/tex/texmf-context
     mkdir -p $out/tex/texmf-context
-    cp -a ${inputs.context}/{colors,context,doc,fonts,metapost,scripts,tex,web2c} $out/tex/texmf-context
+    cp -a ${inputs.context}/{colors,context,doc,fonts,metapost,tex,web2c} $out/tex/texmf-context
+
+    # for scripts in source, avoid copying the stubs
+    mkdir -p $out/tex/texmf-context/scripts/context
+    cp -a ${inputs.context}/scripts/context/{lua,perl,ruby} $out/tex/texmf-context/scripts/context
 
     # make writable for patch temporary file
     chmod +w $out/tex/texmf-context/scripts/context/lua \
-      $out/tex/texmf-context/scripts/context/stubs/mswin \
-      $out/tex/texmf-context/scripts/context/stubs/unix \
-      $out/tex/texmf-context/scripts/context/stubs/win64 \
       $out/tex/texmf-context/tex/context/base/mkiv \
       $out/tex/texmf-context/tex/context/base/mkxl \
       $out/tex/texmf-context/tex/generic/context/luatex
 
     # apply patches
-    patch -Np1 -d $out/tex/texmf-context -i ${./0001-remove-modification-detections.patch}
+    patch -Np1 -d $out/tex/texmf-context -i $src/patches/0001-remove-modification-detections.patch
+    patch -Np1 -d $out/tex/texmf-context -i $src/patches/0002-remove-timestamps-and-uuid-embedding-in-font-caches.patch
 
     # patch done, make read-only
     chmod -w $out/tex/texmf-context/scripts/context/lua \
-      $out/tex/texmf-context/scripts/context/stubs/mswin \
-      $out/tex/texmf-context/scripts/context/stubs/unix \
-      $out/tex/texmf-context/scripts/context/stubs/win64 \
       $out/tex/texmf-context/tex/context/base/mkiv \
       $out/tex/texmf-context/tex/context/base/mkxl \
       $out/tex/texmf-context/tex/generic/context/luatex
@@ -86,19 +84,6 @@ stdenv.mkDerivation {
 
   fixupPhase = ''
     runHook preFixup
-
-  '' + lib.optionalString stdenv.isLinux ''
-    # make cache deterministic
-    export LD_PRELOAD=${libfaketime}/lib/libfaketime.so.1
-    export FAKETIME="1970-01-01 00:00:00"
-
-  '' + lib.optionalString stdenv.isDarwin ''
-    # make cache deterministic
-    export DYLD_INSERT_LIBRARIES=${libfaketime}/lib/faketime/libfaketime.1.dylib
-    export DYLD_FORCE_FLAT_NAMESPACE=1
-    export FAKETIME="1970-01-01 00:00:00"
-
-  '' + ''
 
     # generate file databases
     $out/tex/texmf-system/bin/mtxrun --generate

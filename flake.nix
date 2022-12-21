@@ -29,9 +29,8 @@
         luatex = pkgs.callPackage ./pkgs/luatex/default.nix {
           src = inputs.luatex;
         };
-        libfaketime = pkgs.callPackage ./pkgs/libfaketime/default.nix {};
         context-minimals = pkgs.callPackage ./default.nix {
-          inherit inputs luametatex luatex libfaketime;
+          inherit inputs luametatex luatex;
           src = self;
           fonts = [ pkgs.lmodern pkgs.libertinus ];
         };
