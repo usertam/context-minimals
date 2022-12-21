@@ -46,10 +46,11 @@ jobs:
         nix flake metadata --update-input context --update-input luatex --update-input modules
         if git status --porcelain | grep flake.lock; then
           nix flake update
+          # set steps.update.outputs.BUILD
+          echo "BUILD=$(nix eval --raw .#context-minimals.version)" >> $GITHUB_OUTPUT
         fi
-        # set steps.update.outputs.BUILD
-        echo "BUILD=$(nix eval --raw .#context-minimals.version)" >> $GITHUB_OUTPUT
     - name: Upload lock file artifact
+      if: steps.update.outputs.BUILD
       uses: actions/upload-artifact@v3
       with:
         name: flake.lock
@@ -58,6 +59,7 @@ jobs:
   build:
     name: Build
     needs: update-deps
+    if: needs.update-deps.outputs.build
     strategy:
       matrix:
         os: [ macos-latest, ubuntu-latest ]
@@ -84,6 +86,7 @@ jobs:
   release:
     name: Release
     needs: [ update-deps, build ]
+    if: needs.update-deps.outputs.build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
