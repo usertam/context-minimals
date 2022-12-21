@@ -7,6 +7,8 @@ jobs:
   update-deps:
     name: Update dependencies
     runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.update.outputs.BUILD }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up github-actions name and email
@@ -38,13 +40,15 @@ jobs:
       run: |
         git switch ${GITHUB_REF##*/}
     - name: Update flake lock file
+      id: update
       run: |
         # only update nixpkgs if others dependencies are updated
         nix flake metadata --update-input context --update-input luatex --update-input modules
         if git status --porcelain | grep flake.lock; then
           nix flake update
-          echo "BUILD=$(nix eval .#context-minimals.version)" >> $GITHUB_ENV
         fi
+        # set steps.update.outputs.BUILD
+        echo "BUILD=$(nix eval --raw .#context-minimals.version)" >> $GITHUB_OUTPUT
     - name: Upload lock file artifact
       uses: actions/upload-artifact@v3
       with:
@@ -79,7 +83,7 @@ jobs:
 
   release:
     name: Release
-    needs: build
+    needs: [ update-deps, build ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -98,6 +102,6 @@ jobs:
         else
           echo "Lock file changes present."
           git add flake.lock
-          git commit -m "context-minimals: ${{ env.BUILD }}"
+          git commit -m "context-minimals: ${{ needs.update-deps.outputs.build }}"
           git push origin ${GITHUB_REF##*/}
         fi
