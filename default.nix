@@ -1,19 +1,17 @@
-{ lib
-, stdenv
+{ stdenvNoCC
 , inputs
 , src
 , runCommand
 , luametatex
 , luatex
 , makeWrapper
-, writeText
 , xorg
 , fonts
-, fpath ? lib.makeSearchPath "share/fonts" fonts
+, fpath ? []
 , fcache ? []
 }:
 
-stdenv.mkDerivation {
+stdenvNoCC.mkDerivation {
   inherit src;
   pname = "context-minimals";
   version = builtins.readFile (runCommand "version" {} ''
@@ -91,7 +89,7 @@ stdenv.mkDerivation {
     $out/tex/texmf-system/bin/luatex --luaonly $out/tex/texmf-system/bin/mtxrun.lua --generate
 
     # generate font databases
-    export OSFONTDIR=${fpath}
+    export OSFONTDIR=${builtins.concatStringsSep ":" ((map (f: f + "/share/fonts") fonts) ++ fpath)}
     $out/tex/texmf-system/bin/mtxrun --script font --reload
 
     '' + builtins.concatStringsSep "\n" (map (font: ''
