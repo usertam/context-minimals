@@ -1,5 +1,4 @@
-{ lib
-, stdenv
+{ stdenv
 , src
 , runCommand
 , pkg-config
@@ -14,8 +13,8 @@
 , zziplib
 }:
 
-stdenv.mkDerivation rec {
-  inherit src;
+stdenv.mkDerivation {
+  src = "${src}/source";
   pname = "luatex";
   version = builtins.readFile (runCommand "version" {} ''
     grep 'luatex_version_string' ${src}/source/texk/web2c/luatexdir/luatex.c \
@@ -38,17 +37,10 @@ stdenv.mkDerivation rec {
     zziplib
   ];
 
-  ldLibraryPath = lib.makeLibraryPath buildInputs;
-
   enableParallelBuilding = true;
 
-  preConfigure = ''
-    export BUILD=$PWD/build
-    mkdir -p $BUILD && cd $BUILD
-  '';
-
-  configureScript = "${src}/source/configure";
   configureFlags = [
+    "--enable-build-in-source-tree"
     "--enable-compiler-warnings=yes"
     "--enable-silent-rules"
     "--disable-all-pkgs"
@@ -87,11 +79,9 @@ stdenv.mkDerivation rec {
   ];
 
   postConfigure = toString (map (dir: ''
-    mkdir -p $BUILD/${dir} && cd $BUILD/${dir}
     local flagsArray=($configureFlags "''${configureFlagsArray[@]}")
-    ${src}/source/${dir}/configure ''${flagsArray[@]}
+    ( cd ${dir} && ./configure ''${flagsArray[@]} )
     unset flagsArray
-    cd $BUILD
   '') [
     "texk/kpathsea"
     "texk/web2c"
