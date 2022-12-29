@@ -1,0 +1,96 @@
+From 21288e890ead65f667cd6e7cfba9dfe1498007d0 Mon Sep 17 00:00:00 2001
+From: usertam <heiyiutam@gmail.com>
+Date: Fri, 30 Dec 2022 01:59:42 +0800
+Subject: [PATCH 4/4] remove placeholder text for uuid
+
+---
+ tex/context/base/mkiv/lpdf-xmp.lua | 11 ++---------
+ tex/context/base/mkxl/lpdf-xmp.lmt | 12 ++----------
+ 2 files changed, 4 insertions(+), 19 deletions(-)
+
+diff --git a/tex/context/base/mkiv/lpdf-xmp.lua b/tex/context/base/mkiv/lpdf-xmp.lua
+index 2ca3ab3..ec77404 100644
+--- a/tex/context/base/mkiv/lpdf-xmp.lua
++++ b/tex/context/base/mkiv/lpdf-xmp.lua
+@@ -262,18 +262,11 @@ local function flushxmpinfo()
+     commands.pushrandomseed()
+     commands.setrandomseed(os.time())
+ 
+-    local documentid = "no unique document id here"
+-    local instanceid = "no unique instance id here"
+     local metadata   = pdfgetmetadata()
+     local time       = metadata.time
+     local producer   = metadata.producer
+     local creator    = metadata.creator
+ 
+-    if included.id ~= "fake" then
+-        documentid = "uuid:" .. os.uuid()
+-        instanceid = "uuid:" .. os.uuid()
+-    end
+-
+     pdfaddtoinfo("Producer",producer)
+     pdfaddtoinfo("Creator",creator)
+     pdfaddtoinfo("CreationDate",time)
+@@ -281,8 +274,8 @@ local function flushxmpinfo()
+ 
+     if add_xmp_blob then
+ 
+-        pdfaddxmpinfo("DocumentID",documentid)
+-        pdfaddxmpinfo("InstanceID",instanceid)
++        pdfaddxmpinfo("DocumentID","")
++        pdfaddxmpinfo("InstanceID","")
+         pdfaddxmpinfo("Producer",producer)
+         pdfaddxmpinfo("CreatorTool",creator)
+         pdfaddxmpinfo("CreateDate",time)
+diff --git a/tex/context/base/mkxl/lpdf-xmp.lmt b/tex/context/base/mkxl/lpdf-xmp.lmt
+index e147c79..c485012 100644
+--- a/tex/context/base/mkxl/lpdf-xmp.lmt
++++ b/tex/context/base/mkxl/lpdf-xmp.lmt
+@@ -119,8 +119,6 @@ local function pdfgetmetadata()
+         local luatexversion       = format("%1.2f",LUATEXVERSION)
+         local luatexfunctionality = tostring(LUATEXFUNCTIONALITY)
+         local jobname             = environment.jobname or tex.jobname or "unknown"
+-        local documentid          = trailerid and ("uuid:" .. osuuid()) or "no unique document id here"
+-        local instanceid          = trailerid and ("uuid:" .. osuuid()) or "no unique instance id here"
+         metadata = creationdate and {
+             producer            = format("LuaMetaTeX-%s",luatexversion),
+             creator             = format("LuaMetaTeX %s %s + ConTeXt LMTX %s",luatexversion,luatexfunctionality,contextversion),
+@@ -132,15 +130,11 @@ local function pdfgetmetadata()
+             creationdate        = creationdate,
+             modificationdate    = modificationdate,
+             id                  = format("%s | %s",jobname,creationdate),
+-            documentid          = documentid,
+-            instanceid          = instanceid,
+             jobname             = jobname,
+         } or {
+             producer            = "LuaMetaTeX",
+             creator             = "LuaMetaTeX + ConTeXt LMTX",
+             id                  = jobname,
+-            documentid          = documentid,
+-            instanceid          = instanceid,
+             jobname             = jobname,
+         }
+      -- inspect(metadata)
+@@ -364,8 +358,6 @@ local function flushxmpinfo()
+     local time       = metadata.time
+     local producer   = metadata.producer
+     local creator    = metadata.creator
+-    local documentid = metadata.documentid
+-    local instanceid = metadata.instanceid
+ 
+     pdfaddtoinfo("Producer",producer)
+     pdfaddtoinfo("Creator",creator)
+@@ -374,8 +366,8 @@ local function flushxmpinfo()
+ 
+     if add_xmp_blob then
+ 
+-        pdfaddxmpinfo("DocumentID",documentid)
+-        pdfaddxmpinfo("InstanceID",instanceid)
++        pdfaddxmpinfo("DocumentID","")
++        pdfaddxmpinfo("InstanceID","")
+         pdfaddxmpinfo("Producer",producer)
+         pdfaddxmpinfo("CreatorTool",creator)
+         pdfaddxmpinfo("CreateDate",time)
+-- 
+2.38.1
+

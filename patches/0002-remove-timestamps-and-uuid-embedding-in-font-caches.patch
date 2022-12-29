@@ -1,7 +1,7 @@
-From c5ce88bdeaa585b1aefc9a07041d3aa6f47abb6e Mon Sep 17 00:00:00 2001
+From 4982b2810f3ed3a9ac9a987cf3a9cc4578dba700 Mon Sep 17 00:00:00 2001
 From: usertam <heiyiutam@gmail.com>
 Date: Wed, 21 Dec 2022 16:48:39 +0800
-Subject: [PATCH 2/3] remove timestamps and uuid embedding in font caches
+Subject: [PATCH 2/4] remove timestamps and uuid embedding in font caches
 
 Improves font caches reproducibility.
 ---

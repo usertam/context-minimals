@@ -1,7 +1,7 @@
-From c593cd23d6e14b09c5c6141728fc11a3243ebc27 Mon Sep 17 00:00:00 2001
+From 34b364ca5fcbab147db64389bbfb5fcebfe33eaa Mon Sep 17 00:00:00 2001
 From: usertam <heiyiutam@gmail.com>
 Date: Wed, 21 Dec 2022 16:40:04 +0800
-Subject: [PATCH 1/3] remove modification detections
+Subject: [PATCH 1/4] remove modification detections
 
 In a pure environment, caches are always reproducible and correct.
 Hence, outdated caches are perfectly fine, rendering timestamp-based
@@ -712,7 +712,7 @@ index e55ac47..c4dc3dd 100644
                  if io.exists(newname) and io.size(newname) > 0 then
                      specification.foundname = oldname
 diff --git a/tex/generic/context/luatex/luatex-fonts-merged.lua b/tex/generic/context/luatex/luatex-fonts-merged.lua
-index d3fd3db..7000b5a 100644
+index 60c5485..59809e8 100644
 --- a/tex/generic/context/luatex/luatex-fonts-merged.lua
 +++ b/tex/generic/context/luatex/luatex-fonts-merged.lua
 @@ -2584,9 +2584,6 @@ function lfs.isfound(name)
@@ -789,7 +789,7 @@ index d3fd3db..7000b5a 100644
     glyphs=fontdata.glyphs,
     descriptions=fontdata.descriptions,
     format=fontdata.format,
-@@ -21399,7 +21384,6 @@ function otf.load(filename,sub,instance)
+@@ -21397,7 +21382,6 @@ function otf.load(filename,sub,instance)
   local name=file.removesuffix(base) 
   local attr=lfs.attributes(filename)
   local size=attr and attr.size or 0
@@ -797,7 +797,7 @@ index d3fd3db..7000b5a 100644
   if sub=="" then
    sub=false
   end
-@@ -21412,7 +21396,7 @@ function otf.load(filename,sub,instance)
+@@ -21410,7 +21394,7 @@ function otf.load(filename,sub,instance)
   end
   hash=containers.cleanname(hash)
   local data=containers.read(otf.cache,hash)
@@ -806,7 +806,7 @@ index d3fd3db..7000b5a 100644
   if forceload then
    report_otf("forced reload of %a due to hard coded flag",filename)
    reload=true
-@@ -21432,14 +21416,11 @@ function otf.load(filename,sub,instance)
+@@ -21430,14 +21414,11 @@ function otf.load(filename,sub,instance)
     if svgshapes then
      resources.svgshapes=nil
      if otf.svgenabled then
@@ -821,7 +821,7 @@ index d3fd3db..7000b5a 100644
       }
      end
      if cleanup>1 then
-@@ -21451,14 +21432,11 @@ function otf.load(filename,sub,instance)
+@@ -21449,14 +21430,11 @@ function otf.load(filename,sub,instance)
     if pngshapes then
      resources.pngshapes=nil
      if otf.pngenabled then
@@ -836,7 +836,7 @@ index d3fd3db..7000b5a 100644
       }
      end
      if cleanup>1 then
-@@ -21764,14 +21742,13 @@ local function checkconversion(specification)
+@@ -21762,14 +21740,13 @@ local function checkconversion(specification)
    local name=file.removesuffix(base)
    local attr=lfs.attributes(filename)
    local size=attr and attr.size or 0
@@ -853,7 +853,7 @@ index d3fd3db..7000b5a 100644
     end
     specification.filename=cachename
    end
-@@ -34846,19 +34823,17 @@ local function initializesvg(tfmdata,kind,value)
+@@ -34844,19 +34821,17 @@ local function initializesvg(tfmdata,kind,value)
   if value and otf.svgenabled then
    local svg=tfmdata.properties.svg
    local hash=svg and svg.hash
@@ -874,7 +874,7 @@ index d3fd3db..7000b5a 100644
     })
    end
    pdftovirtual(tfmdata,pdfshapes,"svg")
-@@ -34932,19 +34907,17 @@ local function initializepng(tfmdata,kind,value)
+@@ -34930,19 +34905,17 @@ local function initializepng(tfmdata,kind,value)
   if value and otf.pngenabled then
    local png=tfmdata.properties.png
    local hash=png and png.hash
@@ -895,7 +895,7 @@ index d3fd3db..7000b5a 100644
     })
    end
    pdftovirtual(tfmdata,pdfshapes,"png")
-@@ -35402,20 +35375,17 @@ function afm.load(filename)
+@@ -35400,20 +35373,17 @@ function afm.load(filename)
    local data=containers.read(afm.cache,name)
    local attr=lfs.attributes(filename)
    local size=attr and attr.size or 0
@@ -917,7 +917,7 @@ index d3fd3db..7000b5a 100644
     report_afm("reading %a",filename)
     data=afm.readers.loadfont(filename,pfbname)
     if data then
-@@ -35424,9 +35394,7 @@ function afm.load(filename)
+@@ -35422,9 +35392,7 @@ function afm.load(filename)
      otfreaders.stripredundant(data)
      otfreaders.pack(data)
      data.size=size
@@ -927,7 +927,7 @@ index d3fd3db..7000b5a 100644
      report_afm("saving %a in cache",name)
      data=containers.write(afm.cache,name,data)
      data=containers.read(afm.cache,name)
-@@ -37312,17 +37280,15 @@ local function loadoutlines(cache,filename,sub,instance)
+@@ -37310,17 +37278,15 @@ local function loadoutlines(cache,filename,sub,instance)
   local kind=file.suffix(filename)
   local attr=lfs.attributes(filename)
   local size=attr and attr.size or 0
@@ -946,7 +946,7 @@ index d3fd3db..7000b5a 100644
      packoutlines(data)
      containers.write(cache,hash,data)
      data=containers.read(cache,hash) 
-@@ -37332,12 +37298,11 @@ local function loadoutlines(cache,filename,sub,instance)
+@@ -37330,12 +37296,11 @@ local function loadoutlines(cache,filename,sub,instance)
   elseif size>0 and (kind=="pfb") then
    local hash=containers.cleanname(base) 
    data=containers.read(cache,hash)
@@ -960,7 +960,7 @@ index d3fd3db..7000b5a 100644
      packoutlines(data)
      containers.write(cache,hash,data)
      data=containers.read(cache,hash) 
-@@ -37348,7 +37313,6 @@ local function loadoutlines(cache,filename,sub,instance)
+@@ -37346,7 +37311,6 @@ local function loadoutlines(cache,filename,sub,instance)
    data={
     filename=filename,
     size=0,
@@ -968,7 +968,7 @@ index d3fd3db..7000b5a 100644
     format="unknown",
     units=1000,
     glyphs={}
-@@ -37366,12 +37330,11 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37364,12 +37328,11 @@ local function loadstreams(cache,filename,sub,instance)
   local kind=lower(file.suffix(filename))
   local attr=lfs.attributes(filename)
   local size=attr and attr.size or 0
@@ -982,7 +982,7 @@ index d3fd3db..7000b5a 100644
     data=otf.readers.loadshapes(filename,sub,instance,true)
     if data then
      local glyphs=data.glyphs
-@@ -37390,14 +37353,13 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37388,14 +37351,13 @@ local function loadstreams(cache,filename,sub,instance)
      data.glyphs=nil
      data.size=size
      data.format=data.format or (kind=="otf" and "opentype") or "truetype"
@@ -998,7 +998,7 @@ index d3fd3db..7000b5a 100644
     local names,encoding,streams,metadata=pfb.loadvector(filename,false,true)
     if streams then
      local fontbbox=metadata.fontbbox or { 0,0,0,0 }
-@@ -37407,7 +37369,6 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37405,7 +37367,6 @@ local function loadstreams(cache,filename,sub,instance)
      data={
       filename=filename,
       size=size,
@@ -1006,7 +1006,7 @@ index d3fd3db..7000b5a 100644
       format="type1",
       streams=streams,
       fontheader={
-@@ -37452,7 +37413,6 @@ local function loadstreams(cache,filename,sub,instance)
+@@ -37450,7 +37411,6 @@ local function loadstreams(cache,filename,sub,instance)
    data={
     filename=filename,
     size=0,
