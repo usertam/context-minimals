@@ -13,10 +13,7 @@
 
 stdenvNoCC.mkDerivation {
   pname = "context-minimals";
-  version = builtins.readFile (runCommand "version" {} ''
-    grep 'newcontextversion' ${context}/tex/context/base/mkxl/cont-new.mkxl \
-      | cut -d{ -f2 | cut -d} -f1 | tr -d "\n" > $out
-  '');
+  version = "2022.12.29 14:29";
 
   src = context;
   buildInputs = [ luametatex luatex ] ++ fonts;

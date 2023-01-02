@@ -8,10 +8,7 @@
 stdenv.mkDerivation {
   inherit src;
   pname = "luametatex";
-  version = builtins.readFile (runCommand "version" {} ''
-    grep 'luametatex_version_string' ${src}/source/luametatex.h \
-      | cut -d\" -f2 | tr -d "\n" > $out
-  '');
+  version = "2.10.05";
 
   nativeBuildInputs = [
     cmake

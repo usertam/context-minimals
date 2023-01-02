@@ -12,10 +12,7 @@
 stdenv.mkDerivation {
   src = "${src}/source";
   pname = "luatex";
-  version = builtins.readFile (runCommand "version" {} ''
-    grep 'luatex_version_string' ${src}/source/texk/web2c/luatexdir/luatex.c \
-      | cut -d\" -f2 | tr -d "\n" > $out
-  '');
+  version = "1.15.1";
 
   nativeBuildInputs = [
     pkg-config
