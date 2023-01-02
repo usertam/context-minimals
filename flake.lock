@@ -12,8 +12,23 @@
       },
       "original": {
         "owner": "contextgarden",
-        "ref": "main",
         "repo": "context",
+        "type": "github"
+      }
+    },
+    "context-fonts": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1668067875,
+        "narHash": "sha256-dsjjmLBG55qkW3uXMQUgpgbs3yqEBDdW4p0TOI/5W0c=",
+        "owner": "contextgarden",
+        "repo": "context-distribution-fonts",
+        "rev": "6d4ce203d8b06caa2664e642927d88c241770534",
+        "type": "github"
+      },
+      "original": {
+        "owner": "contextgarden",
+        "repo": "context-distribution-fonts",
         "type": "github"
       }
     },
@@ -69,6 +84,7 @@
     "root": {
       "inputs": {
         "context": "context",
+        "context-fonts": "context-fonts",
         "luatex": "luatex",
         "modules": "modules",
         "nixpkgs": "nixpkgs"

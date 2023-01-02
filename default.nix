@@ -1,92 +1,101 @@
 { stdenvNoCC
-, inputs
-, src
 , runCommand
+, context
+, context-fonts
+, modules
 , luametatex
 , luatex
 , makeWrapper
-, xorg
-, fonts
+, fonts ? []
 , fpath ? []
 , fcache ? []
 }:
 
 stdenvNoCC.mkDerivation {
-  inherit src;
   pname = "context-minimals";
   version = builtins.readFile (runCommand "version" {} ''
-    grep 'newcontextversion' ${inputs.context}/tex/context/base/mkxl/cont-new.mkxl \
+    grep 'newcontextversion' ${context}/tex/context/base/mkxl/cont-new.mkxl \
       | cut -d{ -f2 | cut -d} -f1 | tr -d "\n" > $out
   '');
 
+  src = context;
   buildInputs = [ luametatex luatex ] ++ fonts;
   nativeBuildInputs = [ makeWrapper ];
 
   dontConfigure = true;
   dontBuild = true;
+  dontInstall = true;
 
-  installPhase = ''
-    # install context source to $out/tex/texmf-context
-    mkdir -p $out/tex/texmf-context
-    cp -a ${inputs.context}/{colors,context,doc,fonts,metapost,tex,web2c} $out/tex/texmf-context
+  unpackPhase = ''
+    runHook preUnpack
 
-    # for scripts in source, avoid copying the stubs
-    mkdir -p $out/tex/texmf-context/scripts/context
-    cp -a ${inputs.context}/scripts/context/{lua,perl,ruby} $out/tex/texmf-context/scripts/context
+    # unpack sources to `tex/texmf-context`
+    mkdir -p $out/share/tex/texmf-context/scripts/context
+    cp -a ${context}/{colors,fonts,metapost,tex}  $out/share/tex/texmf-context
+    cp -a ${context}/scripts/context/lua          $out/share/tex/texmf-context/scripts/context
 
-    # make writable for patch temporary file
-    chmod +w $out/tex/texmf-context/scripts/context/lua \
-      $out/tex/texmf-context/tex/context/base/mkiv \
-      $out/tex/texmf-context/tex/context/base/mkxl \
-      $out/tex/texmf-context/tex/generic/context/luatex
+    # unpack configs to `tex/texmf/web2c`
+    mkdir -p $out/share/tex/texmf/web2c
+    cp -a ${context}/web2c/context.cnf    $out/share/tex/texmf/web2c/texmf.cnf
+    cp -a ${context}/web2c/contextcnf.lua $out/share/tex/texmf/web2c/texmfcnf.lua
 
-    # apply patches
-    for PATCH in $src/patches/*.patch; do
-      patch -Np1 -d $out/tex/texmf-context -i $PATCH
+    # unpack binaries to `tex/texmf-context/bin`
+    install -Dm755 -t $out/share/tex/texmf-context/bin ${luametatex}/bin/luametatex ${luatex}/bin/luatex
+
+    # populate `tex/texmf-context/bin`
+    ln -s ../scripts/context/lua/context.lua  $out/share/tex/texmf-context/bin/context.lua
+    ln -s ../scripts/context/lua/mtxrun.lua   $out/share/tex/texmf-context/bin/mtxrun.lua
+    ln -s luametatex                          $out/share/tex/texmf-context/bin/mtxrun
+    ln -s luametatex                          $out/share/tex/texmf-context/bin/context
+
+    # unpack fonts to `tex/texmf-fonts`
+    cp -a ${context-fonts} $out/share/tex/texmf-fonts
+
+    # unpack modules to `tex/texmf-modules`
+    mkdir -p $out/share/tex/texmf-modules
+    for MODULE in ${modules}/*; do
+      cp -af --no-preserve=mode $MODULE/* $out/share/tex/texmf-modules
+    done
+    find -L $out/share/tex/texmf-modules -maxdepth 1 -type f -delete
+
+    # wrap `tex/texmf-system/bin` -> `bin`
+    for BIN in context mtxrun luametatex luatex; do
+      makeWrapper $out/share/tex/texmf-context/bin/$BIN $out/bin/$BIN
     done
 
-    # patch done, make read-only
-    chmod -w $out/tex/texmf-context/scripts/context/lua \
-      $out/tex/texmf-context/tex/context/base/mkiv \
-      $out/tex/texmf-context/tex/context/base/mkxl \
-      $out/tex/texmf-context/tex/generic/context/luatex
-
-    # install modules to populate $out/modules
-    cp -a ${inputs.modules} $out/modules
-
-    # populate $out/tex/texmf
-    mkdir -p $out/tex/texmf/web2c
-    ln -s $out/tex/texmf-context/web2c/context.cnf $out/tex/texmf/web2c/texmf.cnf
-    ln -s $out/tex/texmf-context/web2c/contextcnf.lua $out/tex/texmf/web2c/texmfcnf.lua
-
-    # install luametatex and luatex to $out/tex/texmf-system/bin
-    install -Dm755 -t $out/tex/texmf-system/bin ${luametatex}/bin/luametatex ${luatex}/bin/luatex
-
-    # populate $out/tex/texmf-system/bin
-    ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/context.lua
-    ln -s $out/tex/{texmf-context/scripts/context/lua,texmf-system/bin}/mtxrun.lua
-    ln -s $out/tex/texmf-system/bin/{luametatex,mtxrun}
-    ln -s $out/tex/texmf-system/bin/{luametatex,context}
-
-    # populate $out/tex/texmf-modules
-    mkdir -p $out/tex/texmf-modules
-    for DIR in $out/modules/*; do
-      ${xorg.lndir}/bin/lndir -silent $DIR $out/tex/texmf-modules
-    done
-    find -L $out/tex/texmf-modules -maxdepth 1 -type f -delete
-
-    # wrap $out/tex/texmf-system/bin/<exe> -> $out/bin/<exe>
-    for FILE in $(find $out/tex/texmf-system/bin -type f -executable -follow); do
-      makeWrapper $FILE $out/bin/''${FILE##*/}
-    done
+    runHook postUnpack
   '';
 
-  fixupPhase = ''
-    runHook preFixup
+  patches = [
+    ./patches/0001-remove-modification-detections.patch
+    ./patches/0002-remove-timestamps-and-uuid-embedding-in-font-caches.patch
+    ./patches/0003-stop-adding-prefixes-to-font-name.patch
+    ./patches/0004-remove-placeholder-text-for-uuid.patch
+  ];
 
+  prePatch = ''
+    # make writable for patch temporary file
+    chmod +w $out/share/tex/texmf-context/scripts/context/lua \
+      $out/share/tex/texmf-context/tex/context/base/mkiv \
+      $out/share/tex/texmf-context/tex/context/base/mkxl \
+      $out/share/tex/texmf-context/tex/generic/context/luatex
+
+    # sources are located in `tex/texmf-context`
+    cd $out/share/tex/texmf-context
+  '';
+
+  postPatch = ''
+    # patch done, make read-only
+    chmod -w $out/share/tex/texmf-context/scripts/context/lua \
+      $out/share/tex/texmf-context/tex/context/base/mkiv \
+      $out/share/tex/texmf-context/tex/context/base/mkxl \
+      $out/share/tex/texmf-context/tex/generic/context/luatex
+  '';
+
+  preFixup = ''
     # generate file databases
     $out/bin/mtxrun --verbose --generate
-    $out/bin/luatex --luaonly $out/tex/texmf-system/bin/mtxrun.lua --verbose --generate
+    $out/bin/luatex --luaonly $out/share/tex/texmf-context/bin/mtxrun.lua --verbose --generate
 
     # generate font databases
     export OSFONTDIR=${builtins.concatStringsSep ":" ((map (f: f + "/share/fonts") fonts) ++ fpath)}
@@ -107,8 +116,6 @@ stdenvNoCC.mkDerivation {
 
     '') fcache) + ''
     # delete the formats from forcing cache misses, keep cache deterministic
-    find $out/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
-
-    runHook postFixup
+    find $out/share/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
   '';
 }

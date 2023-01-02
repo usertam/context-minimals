@@ -1,8 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    context.url = "github:contextgarden/context/main";
+    context.url = "github:contextgarden/context";
     context.flake = false;
+    context-fonts.url = "github:contextgarden/context-distribution-fonts";
+    context-fonts.flake = false;
     luatex.url = "github:TeX-Live/luatex";
     luatex.flake = false;
     modules.url = "github:usertam/context-minimals/mirror/modules";
@@ -22,9 +24,8 @@
           src = inputs.luatex;
         };
         context-minimals = pkgs.callPackage ./default.nix {
-          inherit inputs luametatex luatex;
-          src = self;
-          fonts = [ pkgs.lmodern pkgs.libertinus ];
+          inherit (inputs) context context-fonts modules;
+          inherit luametatex luatex;
         };
         default = context-minimals;
       });
