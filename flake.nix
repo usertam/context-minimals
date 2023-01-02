@@ -17,13 +17,13 @@
       packages = forAllSystems (system: let
         pkgs = inputs.nixpkgs.legacyPackages.${system};
       in rec {
-        luametatex = pkgs.callPackage ./pkgs/luametatex/default.nix {
+        luametatex = pkgs.callPackage ./pkgs/luametatex {
           src = "${inputs.context}/source/luametatex";
         };
-        luatex = pkgs.callPackage ./pkgs/luatex/default.nix {
+        luatex = pkgs.callPackage ./pkgs/luatex {
           src = inputs.luatex;
         };
-        context-minimals = pkgs.callPackage ./default.nix {
+        context-minimals = pkgs.callPackage self {
           inherit (inputs) context context-fonts modules;
           inherit luametatex luatex;
         };
