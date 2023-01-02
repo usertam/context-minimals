@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       rebuild: ${{ steps.update.outputs.REBUILD }}
-      version: ${{ steps.update.outputs.VERSION }}
+      ctx: ${{ steps.versions.outputs.ctx }}
+      lmx: ${{ steps.versions.outputs.lmx }}
+      ltx: ${{ steps.versions.outputs.ltx }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up github-actions name and email
@@ -52,7 +54,24 @@ jobs:
           echo "REBUILD=1" >> $GITHUB_OUTPUT
           nix flake update
         fi
-        echo "VERSION=$(nix eval --raw .#context-minimals.version)" >> $GITHUB_OUTPUT
+    - name: Refresh derivation versions
+      id: versions
+      run: |
+        # context-minimals
+        source=$(nix eval --raw --apply toString .#context-minimals.src)
+        echo -n 'ctx=' >> $GITHUB_OUTPUT
+        grep 'newcontextversion' $source/tex/context/base/mkxl/cont-new.mkxl \
+          | cut -d{ -f2 | cut -d} -f1 >> $GITHUB_OUTPUT
+        # luametatex
+        source=$(nix eval --raw --apply toString .#luametatex.src)
+        echo -n 'lmx=' >> $GITHUB_OUTPUT
+        grep 'luametatex_version_string' $source/source/luametatex.h \
+          | cut -d\" -f2 >> $GITHUB_OUTPUT
+        # luatex
+        source=$(nix eval --raw --apply toString .#luatex.src)
+        echo -n 'ltx=' >> $GITHUB_OUTPUT
+        grep 'luatex_version_string' $source/texk/web2c/luatexdir/luatex.c \
+          | cut -d\" -f2 >> $GITHUB_OUTPUT
     - name: Upload lock file artifact
       if: steps.update.outputs.REBUILD || github.event_name != 'schedule'
       uses: actions/upload-artifact@v3
@@ -81,6 +100,12 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: flake.lock
+    - name: Update default.nix versions
+      run: |
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.lmx }}"/' pkgs/luametatex/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ltx }}"/' pkgs/luatex/default.nix
+        git clean -xfd
     - name: Build and test derivation
       run: |
         echo '\starttext\input khatt-en\stoptext' > test.tex
@@ -102,13 +127,19 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: flake.lock
-    - name: Commit and push if lock file changes present
+    - name: Update default.nix versions
+      run: |
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.lmx }}"/' pkgs/luametatex/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ltx }}"/' pkgs/luatex/default.nix
+        git clean -xfd
+    - name: Commit and push if upstream changes present
       run: |
         if [ -z "$(git status --porcelain)" ]; then
-          echo "No lock file changes present."
+          echo "No upstream changes present."
         else
-          echo "Lock file changes present."
-          git add flake.lock
-          git commit -m "context-minimals: ${{ needs.update-deps.outputs.version }}"
+          echo "Upstream changes present."
+          git add flake.lock default.nix pkgs/luametatex/default.nix pkgs/luatex/default.nix
+          git commit -m "context-minimals: ${{ needs.update-deps.outputs.ctx }}"
           git push origin ${GITHUB_REF##*/}
         fi
