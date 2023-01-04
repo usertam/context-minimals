@@ -11,12 +11,13 @@
 , fcache ? []
 }:
 
-stdenvNoCC.mkDerivation {
-  pname = "context-minimals";
+let
+ctx-base = stdenvNoCC.mkDerivation {
+  pname = "context-minimals-base";
   version = "2022.12.29 14:29";
 
-  src = context;
-  buildInputs = [ luametatex luatex ] ++ fonts;
+  srcs = [ context context-fonts modules ];
+  buildInputs = [ luametatex luatex ];
   nativeBuildInputs = [ makeWrapper ];
 
   dontConfigure = true;
@@ -88,31 +89,39 @@ stdenvNoCC.mkDerivation {
       $out/share/tex/texmf-context/tex/context/base/mkxl \
       $out/share/tex/texmf-context/tex/generic/context/luatex
   '';
+};
 
-  preFixup = ''
-    # generate file databases
-    $out/bin/mtxrun --verbose --generate
-    $out/bin/luatex --luaonly $out/share/tex/texmf-context/bin/mtxrun.lua --verbose --generate
+in
+runCommand "context-minimals-${ctx-base.version}" {
+  src = ctx-base;
+  buildInputs = [ ctx-base ] ++ fonts;
+  nativeBuildInputs = [ makeWrapper ];
+} (''
+  # symlink original sources
+  mkdir -p $out/share/tex
+  ln -t $out/share/tex -s $src/share/tex/*
 
-    # generate font databases
-    export OSFONTDIR=${builtins.concatStringsSep ":" ((map (f: f + "/share/fonts") fonts) ++ fpath)}
-    $out/bin/mtxrun --verbose --script font --reload
+  # wrap `tex/texmf-system/bin` -> `bin`
+  for BIN in context mtxrun luametatex luatex; do
+    makeWrapper $out/share/tex/texmf-context/bin/$BIN $out/bin/$BIN
+  done
 
-    '' + builtins.concatStringsSep "\n" (map (font: ''
-    # generate font cache payload
-    cat <<'EOF' > "${font}.tex"
-    \definefontfamily[main][serif][${font}]
-    \setupbodyfont[main]
-    \starttext
-    Normal {\bf Bold} {\it Italic} {\sl Slanted} {\bi Bold Italic} {\bs Bold Slanted} {\sc Small Capitals}
-    \stoptext
-    EOF
+  # generate file databases
+  $out/bin/mtxrun --verbose --generate
+  $out/bin/luatex --luaonly $out/share/tex/texmf-context/bin/mtxrun.lua --verbose --generate
 
-    # build font cache by forcing cache misses
-    $out/bin/context "${font}.tex"
+  # generate font databases
+  export OSFONTDIR=${builtins.concatStringsSep ":" ((map (f: f + "/share/fonts") fonts) ++ fpath)}
+  $out/bin/mtxrun --verbose --script font --reload
 
-    '') fcache) + ''
-    # delete the formats from forcing cache misses, keep cache deterministic
-    find $out/share/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
-  '';
-}
+  '' + builtins.concatStringsSep "\n" (map (font: ''
+  # build font cache by forcing cache misses
+  cat <<'EOF' > "${font}.tex" && $out/bin/context "${font}.tex"
+  \definedfont[name:${font}*default]
+  Normal {\bf Bold} {\it Italic} {\sl Slanted} {\bi Bold Italic} {\bs Bold Slanted} {\sc Small Capitals}
+  EOF
+  '') fcache) + ''
+
+  # delete the formats from forcing cache misses, keep cache deterministic
+  find $out/share/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
+'')
