@@ -1,6 +1,5 @@
 { stdenv
 , src
-, runCommand
 , pkg-config
 , graphite2
 , harfbuzz

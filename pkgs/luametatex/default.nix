@@ -1,6 +1,5 @@
 { stdenv
 , src
-, runCommand
 , cmake
 , ninja
 }:
