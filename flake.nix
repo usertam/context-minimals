@@ -43,5 +43,11 @@
           mtxrun = mkApp "mtxrun";
           default = self.apps.${system}.context;
         });
+
+      lib = import ./modules/lib {
+        inherit (inputs) nixpkgs;
+        inherit forAllSystems;
+        ctxpkgs = self.packages;
+      };
     };
 }
