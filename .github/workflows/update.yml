@@ -58,7 +58,7 @@ jobs:
       id: versions
       run: |
         # context-minimals
-        source=$(nix eval --raw --apply toString .#context-minimals.src)
+        source=$(nix eval --raw --apply toString .#context-minimals.src.srcs | cut -d\  -f1)
         echo -n 'ctx=' >> $GITHUB_OUTPUT
         grep 'newcontextversion' $source/tex/context/base/mkxl/cont-new.mkxl \
           | cut -d{ -f2 | cut -d} -f1 >> $GITHUB_OUTPUT
