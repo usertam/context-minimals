@@ -3,11 +3,11 @@
     "context": {
       "flake": false,
       "locked": {
-        "lastModified": 1672828320,
-        "narHash": "sha256-POTHlZ7s5YlNLsWEDTIoBjrYNfgkQidGF0B97idjaAA=",
+        "lastModified": 1672936980,
+        "narHash": "sha256-k8qfipxhcffZj3neiV4Vv/h+dOPRb0aGS+HUsi5a7LY=",
         "owner": "contextgarden",
         "repo": "context",
-        "rev": "00b7e156d33decc032f599a9f8738bf7d21e7f4e",
+        "rev": "bff7d390ece7ab2bdc6cb5a15238c3c52bb0c590",
         "type": "github"
       },
       "original": {
