@@ -16,9 +16,7 @@ stdenv.mkDerivation {
 
   enableParallelBuilding = true;
 
-  configurePhase = ''
-    cmake -G Ninja .
-  '';
+  CFLAGS = "-Wno-builtin-macro-redefined -U__DATE__";
 
   installPhase = ''
     install -Dm555 -t $out/bin luametatex
