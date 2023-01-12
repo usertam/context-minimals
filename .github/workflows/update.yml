@@ -106,11 +106,16 @@ jobs:
         sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.lmx }}"/' pkgs/luametatex/default.nix
         sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ltx }}"/' pkgs/luatex/default.nix
         git clean -xfd
-    - name: Build and test derivation
+    - name: Build and enforce determinism
       run: |
-        echo '\starttext\input khatt-en\stoptext' > test.tex
-        nix run .#context test.tex
-        [ -f test.pdf ]
+        for ATTR in luametatex luatex context-minimals.src context-minimals; do
+          nix build ".#$ATTR"
+          nix build --rebuild ".#$ATTR"
+        done
+    - name: Test basic compilation
+      run: |
+        echo '\input khatt-en' > test.tex
+        nix run . test.tex && [ -f test.pdf ]
 
   release:
     name: Release
