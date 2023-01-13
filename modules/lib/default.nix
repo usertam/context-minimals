@@ -6,6 +6,7 @@
 {
   mkCompilation =
     { src
+    , sfx ? [ ".tex" ".bib" ".pdf" ]
     , doc ? "main"
     , preUnpack ? ""
     , postUnpack ? ""
@@ -22,7 +23,9 @@
         };
       in {
         default = pkgs.runCommand "main" {
-          inherit src preUnpack postUnpack;
+          inherit preUnpack postUnpack;
+          src = if sfx == null then src else
+            nixpkgs.lib.sourceFilesBySuffices src sfx;
           nativeBuildInputs = [ ctx pkgs.qpdf ];
         } ''
           unpackPhase && cd $sourceRoot
