@@ -7,6 +7,8 @@
   mkCompilation =
     { src
     , doc ? "main"
+    , preUnpack ? ""
+    , postUnpack ? ""
     , fonts ? []
     , fpath ? []
     , fcache ? []
@@ -20,10 +22,10 @@
         };
       in {
         default = pkgs.runCommand "main" {
-          inherit src;
+          inherit src preUnpack postUnpack;
           nativeBuildInputs = [ ctx pkgs.qpdf ];
         } ''
-          cp -a $src/* .
+          unpackPhase && cd $sourceRoot
           context --randomseed=0 --nodates --trailerid=false ${doc}
           qpdf --deterministic-id --linearize \
             --newline-before-endstream --replace-input ${doc}.pdf
