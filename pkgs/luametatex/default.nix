@@ -7,7 +7,7 @@
 stdenv.mkDerivation {
   inherit src;
   pname = "luametatex";
-  version = "2.10.05";
+  version = "2.10.06";
 
   nativeBuildInputs = [
     cmake
