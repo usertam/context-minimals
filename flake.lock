@@ -51,11 +51,11 @@
     "modules": {
       "flake": false,
       "locked": {
-        "lastModified": 1675297818,
-        "narHash": "sha256-AA5NfcR5h7nWbbjSIwOztNLFl2D4bSbVedCJnEPzM7Q=",
+        "lastModified": 1675470496,
+        "narHash": "sha256-0eyYIt2Mbldiwyc6CvR+gx+BtzSEkhBulsGSlUjs/XI=",
         "owner": "usertam",
         "repo": "context-minimals",
-        "rev": "973a68206923caa23113a9c2153c37c3a70c1418",
+        "rev": "7d0c1bbcad99a85088d60b3b0d2e13935a06524f",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1675184753,
-        "narHash": "sha256-ia5TQvzc/XsFWeQb60AhLRK8W8xdhnR9lrihnAnk7KE=",
+        "lastModified": 1675309347,
+        "narHash": "sha256-D3CQ6HRDT2m3XJlrzb5jKq4vNFR5xFTEFKC7iSjlFpM=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "50e4dbf35b95fd2b96718b656ebcbc6f9fa3a4ab",
+        "rev": "006c3bd4dd2f5d1d2094047f307cbf9e2b73d9c5",
         "type": "github"
       },
       "original": {
