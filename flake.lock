@@ -3,11 +3,11 @@
     "context": {
       "flake": false,
       "locked": {
-        "lastModified": 1675702500,
-        "narHash": "sha256-/AK5ip9/ADXE/Df5iy4woEmxq/kw0P2NVaqIBg1tvMY=",
+        "lastModified": 1675792920,
+        "narHash": "sha256-8rlWPJ0Z2v6xIkp954u6MsS+xmXIT6Is/4xFtOzr05Q=",
         "owner": "contextgarden",
         "repo": "context",
-        "rev": "088f772007c6f0c33c7b2dd9f4808a2503252917",
+        "rev": "10de5a74d6c4ad055e339d15272b0af71a1f9473",
         "type": "github"
       },
       "original": {
@@ -51,11 +51,11 @@
     "modules": {
       "flake": false,
       "locked": {
-        "lastModified": 1675470496,
-        "narHash": "sha256-0eyYIt2Mbldiwyc6CvR+gx+BtzSEkhBulsGSlUjs/XI=",
+        "lastModified": 1675816064,
+        "narHash": "sha256-5hW2AnqA622x4p+/0fOKNv9b6EYvEIWvi+1A+hGyUeE=",
         "owner": "usertam",
         "repo": "context-minimals",
-        "rev": "7d0c1bbcad99a85088d60b3b0d2e13935a06524f",
+        "rev": "c3fb63ed60b380bebc6ac14bc12d4db75c34d43e",
         "type": "github"
       },
       "original": {
