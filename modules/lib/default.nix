@@ -6,13 +6,14 @@
 {
   mkCompilation =
     { src
-    , sfx ? [ ".tex" ".bib" ".pdf" ]
-    , doc ? "main"
-    , preUnpack ? ""
-    , postUnpack ? ""
-    , fonts ? []
-    , fpath ? []
-    , fcache ? []
+    , nativeBuildInputs ? []
+    , preUnpack         ? ""
+    , postUnpack        ? ""
+    , doc               ? "main"
+    , suffices          ? [ ".tex" ".bib" ".pdf" ]
+    , fonts             ? []
+    , fpath             ? []
+    , fcache            ? []
     }:
     forAllSystems (system:
       let
@@ -22,11 +23,13 @@
           fonts = map (a: pkgs.${a}) fonts;
         };
       in {
-        default = pkgs.runCommand "main" {
+        default = pkgs.runCommand doc {
           inherit preUnpack postUnpack;
-          src = if sfx == null then src else
-            nixpkgs.lib.sourceFilesBySuffices src sfx;
-          nativeBuildInputs = [ ctx pkgs.qpdf ];
+          src = if suffices != null
+            then nixpkgs.lib.sourceFilesBySuffices src suffices
+            else src;
+          nativeBuildInputs = [ ctx pkgs.qpdf ]
+            ++ map (a: pkgs.${a}) nativeBuildInputs;
         } ''
           unpackPhase && cd $sourceRoot
           context --randomseed=0 --nodates --trailerid=false ${doc}
@@ -37,10 +40,10 @@
       });
 
   mkCompilationApps =
-    { doc ? "main"
-    , fonts ? []
-    , fpath ? []
-    , fcache ? []
+    { doc ?     "main"
+    , fonts ?   []
+    , fpath ?   []
+    , fcache ?  []
     }:
     forAllSystems (system:
       let
