@@ -3,11 +3,11 @@
     "context": {
       "flake": false,
       "locked": {
-        "lastModified": 1677183780,
-        "narHash": "sha256-YbgtgfziXlcQ7tZa4gtIBkNgGWs78Fnlw6H3P54I5jk=",
+        "lastModified": 1678140900,
+        "narHash": "sha256-3mfg35qSFan4jfvnMLjD/aXH6jJok26G3tuUFwXW3Ug=",
         "owner": "contextgarden",
         "repo": "context",
-        "rev": "fec3524de1939877fcb6f9d3f97649faac4e8c51",
+        "rev": "5de3c99a0f7e3c2c3f5acb4f09a53a4b817b0eca",
         "type": "github"
       },
       "original": {
@@ -35,11 +35,11 @@
     "luatex": {
       "flake": false,
       "locked": {
-        "lastModified": 1666461452,
-        "narHash": "sha256-bgpDlES33jZSVbNIc5kV/dtsNwDVTAzJ4SZIBD2xrV4=",
+        "lastModified": 1677857213,
+        "narHash": "sha256-70KPEGv2oVkhGlCWThtmRdasKA1E4ZZe/vTt4wHoukk=",
         "owner": "TeX-Live",
         "repo": "luatex",
-        "rev": "3f14129c06359e1a06dd2f305c8334a2964149d3",
+        "rev": "f52b099f3e01d53dc03b315e1909245c3d5418d3",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1677080879,
-        "narHash": "sha256-0SjW4/d3Rkw6C7hHZ5lxT4r6Pw9vzQb6Il6zYWwe2Bo=",
+        "lastModified": 1678207308,
+        "narHash": "sha256-WrmS/Inla0koTZIiq094tmjQA0akXjKtvZMcbgqfEP0=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "f5dad40450d272a1ea2413f4a67ac08760649e89",
+        "rev": "0ef02c4792fbde4b78957a46a8cb107b6c7aa3cc",
         "type": "github"
       },
       "original": {
