@@ -123,5 +123,7 @@ runCommand "context-minimals-${ctx-base.version}" {
   '') fcache) + ''
 
   # delete the formats from forcing cache misses, keep cache deterministic
-  find $out/share/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
+  if [ -d $out/share/tex/texmf-cache ]; then
+    find $out/share/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
+  fi
 '')
