@@ -41,10 +41,9 @@ ctx-base = stdenvNoCC.mkDerivation {
     install -Dm755 -t $out/share/tex/texmf-context/bin ${luametatex}/bin/luametatex ${luatex}/bin/luatex
 
     # populate `tex/texmf-context/bin`
-    ln -s ../scripts/context/lua/context.lua  $out/share/tex/texmf-context/bin/context.lua
-    ln -s ../scripts/context/lua/mtxrun.lua   $out/share/tex/texmf-context/bin/mtxrun.lua
-    ln -s luametatex                          $out/share/tex/texmf-context/bin/mtxrun
-    ln -s luametatex                          $out/share/tex/texmf-context/bin/context
+    ln -st $out/share/tex/texmf-context/bin ../scripts/context/lua/{context.lua,mtxrun.lua,mtx-context.{lua,xml}}
+    ln -s luametatex $out/share/tex/texmf-context/bin/mtxrun
+    ln -s luametatex $out/share/tex/texmf-context/bin/context
 
     # unpack fonts to `tex/texmf-fonts`
     cp -a ${context-fonts} $out/share/tex/texmf-fonts
