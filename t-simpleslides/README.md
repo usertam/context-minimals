@@ -2,6 +2,7 @@
 
 SimpleSlides presentation module for ConTeXt<br>
 by Aditya Mahajan and Thomas A. Schmitz
+maintained by Henning Hraban Ramm since 2022
 
 
 ## Introduction

@@ -2,7 +2,7 @@
 
 <cd:interface xmlns:cd="http://www.pragma-ade.com/commands" 
   name="context" language="en" 
-  version="2008.11.30">
+  version="2023.04.13">
 
   <cd:command name="simpleslides" file="t-simpleslides.tex">
     <cd:sequence>
@@ -47,6 +47,8 @@
           <cd:constant type="Palatino"/>
           <cd:constant type="Schoolbook"/>
           <cd:constant type="Times"/>
+          <cd:constant type="Plex"/>
+          <cd:constant type="PlexSans"/>
         </cd:parameter>
         <cd:parameter name="color">
           <cd:constant type="red"/>
