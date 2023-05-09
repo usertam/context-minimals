@@ -1,0 +1,220 @@
+%D \module
+%D   [      file=simpleslides-s-BigNumber,
+%D        version=2022.07.13,
+%D          title=\CONTEXT\ Style File,
+%D       subtitle=Presentation Module --- Big Number Style,
+%D         author=Aditya Mahajan and Thomas A. Schmitz,
+%D           date=\currentdate
+%D      copyright={Aditya Mahajan and Thomas A. Schmitz}]
+%C
+%C Copyright 2007 Aditya Mahajan and Thomas A. Schmitz
+%C This file may be distributed under the GNU General Public License v. 2.0.
+
+%D This file provides the \quotation{BigNumber} style for the presentation
+%D module. It is loaded at runtime.
+
+\writestatus{simpleslides}{loading Big Number style}
+
+\startmodule[simpleslides-s-BigNumber]
+
+\unprotect
+
+%D First, we change the page layout to have more space all around
+
+\setuplayout [width=fit,
+              margin=2cm,
+              height=fit,
+	      leftmargindistance=.8cm,
+	      rightmargindistance=0cm,
+              header=18mm,
+              footer=0cm,
+              topspace=.8cm,
+              backspace=1.9cm,
+              location=singlesided]
+
+\setuplayout [simpleslides:layout:horizontal][header=18mm]
+\setuplayout [simpleslides:layout:vertical]  [header=0mm]
+\setuplayout [simpleslides:layout:title]     [header=0mm]
+
+\setuplayer[simpleslides:layer:slidetitle]
+    [width=\paperwidth,
+    height=\paperheight,x=20mm]
+
+%D Next we define generic frames, which will be used by other macros to
+%D get a consistent look and feel.
+
+\defineframed[simpleslides:framed:small]
+             [frame=off,offset=0pt,
+              width=1.7cm,align=middle]
+
+\setupcombinations[distance=2.5em]
+
+%D These macros are used for placing figures/pictures:
+
+\define\NormalHeight        {\textheight}
+\define\NormalWidth         {.46\textwidth}
+\define\PictureFrameHeight  {\textheight}
+\define\PictureFrameWidth   {.46\textwidth}
+
+%D This module has two color schemes, a blue one and a red one.
+
+\startsetups simpleslides:setups:blue
+\definecolor [simpleslides:contrastcolor]      [r=0.8,g=0.8,b=0.9]
+\definecolor [simpleslides:backgroundcolor]	   [s=.88]
+\definecolor [simpleslides:textcolor]          [s=0]
+\stopsetups
+
+\startsetups simpleslides:setups:red
+\definecolor [simpleslides:contrastcolor]     [r=0.4]
+\definecolor [simpleslides:backgroundcolor]	  [s=.35]
+\definecolor [simpleslides:textcolor]         [s=1]
+\stopsetups
+
+%D Now we choose the scheme that the user asked for
+
+\doifsetupselse{simpleslides:setups:\moduleparameter{simpleslides}{color}}
+    {\setups{simpleslides:setups:\moduleparameter{simpleslides}{color}}}
+    {\setups{simpleslides:setups:blue}}
+
+\setupcolors[textcolor={simpleslides:textcolor}]
+
+
+%D The characteristic feature of this module is that the page number is drawn in
+%D big letters on the slide. First we define the font used to draw the number.
+
+\definefontsynonym  [BigNumberFont] [name:texgyreherosbold]
+
+\definefont         [NumberFont]    [BigNumberFont at 30pt]
+
+
+%D We use \METAPOST\ to draw backgrounds. First, we define a few helper macros
+%D to place text inside \METAPOST
+
+\definetextext[simpleslides:sometxt:left] {\TaspresentSometxtLeft}
+\definetextext[simpleslides:sometxt:right]{\TaspresentSometxtRight}
+
+\unexpanded\def\TaspresentSometxtLeft#1%
+  {\getvalue{simpleslides:framed:small}
+                       {\color[simpleslides:contrastcolor]
+                       {\NumberFont #1}}}
+
+\unexpanded\def\TaspresentSometxtRight#1%
+  {\getvalue{simpleslides:framed:small}
+                       {\NumberFont \color[simpleslides:backgroundcolor]{#1}}}
+
+%D Now we define a \METAPOST| graphic that draws the number. The exact
+%D dimensions have been found by trial and error.
+
+\startuseMPgraphic{simpleslides:MP:ornament}
+StartPage ;
+save Left, Right ;
+picture Left, Right ;
+
+Left  := textext("\NumberFont \color[simpleslides:contrastcolor]{\pagenumber}") ysized 4cm ;
+Right := textext("\NumberFont \color[simpleslides:backgroundcolor]{\pagenumber}") ysized 4cm ;
+
+save LeftBox, RightBox ;
+path LeftBox, RightBox ;
+
+save split ; numeric split ;
+split := if RealPageNumber < 10 : 1/2 else : 3/4 fi  ;
+%split := 1/2 ;
+
+LeftBox := llcorner Left -- split[llcorner Left, lrcorner Left]
+           -- split[ulcorner Left, urcorner Left] -- ulcorner Left --cycle ;
+
+RightBox := lrcorner Right -- split[lrcorner Right, llcorner Right]
+           -- split[urcorner Right, ulcorner Right] -- urcorner Right --cycle ;
+
+save shft ; numeric shft ;
+shft = arclength(llcorner Right -- lrcorner Right) ;
+if RealPageNumber >= 10 :
+  RightBox := RightBox shifted  (shft/2, 0) ;
+fi;
+
+clip Left  to LeftBox  ;
+clip Right to RightBox ;
+
+save corner; pair corner ;
+corner := lrcorner Field[Text][Text] shifted (.2cm,0.3cm) ; % same as x2
+
+labeloffset := 0bp;
+
+label.ulft(Left,  corner) ;
+label.urt (Right, corner) ;
+
+StopPage ;
+\stopuseMPgraphic
+
+%D We also use \METAPOST\ to draw the horizontal and vertical page backgrounds.
+
+\startuniqueMPgraphic{simpleslides:MP:horizontal}
+StartPage ;
+fill Page withcolor \MPcolor{simpleslides:contrastcolor} ;
+fill Field[Text][Text] enlarged 0.2cm
+     withcolor \MPcolor{simpleslides:backgroundcolor} ;
+StopPage ;
+\stopuniqueMPgraphic
+
+\startuniqueMPgraphic{simpleslides:MP:vertical}
+StartPage ;
+fill Page withcolor \MPcolor{simpleslides:contrastcolor} ;
+
+z1 = urcorner Field[Text][Text] shifted (.2cm,0) ;
+z2 = lrcorner Field[Text][Text] shifted (.2cm,-.2cm) ;
+z3 = z1 shifted (-8.05cm,0) ;
+z4 = (x3,y2) ;
+
+save Main ;
+path Main ;
+Main := z1 -- z2 -- z4 -- z3 --cycle ;
+
+fill Main withcolor \MPcolor{simpleslides:backgroundcolor} ;
+StopPage ;
+\stopuniqueMPgraphic
+
+
+%D We define these backgrounds as overlays:
+
+\defineoverlay
+  [simpleslides:background:horizontal]
+  [\useMPgraphic{simpleslides:MP:horizontal}]
+
+\defineoverlay
+  [simpleslides:background:vertical]
+  [\useMPgraphic{simpleslides:MP:vertical}]
+
+\defineoverlay
+  [simpleslides:background:title]
+  [\useMPgraphic{simpleslides:MP:horizontal}]
+
+\defineoverlay
+  [simpleslides:background:ornament]
+  [\useMPgraphic{simpleslides:MP:ornament}]
+
+%D The slide title is placed on the top of the text area. The layer takes care
+%D of the positioning.
+
+\setupSlideTitle
+   [\c!after=,
+    \c!alternative=layer,
+    \c!width=\textwidth,
+    \c!height=2.5cm,
+    \c!command=\doSlideTitle]
+
+\setupTitle
+   [\c!headcolor=simpleslides:textcolor,
+   \c!title\c!color=simpleslides:textcolor,
+   \c!date\c!color=simpleslides:textcolor,
+   \c!author\c!color=simpleslides:textcolor]
+
+%D Squares are used as the first level of itemizations
+
+\definesymbol[1][$\square$]
+\setupitemize[1][inmargin]
+%\setupitemize[each][joinedup,unpacked]
+
+\protect
+\stopmodule
+
+\endinput

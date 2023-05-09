@@ -1,0 +1,880 @@
+%D \module
+%D   [      file=simpleslides-s-default,
+%D        version=2022.07.13,
+%D          title=\CONTEXT\ Style File,
+%D       subtitle=Presentation Module simpleslides --- Default style setup,
+%D         author=Thomas A. Schmitz \& Aditya Mahajan,
+%D           date=\currentdate,
+%D      copyright={Aditya Mahajan and Thomas A. Schmitz}]
+%C
+%C Copyright 2007 Aditya Mahajan and Thomas A. Schmitz
+%C This file may be distributed under the GNU General Public License v. 2.0.
+
+\writestatus{simpleslides}{loading default style setup}
+
+\startmodule[simpleslides-s-default]
+
+\unprotect
+
+%D This module is the first sub-module that is loaded by
+%D \filename{simpleslides}.  This sets up the style macros for the module. We
+%D choose a rather plain style as the default; separate style sub-modules
+%D redefine some internal macros to achieve fancier effects.
+
+
+%D We start with the page layout. S6 has the 3:4 ratio of a traditional computer screen.
+
+\setuppapersize[S6][S6]
+
+%D We do not want page numbers, but we sometimes want to use the page numbering
+%D mechanism, so we make sure pages are counted, but the numbers are not
+%D displayed.
+
+\setuppagenumbering[location=]
+
+%D As for the page layout: most of the numbers have been reached by
+%D trial and error; I have just taken what seemed to produce the best output.
+
+\setuplayout [width=middle,
+              margin=0.6cm,
+              height=middle,
+              header=0.15cm,
+              footer=1.35cm,
+	      footerdistance=0.5cm,
+              topspace=0.5cm,
+              backspace=1cm,
+              location=singlesided]
+
+
+%D We define some other layouts which can be used to change the layout of
+%D specific kinds of pages. This module defines three kinds of pages:
+%D horizontal, vertical, and title, and we allow the possibility of changing the
+%D layout of all three page styles.
+
+\definelayout [simpleslides:layout:horizontal]
+\definelayout [simpleslides:layout:vertical]
+\definelayout [simpleslides:layout:title]
+\definelayout [simpleslides:layout:page]
+
+\setuplayout  [simpleslides:layout:page]
+              [topspace=0cm,
+               header=0cm,
+               footer=0cm,
+               bottomspace=0cm,
+               backspace=0cm,
+               cutspace=0cm,
+               width=middle,
+               height=middle]
+
+%D We want colored presentations
+
+\setupcolors[state=start]
+
+%D And colored typesetting for \TEX\ code.
+% HR: outdated!
+\definetype[typeTEX][option=color]
+
+%D Presentations have relatively dense lines, we do not care about underfull
+%D lines, but allow emergency stretch.
+
+\setuptolerance[\v!verytolerant,\v!stretch]
+
+%D We use combinations for placing vertical pictures and text side by side, and
+%D we want a distance of 3em between both.
+
+\setupcombinations[distance=0.9cm]
+
+%D Next we define some dimensions that are used as nominal values by other
+%D macros and the user.
+
+\define\NormalHeight        {.830\textheight}
+\define\NormalWidth         {.476\textwidth}
+\define\PictureFrameHeight  {.830\textheight}
+\define\PictureFrameWidth   {.476\textwidth}
+
+%D As we said before, the presentation consists of three kinds of pages: title,
+%D horizontal, and vertical. Each page can have a different background; we can
+%D switch to a specific background using
+%D \starttyping
+%D \setupPageBackground[horizontal]
+%D \stoptyping
+
+\def\setupPageBackground%
+   {\dosingleargument\dosetupPageBackground}
+
+\def\dosetupPageBackground[#1]%
+  {\setups{simpleslides:background:#1}}
+
+%D The backgrounds in all the styles are very similar. So, we define overlays to
+%D capture the different features of the backgrounds, and then simply define the
+%D overlays in different styles.
+
+\defineoverlay[simpleslides:background:horizontal]
+\defineoverlay[simpleslides:background:title]
+\defineoverlay[simpleslides:background:vertical]
+\defineoverlay[simpleslides:background:ornament]
+\defineoverlay[simpleslides:background:page]
+
+\defineoverlay[simpleslides:background:highlight]
+              [\useMPgraphic{simpleslides:MP:highlight}]%
+
+\definelayer[simpleslides:layer:slidetitle]
+    [\c!width=\paperwidth,
+    \c!height=\paperheight]
+
+\definelayer[simpleslides:layer:page]
+    [\c!width=\paperwidth,
+    \c!height=\paperheight]
+
+\definelayer[simpleslides:layer:extras]
+    [\c!width=\paperwidth,
+    \c!height=\paperheight]
+
+\definelayer[simpleslides:layer:highlight]
+    [\c!width=\paperwidth,
+    \c!height=\paperheight]
+
+
+%D A generic frame which is used for titles and other commands
+
+\defineframed[simpleslides:framed]
+             [\c!frame=\v!off,\c!offset=\zeropoint,
+              \c!top=\vss,\c!bottom=\vss]
+
+\defineframed[simpleslides:framed:page]
+             [\c!frame=\v!off,\c!offset=3mm,
+              \c!top=\vss,\c!bottom=\vss,
+              \c!width=fit,
+              \c!corner=\v!round,
+              \c!background=\v!color,
+              \c!backgroundcolor=simpleslides:backgroundcolor]
+
+
+%D Now we define setups for specific backgrounds
+
+\startsetups simpleslides:background:title
+   \setuplayout[simpleslides:layout:title]
+     \setupbackgrounds[\v!page]
+        [background={simpleslides:background:title,
+                     foreground,
+                     simpleslides:layer:highlight}]
+\stopsetups
+
+\startsetups simpleslides:background:horizontal
+  \setuplayout[simpleslides:layout:horizontal]
+  \setupbackgrounds[\v!page]
+        [background={simpleslides:background:horizontal,
+                     simpleslides:background:ornament,
+                     simpleslides:layer:extras,
+                     simpleslides:layer:slidetitle,
+                     foreground,
+                     simpleslides:layer:highlight}]
+\stopsetups
+
+\startsetups simpleslides:background:vertical
+  \setuplayout[simpleslides:layout:vertical]
+  \setupbackgrounds[\v!page]
+        [background={simpleslides:background:vertical,
+                     simpleslides:layer:extras,
+                     simpleslides:background:ornament}]
+\stopsetups
+
+\startsetups simpleslides:background:page
+  \page
+  \setuplayout[simpleslides:layout:page]
+  \setupbackgrounds[\v!page]
+        [background={simpleslides:background:page,
+                     foreground,
+                    %simpleslides:background:ornament,
+                     simpleslides:layer:extras,
+                     simpleslides:layer:page}]
+\stopsetups
+
+%D We also define some fallbacks for presentation backgrounds.
+
+\startsetups simpleslides:background:default
+  \setups{simpleslides:background:horizontal}
+\stopsetups
+
+\startsetups simpleslides:background:none
+  \setupbackgrounds[\v!page]
+                   [background=]
+\stopsetups
+
+\startsetups simpleslides:background:empty
+   \message{I don't know the name of the background you have provided.}
+   \setups{simpleslides:background:horizontal}
+\stopsetups
+
+%D Now we move on to specific components of the presentation. The first thing in
+%D any presentation is the title page, so we start with that. We define a macro
+%D that stores values for the title, author and date of the presentation. These
+%D are input as
+%D \starttyping
+%D \setupTitle[title={How to write a sub module for simpleslides},
+%D             author={Aditya Mahajan},
+%D             date={\currentdate[d=10,m=7,y=2008]}]
+%D \stoptyping
+%D This setup command can also setup the color and style for the title, author,
+%D and date.
+
+\enabletrackers[interfaces.namespaces]
+
+\definenamespace
+  [simpleslidestitle]
+  [
+    \c!type=module,
+    \c!name=simpleslidestitle,
+    setup=list,
+    \c!style=\v!yes,
+    \s!parent=simpleslidetitle,
+  ]
+
+\let\setupTitle\setupsimpleslidestitle
+
+\def\simpleslidestitlecomponent#1%
+  {\simpleslidestitleparameter{\c!before#1}
+      \startalignment[\simpleslidestitleparameter{#1\c!align}]
+        \usesimpleslidestitlestyleandcolor{#1\c!style}{#1\c!color}%
+          \simpleslidestitleparameter{#1}%
+       \stopalignment
+    \simpleslidestitleparameter{\c!after#1}}
+
+%D \macros{placeTitle}
+%D
+%D The macro \tex{placeTitle} produces a title page with the author, the
+%D title of the presentation, and the date. Using it is not mandatory.
+
+\define\placeTitle
+  {\page
+   \setupPageBackground[title]
+   \null
+   \simpleslidestitleparameter\c!before
+   \startalignment[\simpleslidestitleparameter\c!align]
+   \usesimpleslidestitlestyleandcolor\c!style\c!color
+    \simpleslidestitlecomponent\c!title
+    \simpleslidestitlecomponent\c!author
+    \simpleslidestitlecomponent\c!date
+   \stopalignment
+   \simpleslidestitleparameter\c!after
+   \page}
+
+%D If a sub-module wants to display more information about the presentation
+%D (e.g., institute of the author), it can be simply input as
+%D \starttyping
+%D   \setupTitle[institute={Some University}]
+%D \stoptyping
+%D This parameter can be accessed inside the module as
+%D \type{\simpleslidestitleparameter{institute}}, and the module writer
+%D can redefine \type{\placeTitle} to display the institute at the appropriate
+%D place.
+
+
+%D Now we setup some default values for the title page. Other modules will
+%D redefine these values later.
+
+\setupTitle
+  [\c!title=,
+   \c!author=,
+   \c!date=\currentdate,
+   \c!style=,
+   \c!color=red,
+   \c!align=\v!middle,
+   \c!before=\vfill,
+   \c!after=\vfill,
+   \c!title\c!style={\switchtobodyfont[\TitleSize]},
+   \c!title\c!color=,
+   \c!title\c!align=\simpleslidestitleparameter\c!align,
+   \c!author\c!style=,%{\switchtobodyfont[\SlideTitleSize]},
+   \c!author\c!color=,
+   \c!author\c!align=\simpleslidestitleparameter\c!align,
+   \c!date\c!style=,%{\switchtobodyfont[\SlideTitleSize]},
+   \c!date\c!color=,
+   \c!date\c!align=\simpleslidestitleparameter\c!align,
+   \c!before\c!title=,
+   \c!before\c!author=,
+   \c!before\c!date=,
+   \c!after\c!title={\blank[2*line]},
+   \c!after\c!author={\blank[3*line]},
+   \c!after\c!date=]
+
+%D \macros{SlideTitle}
+%D \tex{SlideTitle}: well, the name says it all. The
+%D argument is typeset as the title, but the implementation and the result
+%D (alignment, size, distance to text, color etc.) vary from module to module,
+%D so this macro is defined in each of the submodules.
+
+\definenamespace
+  [SlideTitle]
+  [
+    \c!type=module,
+    \c!name=SlideTitle,
+    \c!command=\v!yes,
+    setup=list,
+    \c!style=\v!yes,
+    \s!parent=SlideTitle,
+  ]
+
+\def\defineSlideTitleAlternative
+  {\dodoubleargument\dodefineSlideTitleAlternative}
+
+\def\dodefineSlideTitleAlternative[#1][#2]% #3
+  {\setvalue{simpleslides:slidetitle:#1}}
+
+\defineSlideTitleAlternative[\v!normal]#1%
+  {\page[\SlideTitleparameter\c!page]%
+   \SlideTitleparameter\c!before
+      \startalignment[\SlideTitleparameter\c!align]
+        \useSlideTitlestyleandcolor\c!style\c!color
+        #1%
+       \stopalignment
+    \SlideTitleparameter\c!after}
+
+%D The layered alternative is adapted from a sample document that Brooks Moses
+%D published on the wiki:
+
+\defineSlideTitleAlternative[layer]#1%
+  {\page[\SlideTitleparameter\c!page]%
+   \SlideTitleparameter\c!before
+   \setlayer[simpleslides:layer:slidetitle]%
+     {\getvalue{simpleslides:framed}
+        [\c!width=\SlideTitleparameter\c!width,
+        \c!height=\SlideTitleparameter\c!height,
+         \c!align=\SlideTitleparameter\c!align]
+         {\useSlideTitlestyleandcolor\c!style\c!color
+          #1}}%
+    \SlideTitleparameter\c!after}
+
+\defineSlideTitleAlternative[page]#1%
+  {\page[\SlideTitleparameter\c!page]%
+   %\SlideTitleparameter\c!before
+   \setlayer[simpleslides:layer:page]%
+     [\c!preset=\SlideTitleparameter\c!preset,
+      \c!hoffset=\SlideTitleparameter\c!hoffset,
+      \c!voffset=\SlideTitleparameter\c!voffset]
+     {\getvalue{simpleslides:framed:page}
+       [\c!align=\SlideTitleparameter\c!align]
+       {\let\\\crlf
+        \useSlideTitlestyleandcolor\c!style\c!color
+          #1}}}
+    %\SlideTitleparameter\c!after}
+
+
+%D Now the main user command
+
+\def\SlideTitle{\dowithpargument\doSlideTitle}
+
+\def\doSlideTitle% #1
+  {\getvalue{simpleslides:slidetitle:\SlideTitleparameter\c!alternative}}
+
+\setupSlideTitle
+  [\c!page=\v!yes,
+   \c!style={\switchtobodyfont[\SlideTitleSize]},
+   \c!before={\setupPageBackground[horizontal]},
+   \c!after={\blank[0.75cm]},
+   \c!width=\textwidth,
+   \c!height=2\lineheight,
+   \c!align=\v!middle,
+   \c!alternative=\v!normal]
+
+
+%AM: Clean this up later.
+
+%D \macros{IncludePicture}
+%D The macros for placing pictures. This section has been entirely rewritten in
+%D order to provide a cleaner user interface and to make the code easier to
+%D maintain. We now have just one macro, \tex{IncludePicture}, which
+%D automatically inserts page breaks and adjusts the background and margins, if
+%D necessary. This macro takes four arguments:
+%D \setup{IncludePicture}
+%D The first argument decides whether the picture will be place in a horizontal
+%D or vertical arrangement; the second argument is the filename of the picture
+%D you want to include; the third argument does some setup, and the fourth
+%D argument (in braces) is the text accompanying the picture, which will be
+%D placed either in a \tex{SlideTitle} environment (for horizontal pictures) or
+%D opposite the picture, centered horizontally and vertically, for vertical
+%D pictures.
+
+%D The user macro takes three arguments in brackets + an additional argument
+%D for typeset content. So we define it in two steps:
+
+\def\setupPicture
+  {\dosingleargument\dosetupPicture}
+
+\def\dosetupPicture[#1]%
+  {\setvariables[simpleslides:picture]
+                [highlight=\v!no,
+                 steps=5,
+                 opacity=0.4,
+                 \c!x\c!scale=couple,
+                 \c!y\c!scale=couple,
+                 \c!width=,\c!height=,#1]}
+
+\setupPicture
+  [highlight=\v!no,%yes|no|default=no
+   \c!alternative=\v!none,%none|circle|arrow|focus|default=none
+   \c!grid\c!color=darkgreen,
+   \c!grid=\v!no,
+   \c!sub\c!grid=\v!no,
+   steps=5,%controls the number of subdivisions of the subgrid
+   \c!rulethickness={OverlayWidth/100},%for circle and arrow
+   \c!color=orange,% should this be called highlightcolor?
+   \c!x=5,
+   \c!y=5,
+   \c!x\c!scale=couple,
+   \c!y\c!scale=couple,
+   length=2cm,
+   direction=0,
+   opacity=0.4,
+   shadow=\v!no,
+   shadow\c!color=gray,
+   verticalbackground=none,
+   verticalbackgroundcolor=simpleslides:backgroundcolor,
+   verticalforegroundcolor=simpleslides:textcolor,
+  ]
+
+\def\simpleslidesPictureParameter%#1
+  {\getvariable{simpleslides:picture}}
+
+
+\newconditional\simpleslidesHighlight   \setfalse\simpleslidesHighlight
+\newconditional\simpleslidesGrid        \setfalse\simpleslidesGrid
+\newconditional\simpleslidesSubGrid     \setfalse\simpleslidesSubGrid
+
+\chardef\simpleslidesHighlightAlternative\zerocount %0=none, 1=circle,
+                                                    %2=arrow, 3=focus
+\chardef\simpleslidesShadow\zerocount %0=no, 1=topleft, 2=topright,
+                                      %3=bottomright, 4=bottomleft
+
+\def\IncludePicture%
+   {\dotripleargument\doIncludePicture}
+
+
+\def\doIncludePicture[#1][#2][#3]#4% dir graphic options text
+  {\begingroup % Else the settings of \setupPicture are global
+   \setupPicture[#3]%
+   \processaction
+     [\simpleslidesPictureParameter{highlight}]
+     [    \v!yes=>\settrue\simpleslidesHighlight,
+           \v!no=>\setfalse\simpleslidesHighlight,
+      \v!default=>\setfalse\simpleslidesHighlight,
+      \v!unknown=>\setfalse\simpleslidesHighlight]
+   %
+   \processaction
+     [\simpleslidesPictureParameter\c!grid]
+     [    \v!yes=>\settrue\simpleslidesGrid,
+           \v!no=>\setfalse\simpleslidesGrid,
+      \v!default=>\setfalse\simpleslidesGrid,
+      \v!unknown=>\setfalse\simpleslidesGrid]
+   %
+   \processaction
+     [\simpleslidesPictureParameter{\c!sub\c!grid}]
+     [    \v!yes=>\settrue\simpleslidesSubGrid,
+           \v!no=>\setfalse\simpleslidesSubGrid,
+      \v!default=>\setfalse\simpleslidesSubGrid,
+      \v!unknown=>\setfalse\simpleslidesSubGrid]
+   %
+   \processaction
+     [\simpleslidesPictureParameter{shadow}]
+       [     \v!no=>\chardef\simpleslidesShadow\zerocount,
+            \v!yes=>\chardef\simpleslidesShadow\plusthree,
+     \v!top\v!left=>\chardef\simpleslidesShadow\plusone,
+    \v!top\v!right=>\chardef\simpleslidesShadow\plustwo,
+ \v!bottom\v!right=>\chardef\simpleslidesShadow\plusthree,
+  \v!bottom\v!left=>\chardef\simpleslidesShadow\plusfour,
+        \v!default=>\chardef\simpleslidesShadow\zerocount,
+        \v!unknown=>\chardef\simpleslidesShadow\zerocount]
+   %
+   \edef\simpleslidesGridColor{\simpleslidesPictureParameter{\c!grid\c!color}}%
+   \doifnothing{\simpleslidesGridColor}{\edef\simpleslidesGridColor{green}}%
+   %
+   \processaction
+     [\simpleslidesPictureParameter\c!alternative]
+     [   circle=>\chardef\simpleslidesHighlightAlternative\plusone
+                  \simpleslidesSetEllipseDimensions,
+           arrow=>\chardef\simpleslidesHighlightAlternative\plustwo,
+           focus=>\chardef\simpleslidesHighlightAlternative\plusthree
+                  \simpleslidesSetEllipseDimensions,
+      \v!default=>\chardef\simpleslidesHighlightAlternative\zerocount,
+      \v!unknown=>\chardef\simpleslidesHighlightAlternative\zerocount]
+   %
+    \processaction[#1]
+      [\v!horizontal=>{\doIncludePictureHorizontal[#2]{#4}},
+         \v!vertical=>{\doIncludePictureVertical[#2]{#4}},
+             \v!page=>{\doIncludePicturePage[#2]{#4}},
+          \v!default=>{\doIncludePictureHorizontal[#2]{#4}},
+          \v!unknown=>{\doIncludePictureHorizontal[#2]{#4}}%
+                       \message{Keywords for positioning pictures are
+                         "horizontal" or "vertical."
+                          Please specify one of them!}]
+     \endgroup}
+
+%D We have to set the width or height for vertical and horizontal pictures
+%D separately. We test if the user has supplied values for the "width" and
+%D "height" key. If they have been set, these are used for the width/height of
+%D the picture. If not, we determine the ratio of the picture and let it fill
+%D the available space. Small pictures will be enlarged, big pictures will be
+%D fit. This code was suggested by Wolfgang Schuster on the mailing list.
+
+\def\setPictureDimensionsTo#1#2#3% graphic height width
+  {\doifelsenothing{\simpleslidesPictureParameter\c!width}
+     {\doifelsenothing{\simpleslidesPictureParameter\c!height}
+        {\setbox\scratchbox\hbox{\externalfigure[#1]
+          [\c!page=\simpleslidesPictureParameter\c!page]}
+        % Courtsey Wolfgang Schuster
+        \ifdim\dimexpr#3*100/\wd\scratchbox\relax <
+              \dimexpr#2*100/\ht\scratchbox\relax
+          %
+          \setvalue{simpleslides:picture:width}{#3}%
+          \setvalue{simpleslides:picture:height}{}%
+        \else
+          \setvalue{simpleslides:picture:width}{}%
+          \setvalue{simpleslides:picture:height}{#2}%
+        \fi}
+     {\setvalue{simpleslides:picture:width}{}%
+      \setvalue{simpleslides:picture:height}{\simpleslidesPictureParameter\c!height}}}
+ {\setvalue{simpleslides:picture:width}{\simpleslidesPictureParameter\c!width}
+  \setvalue{simpleslides:picture:height}{}}}% not \simpleslidesPictureParameter\c!height
+
+%D This macro places the picture centered both vertically and horizontally.
+
+\def\doplacePictureFrame[#1]#2%
+  {\framed[\c!frame=\v!off,
+           \c!framecolor=green,
+           \c!align=\v!middle,
+           \c!top=\vss,
+           \c!bottom=\vss,
+           \c!strut=\v!no,
+           \c!offset=\zeropoint,#1]
+      {\framed[\c!frame=\v!off,
+	       \c!framecolor=red,
+               \c!strut=\v!no,
+               \c!offset=\zeropoint,
+               \c!width=\v!fit,
+               \c!height=\v!fit,
+               \c!background={foreground,simpleslides:background:highlight}]
+      {#2}}}
+
+
+%D This macro places the picture in horizontal mode.
+
+\def\doIncludePictureHorizontal[#1]#2% graphic text
+ {\setPictureDimensionsTo{#1}\PictureFrameHeight\textwidth
+  \SlideTitle{#2}%
+  \doplacePictureFrame
+    [\c!width=\textwidth,
+     \c!height=\PictureFrameHeight]
+    {\externalfigure[#1]
+                    [\c!height=\getvalue{simpleslides:picture:height},
+                      \c!width=\getvalue{simpleslides:picture:width},
+                       \c!page=\simpleslidesPictureParameter\c!page]}%
+    \page}% Otherwise last page is not correct in \MKII.
+
+%D This macro places the picture in vertical mode.
+
+\def\doIncludePictureVertical[#1]#2% graphic text
+  {\page
+   \setPictureDimensionsTo{#1}\PictureFrameHeight\PictureFrameWidth
+    \setupPageBackground[vertical]
+    \startcombination[2]
+      {\doplacePictureFrame
+        [\c!height=\textheight,
+         \c!width=\PictureFrameWidth]
+         {\externalfigure[#1]
+                    [\c!height=\getvalue{simpleslides:picture:height},
+                      \c!width=\getvalue{simpleslides:picture:width},
+                       \c!page=\simpleslidesPictureParameter\c!page]}}{}
+       {\framed[\c!frame=\v!off,
+                \c!framecolor=blue,
+                \c!height=\textheight,
+                \c!width=\PictureFrameWidth,
+                background=\simpleslidesPictureParameter{verticalbackground},
+                backgroundcolor=\simpleslidesPictureParameter{verticalbackgroundcolor},
+ 	        foregroundcolor=\simpleslidesPictureParameter{verticalforegroundcolor},
+                \c!top=\vss,
+                \c!bottom=\vss,
+                \c!align=\v!middle,
+                \c!strut=\v!no]{#2}}{}
+    \stopcombination
+    \page}% Otherwise last page is not correct in \MKII.
+
+%D This macro places the picture in full page mode
+
+\def\doIncludePicturePage[#1]#2% graphic text
+ {%\setPictureDimensionsTo{#1}{0.95\paperheight}{0.95\paperwidth}
+  \getvalue{simpleslides:slidetitle:page}{#2}%
+  \setupPageBackground[page]%
+  \doplacePictureFrame
+    [\c!width=\paperwidth,
+     \c!height=\paperheight]
+    {\externalfigure[#1]
+                    [\c!height=\paperheight,
+                      \c!width=\paperwidth,
+                       \c!page=\simpleslidesPictureParameter\c!page]}%
+    \page}% Otherwise last page is not correct in \MKII.
+
+%D Now, we define the main \METAPOST\ graphic to highlight the picture. It first
+%D checks if the user has asked for a grid, and if so, draws a grid and a
+%D subgrid. Then it checks which alternative (arrow, circle, focus) is requested
+%D and draws that. Notice that we have intermixed \TEX\ and \METAPOST,
+%D exploiting the power of the MP-TEX interaction provided by \CONTEXT.
+
+\startuseMPgraphic{simpleslides:MP:highlight}
+\ifconditional \simpleslidesHighlight
+  \ifconditional \simpleslidesGrid
+	\includeMPgraphic{simpleslides:MP:highlight:grid}
+    \ifconditional \simpleslidesSubGrid
+      \includeMPgraphic{simpleslides:MP:highlight:subgrid}%
+    \fi
+  \fi
+ \ifcase \simpleslidesHighlightAlternative \or
+  \includeMPgraphic{simpleslides:MP:highligh:circle} \or
+  \includeMPgraphic{simpleslides:MP:highligh:arrow}  \or
+  \includeMPgraphic{simpleslides:MP:highligh:focus}  \fi
+  \fi
+  setbounds currentpicture to OverlayBox ;
+\stopuseMPgraphic
+
+%D Metapost graphic to draw a 10x10 grid on a picture. The width of the grid
+%D line is 1/250th of the width of the picture, so smaller picture have smaller
+%D grid lines.
+
+\startuseMPgraphic{simpleslides:MP:highlight:grid}
+  save xaxis, yaxis ; path xaxis, yaxis ;
+  xaxis := leftboundary OverlayBox ;
+  yaxis := bottomboundary OverlayBox ;
+
+
+  for i = 0 upto 10 :
+
+    draw xaxis shifted (i/10*OverlayWidth, 0)
+               withpen pencircle scaled (OverlayWidth/250)
+               withcolor \MPcolor\simpleslidesGridColor ;
+
+    draw yaxis shifted (0,i/10*OverlayHeight)
+               withpen pencircle scaled (OverlayWidth/250)
+               withcolor \MPcolor\simpleslidesGridColor ;
+
+    label.bot(textext("\switchtobodyfont[9pt]\startcolor[simpleslides:textcolor]"
+                     & decimal i & "\stopcolor"),
+              (i/10*OverlayWidth, 0)) ;
+    label.top(textext("\switchtobodyfont[9pt]\startcolor[simpleslides:textcolor]"
+                      & decimal i & "\stopcolor"),
+              (i/10*OverlayWidth, OverlayHeight)) ;
+
+    label.lft(textext("\switchtobodyfont[9pt]\startcolor[simpleslides:textcolor]"
+                     & decimal i & "\stopcolor"),
+              (0, i/10*OverlayHeight)) ;
+    label.rt(textext("\switchtobodyfont[9pt]\startcolor[simpleslides:textcolor]"
+                    & decimal i & "\stopcolor"),
+              (OverlayWidth, i/10*OverlayHeight)) ;
+  endfor ;
+  setbounds currentpicture to OverlayBox ;
+\stopuseMPgraphic
+
+%D The Metapost graphic draws a fine grid on the picture. The number of grid
+%D lines is controlled by \type{steps} parameter of \type{\setupPicture}. Each
+%D grid box of the 10x10 grid drawn above is subdivided into \type{steps} number
+%D of finer lines.
+
+\startuseMPgraphic{simpleslides:MP:highlight:subgrid}
+  save xaxis, yaxis ; path xaxis, yaxis ;
+  xaxis := leftboundary OverlayBox ;
+  yaxis := bottomboundary OverlayBox ;
+
+
+  save stepSize ; numeric stepSize ;
+  stepSize := \simpleslidesPictureParameter{steps} + epsilon ;
+
+  for i = 0 step 10/stepSize until 100 :
+    if i mod 10 <> 0 :
+      draw xaxis shifted (i/100*OverlayWidth, 0)
+                 withpen pencircle scaled (OverlayWidth/500)
+                 withcolor \MPcolor\simpleslidesGridColor ;
+      draw yaxis shifted (0,i/100*OverlayHeight)
+                 withpen pencircle scaled (OverlayWidth/500)
+                 withcolor \MPcolor\simpleslidesGridColor ;
+    fi
+
+  endfor ;
+  setbounds currentpicture to OverlayBox ;
+\stopuseMPgraphic
+
+
+%D This is a helper macro to get the dimensions for the circle. Taking care of
+%D expansion inside Metapost is tricky, so we define an external macro to set
+%D the x and y scales correctly. This macro does not check if both x and y are
+%D equal to 'couple'. We should probably catch that error inside Metapost, and
+%D give an error message on the terminal if that is the case.
+
+
+\def\simpleslidesSetEllipseDimensions%
+  {\edef\simpleslidesCurrentXscale{\simpleslidesPictureParameter{\c!x\c!scale}}
+   \edef\simpleslidesCurrentYscale{\simpleslidesPictureParameter{\c!y\c!scale}}
+   \doifelse{\simpleslidesCurrentXscale}{couple}
+     {\doifelse{\simpleslidesCurrentYscale}{couple}
+       {\edef\simpleslidesCurrentXscale{1}
+        \edef\simpleslidesCurrentYscale{1}}
+       {\dosimpleslidesSetEllipseDimensions}}
+    {\dosimpleslidesSetEllipseDimensions}}
+
+\def\dosimpleslidesSetEllipseDimensions%
+  {\processaction
+     [\simpleslidesCurrentXscale]
+     [    couple=>\edef\simpleslidesCurrentXscale{\simpleslidesCurrentYscale*OverlayHeight/5},
+      \v!unknown=>\edef\simpleslidesCurrentXscale{\simpleslidesCurrentXscale*OverlayWidth/5}]
+   \processaction
+     [\simpleslidesCurrentYscale]
+     [    couple=>\edef\simpleslidesCurrentYscale{\simpleslidesCurrentXscale}, % no *OverlayWidth/5, it has already been scaled
+      \v!unknown=>\edef\simpleslidesCurrentYscale{\simpleslidesCurrentYscale*OverlayHeight/5}]}
+
+%D Metapost graphic to draw a circle. The circle is centered at (x,y) with a
+%D x-radius equal to \type{xscale} and y-radius equal to \type{yscale}. If
+%D either \type{xscale} or \type{yscale} equals \type{couple}, a circle is drawn
+%D with radius equal to the other (non-couple) scale parameter. The thickness of
+%D the circle is \type{rulethickness} and the color is \type{color}. The
+%D circle is rotated by an angle \type{direction}
+
+\startuseMPgraphic{simpleslides:MP:highligh:circle}
+  save p; path p;
+  p := fullcircle xyscaled
+        % The dimensions are divided by 5 rather than 10, since the scale
+        % measures the radius, rather than the diameter.
+        (\simpleslidesCurrentXscale, \simpleslidesCurrentYscale)
+       rotated (\simpleslidesPictureParameter\c!direction)
+       shifted
+       (\simpleslidesPictureParameter\c!x *OverlayWidth/10,
+        \simpleslidesPictureParameter\c!y *OverlayHeight/10)  ;
+
+  \ifcase \simpleslidesShadow \else
+
+  save shadow_direction ; pair shadow_direction ;
+  shadow_direction =\simpleslidesPictureParameter\c!rulethickness *
+     \ifcase \simpleslidesShadow \or
+          (-1,1) \or (1,1) \or (1,-1) \or (-1,-1) \fi ;
+
+
+  save shadow_thickness ; numeric shadow_thickness ;
+  shadow_thickness := 1.5 * \simpleslidesPictureParameter\c!rulethickness ;
+
+  def shadow_draw = draw enddef ;
+
+  \includeMPgraphic{simpleslides:MP:highligh:shadow}
+  \fi
+
+  draw p withcolor \MPcolor{\simpleslidesPictureParameter\c!color}
+       withpen pencircle scaled (\simpleslidesPictureParameter\c!rulethickness);
+
+\stopuseMPgraphic
+
+%D Metapost graphic to draw an arrow. The arrow's tip is at \type{(x,y)}, and it
+%D is \type{length} long in the direction specified by \type{direction}. The
+%D arrow is \type{2×rulethickness} thick (the factor of 2 is there so that the
+%D same default works for both circle and arrows) and is on \type{color} color.
+
+\startuseMPgraphic{simpleslides:MP:highligh:arrow}
+  autoarrows := true ; % so that arrow heads are scaled correctly.
+
+  z1 = (\simpleslidesPictureParameter\c!x *OverlayWidth/10,
+        \simpleslidesPictureParameter\c!y *OverlayHeight/10)   ;
+  z2 = z1 + \simpleslidesPictureParameter{length} *
+            dir(\simpleslidesPictureParameter{direction}) ;
+
+  save p ; path p ;
+  p := z2 -- z1 ;
+
+  \ifcase \simpleslidesShadow \else
+  save shadow_direction ; pair shadow_direction ;
+  shadow_direction = 2*\simpleslidesPictureParameter\c!rulethickness *
+     dir(%\simpleslidesPictureParameter{direction} +
+     \ifcase \simpleslidesShadow \or
+          135 \or 45 \or -45 \or -135 \fi ) ;
+
+  save shadow_thickness ; numeric shadow_thickness ;
+  shadow_thickness := 2*\simpleslidesPictureParameter\c!rulethickness ;
+
+  def shadow_draw = drawarrow enddef ;
+
+  \includeMPgraphic{simpleslides:MP:highligh:shadow}
+  \fi
+
+  drawarrow p
+       withcolor \MPcolor{\simpleslidesPictureParameter\c!color}
+       withpen pencircle scaled (2*\simpleslidesPictureParameter\c!rulethickness);
+
+\stopuseMPgraphic
+
+%D Metapost graphic to focus on a particular area. The coordinates of the focus
+%D area are equivalent to that of \type{alternative=circle}. The "unfocussed"
+%D area is covered with \type{shadowcolor} made transparent by
+%D \type{opacity} amount.
+
+\startuseMPgraphic{simpleslides:MP:highligh:focus}
+  save p; path p;
+  p := fullcircle xyscaled
+        % The dimensions are divided by 5 rather than 10, since the scale
+        % measures the radius, rather than the diameter.
+        (\simpleslidesCurrentXscale, \simpleslidesCurrentYscale)
+       rotated (\simpleslidesPictureParameter\c!direction)
+       shifted
+       (\simpleslidesPictureParameter\c!x *OverlayWidth/10,
+        \simpleslidesPictureParameter\c!y *OverlayHeight/10)  ;
+
+  fill OverlayBox -- reverse p -- cycle
+       withcolor transparent (1,
+         \simpleslidesPictureParameter{opacity},
+         \MPcolor{\simpleslidesPictureParameter{shadow\c!color}}) ;
+\stopuseMPgraphic
+
+%D The next Metapost graphic draws an arrow. To ensure code re-usability, we
+%D assume that the shape of the shadow is stored as a path \type{p}, it is
+%D shifted by amount \type{shadow_direction} and its thickness is
+%D \type{shadow_thickness}. It is the responsibility of the calling function to
+%D ensure that this is done. There are four options for the shadow,
+%D \type{topleft}, \type{topright}, \type{bottomright}, and \type{bottomleft}.
+%D (TODO: Keep this thickness configurable). The shadow is drawn in color
+%D \type{shadowcolor}. The arrow is drawn with a transparent color whose opacity
+%D is given by \type{opacity}.
+
+\startuseMPgraphic{simpleslides:MP:highligh:shadow}
+  %% I hope there were a better way to do this.
+  for i = 1 upto 20 :
+  shadow_draw p shifted shadow_direction
+       withcolor transparent (1,
+         \simpleslidesPictureParameter{opacity}/10, % 0.1,
+         \MPcolor{\simpleslidesPictureParameter{shadow\c!color}})
+       withpen pencircle scaled (i*shadow_thickness/20) ;
+  endfor
+\stopuseMPgraphic
+
+
+%D This is a small square which will be used for itemizations; it will be
+%D placed in the margin.
+
+\startuniqueMPgraphic{simpleslides:itemize:triangle}
+  fill (0,0) -- (0,0.4cm) -- (0.6cm,0.2cm) -- cycle
+       withcolor \MPcolor{simpleslides:itemize:color} ;
+\stopuniqueMPgraphic
+
+\startuniqueMPgraphic{simpleslides:itemize:square}
+  fill unitsquare xyscaled(0.4cm,0.4cm)
+       withcolor \MPcolor{simpleslides:itemize:color} ;
+\stopuniqueMPgraphic
+
+%D Sometimes we want an image as a background of a page. For that, we use the
+%D following macro. You need to set a transparent image foreground color for
+%D this to work. TODO: This macro should be combined with \type{\SlideTitle}
+
+\def\SlideBackground#1%
+  {\setlayer[simpleslides:layer:extras]
+    {\externalfigure
+    [#1]
+    [width=\paperwidth,height=\paperheight,
+    background={foreground,color},backgroundcolor=simpleslides:imageforegroundcolor]}}
+
+
+
+
+\protect
+
+\stopmodule
