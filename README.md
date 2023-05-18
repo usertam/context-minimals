@@ -1,7 +1,8 @@
 # context-minimals
-A reproducible ConTeXt LMTX distribution. Sources checked for updates daily.
+A reproducible ConTeXt LMTX distribution. Sources checked and updated daily.
 
 ## Run me with Nix!
+These are some common ad-hoc usages.
 ```sh
 # run context by default; or luametatex, luatex, mtxrun by specifying them
 nix run github:usertam/context-minimals
@@ -11,44 +12,37 @@ nix run github:usertam/context-minimals#mtxrun
 nix shell github:usertam/context-minimals
 ```
 
-## Tex PDFs with flakes
-Below shows a basic flake setup.
-```nix
-{
-  inputs.context-minimals.url = "github:usertam/context-minimals";
-  outputs = { self, context-minimals }: {
-    packages = context-minimals.lib.mkCompilation { src = self; };
-    apps = context-minimals.lib.mkCompilationApps { };
-  };
-}
+## Setup with binary cache
+Now comes with binary cache at [context-minimals.cachix.org][6]! However, only `x86_64-linux` and `x86_64-darwin` are cached as of now, because GitHub Actions. Overall, you just need to add `substituters` and `trusted-public-keys` entries to `nix.conf`.
+```sh
+# write to $XDG_CONFIG_HOME/nix/nix.conf (user); or
+# write to /etc/nix/nix.conf (system; overwrites cache.nixos.org and requires daemon restart)
+
+experimental-features = nix-command flakes
+substituters = https://context-minimals.cachix.org
+trusted-public-keys = context-minimals.cachix.org-1:pYxyH24J/A04fznRlYbTTjWrn9EsfUQvccGMjfXMdj0=
 ```
 
-Include nixpkgs-provided fonts with `fonts`.
+## Tex PDFs declaratively, with flakes
+In `flake.nix`, use [`mkCompilation`][7] in `modules/lib/default.nix` to compile `main.tex`.
 ```nix
 {
   inputs.context-minimals.url = "github:usertam/context-minimals";
-  outputs = { self, context-minimals }:
-    let
-      fonts = [ "source-han-serif" ];
-      fcache = [ "sourcehanserif" ];  # force build caches, useful for slow CJK fonts
-    in {
-      packages = context-minimals.lib.mkCompilation { inherit fonts fcache; src = self; };
-      apps = context-minimals.lib.mkCompilationApps { inherit fonts fcache; };
-    };
-}
-```
+  inputs.photo.url = "https://unsplash.com/photos/.../download";  # include extra files, but only in `nix build`
+  inputs.photo.flake = false;
 
-Include extra files like libraries, with the `postUnpack` hook.
-```nix
-{
-  inputs.context-minimals.url = "github:usertam/context-minimals";
-  inputs.fiziko.url = "github:jemmybutton/fiziko";
-  inputs.fiziko.flake = false;
-
-  outputs = { self, context-minimals, fiziko }: {
+  outputs = { self, context-minimals, ... }@inputs: let
+    fonts = [ "source-han-serif" ]; # include nixpkgs-provided fonts
+    fcache = [ "sourcehanserif" ];  # force build font caches, useful for slow CJK fonts
+  in {
     packages = context-minimals.lib.mkCompilation {
+      inherit fonts fcache;
       src = self;
-      postUnpack = "install -Dt $sourceRoot ${fiziko}/fiziko.mp";
+      nativeBuildInputs = [ "imagemagick" ];  # include tools to use in `postUnpack`
+      postUnpack = "convert -quality 100% -despeckle ${inputs.photo} $sourceRoot/photo.jpeg";
+    };
+    apps = context-minimals.lib.mkCompilationApps {
+      inherit fonts fcache;
     };
   };
 }
@@ -71,3 +65,5 @@ Note that non-determinism can still be introduced by macros like `\date`. For Me
 [3]: https://distribution.contextgarden.net/setup
 [4]: https://wiki.contextgarden.net/Installing_ConTeXt_LMTX_on_MacOS
 [5]: https://distribution.contextgarden.net/current/bin
+[6]: https://context-minimals.cachix.org
+[7]: https://github.com/usertam/context-minimals/blob/53f85e8ea12c5017b230eb3fc6dc38451e637541/modules/lib/default.nix#L7
