@@ -14,7 +14,7 @@
 let
 ctx-base = stdenvNoCC.mkDerivation {
   pname = "context-minimals-base";
-  version = "2023.05.27 23:23";
+  version = "2023.05.28 18:55";
 
   srcs = [ context context-fonts modules ];
   buildInputs = [ luametatex luatex ];
