@@ -13,14 +13,12 @@ nix shell github:usertam/context-minimals
 ```
 
 ## Setup with binary cache
-Now comes with binary cache at [context-minimals.cachix.org][6]! However, only `x86_64-linux` and `x86_64-darwin` are cached as of now, because GitHub Actions. Overall, you just need to add `substituters` and `trusted-public-keys` entries to `nix.conf`.
+Now comes with binary cache at [context-minimals.cachix.org][6]! However, only `x86_64-linux` and `x86_64-darwin` are cached as of now, because GitHub Actions.
 ```sh
-# write to $XDG_CONFIG_HOME/nix/nix.conf (user); or
-# write to /etc/nix/nix.conf (system; overwrites cache.nixos.org and requires daemon restart)
-
-experimental-features = nix-command flakes
-substituters = https://context-minimals.cachix.org
-trusted-public-keys = context-minimals.cachix.org-1:pYxyH24J/A04fznRlYbTTjWrn9EsfUQvccGMjfXMdj0=
+# add to $HOME/nix/nix.conf (user) or /etc/nix/nix.conf (system)
+extra-experimental-features = nix-command flakes
+extra-substituters = https://context-minimals.cachix.org
+extra-trusted-public-keys = context-minimals.cachix.org-1:pYxyH24J/A04fznRlYbTTjWrn9EsfUQvccGMjfXMdj0=
 ```
 
 ## Tex PDFs declaratively, with flakes

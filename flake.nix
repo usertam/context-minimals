@@ -11,6 +11,9 @@
     modules.flake = false;
   };
 
+  nixConfig.extra-substituters = "https://context-minimals.cachix.org";
+  nixConfig.extra-trusted-public-keys = "context-minimals.cachix.org-1:pYxyH24J/A04fznRlYbTTjWrn9EsfUQvccGMjfXMdj0=";
+
   outputs = { self, ... }@inputs:
     let forAllSystems = with inputs.nixpkgs.lib; genAttrs platforms.unix;
     in {
