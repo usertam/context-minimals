@@ -1,0 +1,798 @@
+%D \module
+%D   [       file=mtx-context-third-presvoz,
+%D        version=2022.02.02,
+%D          title=PresVoz,
+%D       subtitle=Presentations with Voice,
+%D         author=Pablo Rodríguez,
+%D           date=\currentdate,
+%D      copyright={Michal Vlásak \&\ Pablo Rodríguez}]
+%C
+%C This module is part of the \CONTEXT\ macro||package and is
+%C copyrighted by its authors.
+
+\starttext
+\startlmtxmode
+\def\Presentation{\getdocumentfilename{1}}
+
+\startluacode
+if file.extname(document.files[1]) == "" then
+  document.main_file = file.addsuffix(document.files[1],"pdf")
+else
+  document.main_file = document.files[1]
+end
+
+if file.pathpart(document.main_file) == "" then
+  document.main_filename = file.nameonly(document.main_file)
+else
+  document.main_filename = file.pathpart(document.main_file):gsub(io.fileseparator, "/") .. "/" .. file.nameonly(document.main_file)
+end
+
+document.original_times = document.main_filename .. "-times.txt"
+
+document.uncompressed_audio = document.main_filename .. "-audio.wav"
+
+document.audio_mp3 = document.main_filename .. "-audio.mp3"
+
+document.audio_opus = document.main_filename .. "-audio.opus" -- opus might work later
+
+document.compressed_audio = document.audio_mp3
+
+--twolame is not an option: gives wrong sizes
+
+if io.exists(document.uncompressed_audio) and not(io.exists(document.audio_mp3)) and os.which('lame') then
+  os.execute('lame -m m -b 32 "' .. document.uncompressed_audio .. '" "' .. document.audio_mp3 .. '"')
+elseif io.exists(document.uncompressed_audio) and not(io.exists(document.compressed_audio)) then
+  if os.which('opusenc') then os.execute('opusenc --downmix-mono --bitrate 16 "' .. document.uncompressed_audio .. '" "' .. document.audio_opus .. '"') end
+end
+
+presvoz_name = document.main_filename .. "-presvoz.pdf"
+
+if not(io.exists(document.original_times)) or not(io.exists(document.compressed_audio)) then
+  context.enablemode({"missing-files"})
+end
+\stopluacode
+
+\startmode[missing-files]
+\setupinteractionscreen[option=max]
+\setupbodyfont[pagella]
+\startTEXpage[offset=2em, align=center]
+  \bf\color[darkred]{{\bi PresVoz} requires\\
+  {\tt\cldcontext{document.original_times}} and {\tt\cldcontext{document.uncompressed_audio}}\\
+  to do its magic with {\tt\cldcontext{document.main_file}}.}
+\stopTEXpage
+\stopmode
+
+\startnotmode[missing-files]
+\startluacode
+document.timeline_filename = document.main_filename .. "-times.js"
+
+document.slides_swf = document.main_filename .. ".swf"
+
+document.presentation_script = document.main_filename .. "-presentation.sc"
+
+document.presentation_swf = document.main_filename .. "-presentation.swf"
+
+document.presentation_filename = file.nameonly(document.main_file) .. "-presentation.swf"
+
+document.first_slide_swf = document.main_filename .. "-first.swf"
+
+document.loader_script = document.main_filename .. "-loader.sc"
+
+document.loader_swf = document.main_filename .. "-loader.swf"
+
+function document.transfer_metadata(name)
+  local main_doc = lpdf.epdf.load(name)
+  lpdf.addtocatalog("Lang", lpdf.unicode(main_doc.Catalog.Lang), lpdf.string(main_doc.Catalog.Lang))
+  if main_doc.Catalog.Lang == "en" then
+    document.separate_subtitle = ": "
+   else
+    document.separate_subtitle = ". "
+  end
+  if main_doc.Info.Subject ~= nil and main_doc.Info.Subject ~= "" then
+    context.setupinteraction{ title = main_doc.Info.Title .. document.separate_subtitle .. main_doc.Info.Subject }
+  else
+    context.setupinteraction{ title = main_doc.Info.Title }
+  end
+  if main_doc.Catalog.Lang == "es" then
+    document.presvoz_banner = "Hecho con «PresVoz»  🤞🐞"
+   elseif main_doc.Catalog.Lang == "pt" then
+    document.presvoz_banner = "Feito con «PresVoz»  🤞🐞"
+   elseif main_doc.Catalog.Lang == "it" then
+    document.presvoz_banner = "Fatto con «PresVoz»  🤞🐞"
+   elseif main_doc.Catalog.Lang == "fr" then
+    document.presvoz_banner = "Fait avec « PresVoz »  🤞🐞"
+   elseif main_doc.Catalog.Lang == "de" then
+    document.presvoz_banner = "Erezeugt mit »PresVoz«  🤞🐞"
+   elseif main_doc.Catalog.Lang == "nl" then
+    document.presvoz_banner = "Gedaan med „PresVoz”  🤞🐞"
+   elseif main_doc.Catalog.Lang == "nl" then
+    document.presvoz_banner = "Gedaan med „PresVoz”  🤞🐞"
+   else
+    document.presvoz_banner = "Done with “PresVoz”  🤞🐞"
+  end
+  context.setupinteraction{ subtitle = document.presvoz_banner .. " – https://www.presvoz.tk" }
+  if main_doc.Info.Author ~= nil and main_doc.Info.Author ~= "" then
+    context.setupinteraction{ author = main_doc.Info.Author }
+  end
+  if main_doc.Info.ModDate ~=nil and main_doc.Info.ModDate ~= "" then
+    original_Doc_date =  main_doc.Info.ModDate:sub(3,6) .. "-" ..
+      main_doc.Info.ModDate:sub(7,8) .. "-" ..
+      main_doc.Info.ModDate:sub(9,10) .. "T" ..
+      main_doc.Info.ModDate:sub(11,12) .. ":" ..
+      main_doc.Info.ModDate:sub(13,14) .. ":" ..
+      main_doc.Info.ModDate:sub(15,22):gsub("'", ":")
+    directives.enable('backend.date=' .. original_Doc_date .. "'")
+  end
+  lpdf.epdf.unload(name)
+end
+
+document.transfer_metadata(document.main_file)
+\stopluacode
+
+\startbuffer[flash-presentation]
+    \startluacode
+    local raw_times = io.open(document.original_times)
+    local swf_times = io.open(document.presentation_script, "w")
+
+    swf_times:write([[# Presentation script, generated by PresVoz
+    #
+    # Copyright (C) 2003 Leonard Lin
+    # Copyright (C) 2007-2008 Sergio Costas
+    # Copyright (C) 2009-2021 Pablo Rodríguez
+    #
+    # This program is free software; you can redistribute it and/or
+    # modify it under the terms of the GNU General Public License
+    # as published by the Free Software Foundation; either version 3
+    # of the License, or (at your option) any later version.
+    #
+    # This program is distributed in the hope that it will be useful,
+    # but WITHOUT ANY WARRANTY; without even the implied warranty of
+    # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    # General Public License for more details.
+    #
+    # You should have received a copy of the GNU General Public License
+    # along with this program; if not, see <http://www.gnu.org/licenses>.
+    #
+    # Additional permission under GNU GPL version 3 section 7
+    #
+    # As a special exception, if you create a document which uses this
+    # script, and compile this script or a modified version of it in the
+    # document, this script does not by itself cause the resulting document
+    # to be covered by the GNU General Public License. This exception does
+    # not however invalidate any other reasons why the document might be
+    # covered by the GNU General Public License.
+
+    .flash filename="]] .. document.presentation_swf .. [[" version=8 fps=12
+
+    .swf slides "]] .. document.slides_swf .. [["
+    .sound audio "]] .. document.audio_mp3 .. [["
+
+    .action:
+        var times=new Array();
+        var maxtimes;
+        var position;
+        var mode;
+        var sound_position;
+        var sound_length;
+        var show_slide;
+
+        var contextual = new ContextMenu();
+        function ssurl(){
+            getURL("https://www.presvoz.tk", "_blank");
+        }
+
+        switch (System.capabilities.language) {
+            case "en" :
+                ss_message = "Done with PresVoz  🤞🐞";
+                break;
+            case "es" :
+                ss_message = "Hecho con PresVoz  🤞🐞";
+                break;
+            case "gl" :
+                ss_message = "Feito con PresVoz  🤞🐞";
+                break;
+            case "pt" :
+                ss_message = "Feito con PresVoz  🤞🐞";
+                break;
+            case "it" :
+                ss_message = "Fatto con PresVoz  🤞🐞";
+                break;
+            case "fr" :
+                ss_message = "Fait avec PresVoz  🤞🐞";
+                break;
+            case "de" :
+                ss_message = "Erezeugt mit PresVoz  🤞🐞";
+                break;
+            case "nl" :
+                ss_message = "Gedaan med PresVoz  🤞🐞";
+                break;
+            case "el" :
+                ss_message = "Kατασκευασμένος με PresVoz  🤞🐞";
+                break;
+            default:
+                ss_message = "Made with PresVoz  🤞🐞";
+                break;
+            }
+
+        contextual.hideBuiltInItems();
+        ss_url = new ContextMenuItem(ss_message, ssurl);
+        contextual.customItems.push(ss_url);
+        _root.menu = contextual;
+
+        snd = new Sound(this);
+        snd.attachSound("audio");
+        sound_length=snd.duration;
+        position = 0;
+
+        show_slide = false;
+        times[0] = 0;]] .. "\n")
+
+    line_number = 0
+    while true do
+        line = raw_times:read()
+        if line == nil then break end
+        if line:match("%D") == nil then
+          line_number = line_number + 1
+          print ("times["..line_number.."] = " .. line .. ";")
+                 swf_times:write("    times["..line_number.."] = " .. line .. ";")
+                 swf_times:write("\n")
+        end
+    end
+
+    swf_times:write("\n" .. [[
+        maxtimes = times.length - 1;
+
+        function pause_or_play() {
+            if (mode==0) {
+                snd.start(snd.position/1000.0,0);
+                mode=1;
+            } else if (mode==1) {
+                snd.stop();
+                mode=0;
+            }
+        }
+
+        function previous_slide() {
+            if (mode<2) {
+                if (mode==0) { mode=1; }
+                snd.stop();
+                if (position>0) {
+                    sound_position=times[position-1];
+                } else {
+                    sound_position=0;
+                }
+                snd.start(sound_position/1000.0,0);
+            }
+        }
+
+        function next_slide() {
+            if (mode<2) {
+                if (mode==0) { mode=1; }
+                snd.stop();
+                sound_position = times[position+1];
+                if (sound_position>sound_length) {
+                    sound_position=sound_length-500;
+                }
+                snd.start(sound_position/1000.0,0);
+            }
+        }
+
+        function first_slide() {
+            snd.stop();
+            snd.start(0,0);
+            slides.gotoAndStop(1);
+            position=0;
+            mode=1;
+            show_slide=true;
+        }
+
+        function last_slide() {
+            snd.stop();
+            sound_position = times[maxtimes-1];
+            slides.gotoAndStop(maxtimes);
+            show_slide=false;
+            snd.start(sound_position/1000.0,0);
+        }
+
+        function toogle_fullscreen() {
+            if(Stage.displayState == "normal"){
+                Stage.displayState="fullScreen";
+            } else {
+                Stage.displayState="normal";
+            }
+        }
+
+        Mouse.onMouseDown = function() {
+            if ((getTimer() - lastClick) < 400) {
+                pause_or_play();
+            } else {
+                lastClick = getTimer();
+            }
+        };
+
+
+        key_listen=new Object();
+
+        key_listen.onKeyDown = function() {
+            switch (Key.getCode()) {
+                case 32:
+                    pause_or_play();
+                break;
+                case 37:
+                    previous_slide();
+                break;
+                case 38:
+                    first_slide();
+                break;
+                case 39:
+                    next_slide();
+                break;
+                case 40:
+                    last_slide();
+                break;
+                case 70:
+                    toogle_fullscreen();
+                break;
+            }
+        };
+
+        function check_time() {
+            if (mode==1) {
+                if ( sound_position + 50 > sound_length) {
+                    snd.stop();
+                    mode=2;
+                    if(Stage.displayState == "fullScreen"){
+                          Stage.displayState="normal";
+                    }
+                } else {
+                    if ((snd.position>=times[position])&&(snd.position<times[position+1])) {
+                        if (show_slide) {
+                            slides.gotoAndStop(position+1);
+                            show_slide=false;
+                        }
+                    } else {
+                        if (position>maxtimes) {
+                            snd.stop();
+                            mode=2;
+                        } else {
+                            if (snd.position<times[position]) {
+                                position-=1;
+                            } else {
+                                position+=1;
+                            }
+                            show_slide=true;
+                        }
+                    }
+                }
+            }
+        }
+
+            setInterval(check_time, 10);
+
+           mode=1;
+           snd.start(0,0);
+           Stage["displayState"] = "fullScreen";
+           Mouse.addListener(Mouse);
+           Key.addListener(key_listen);
+
+    .end
+
+    .frame 1
+        .put slides
+        .stop slides
+
+    .end
+    ]])
+
+    raw_times:close()
+    swf_times:close()
+
+    os.execute('pdf2swf -f -T 8 -s filloverlap -s linksopennewwindow "' .. document.main_file .. '" -o "' .. document.slides_swf .. '"')
+    os.execute('swfc "' .. document.presentation_script .. '"')
+    if io.exists(document.presentation_swf) then os.remove(document.presentation_script) os.remove(document.slides_swf) end
+    \stopluacode
+\stopbuffer
+
+\startbuffer[flash-loader]
+    \startluacode
+    local raw_times = io.open(document.original_times)
+    local loader_times = io.open(document.loader_script, "w")
+
+    fig = figures.getinfo(document.main_file)
+    function dimension_bp(dimension)
+        return math.floor(dimension*number.dimenfactors.bp)
+    end
+
+    loader_times:write([[# Preloader script, generated by PresVoz
+    #
+    # Copyright (C) 2009-2021 Pablo Rodríguez
+    #
+    # This program is free software; you can redistribute it and/or
+    # modify it under the terms of the GNU General Public License
+    # as published by the Free Software Foundation; either version 3
+    # of the License, or (at your option) any later version.
+    #
+    # This program is distributed in the hope that it will be useful,
+    # but WITHOUT ANY WARRANTY; without even the implied warranty of
+    # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    # General Public License for more details.
+    #
+    # You should have received a copy of the GNU General Public License
+    # along with this program; if not, see <http://www.gnu.org/licenses>.
+    #
+    # Additional permission under GNU GPL version 3 section 7
+    #
+    # As a special exception, if you create a document which uses this
+    # script, and compile this script or a modified version of this script
+    # into the document, this script does not by itself cause the resulting
+    # document to be covered by the GNU General Public License.
+    # This exception does not however invalidate any other reasons why
+    # the document might be covered by the GNU General Public License.
+
+    .flash filename="]] .. document.loader_swf  .. [[" version=8 fps=12"
+    .font roman "]] .. resolvers.findfile("iRaccoonShowBold.otf") ..  [[" glyphs=" %()KB0123456789/:,.CPDNuk[]resntiocanbld!"
+    .edittext newloader font=roman color=#ffff00 size=30% width=350 height=30 border=none align="center" noselect variable=load_text
+    .box placeholder width=]] .. dimension_bp(fig.used.width) .. [[ height=]] .. dimension_bp(fig.used.height) .. "\n" .. [[
+    .box fsarea fill=#ffffff00 color=#ffffff00 width=]] .. dimension_bp(fig.used.width) .. [[ height=]] .. dimension_bp(fig.used.height) .. "\n" .. [[
+    .outline fscreen_outline: M 62.78125 18.703125 L 43.367188 23.734375 L 38.390625 43.09375 L 42.109375 39.375 L 48.671875 45.9375 L 65.625 29.039062 L 59.0625 22.421875 L 62.78125 18.703125 z M 199.71875 18.703125 L 203.4375 22.421875 L 196.875 29.039062 L 213.773438 45.9375 L 220.390625 39.375 L 224.109375 43.09375 L 219.132812 23.734375 L 199.71875 18.703125 z M 83.125 45.9375 C 73.429688 45.9375 65.625 53.742188 65.625 63.4375 L 65.625 133.4375 C 65.625 143.132812 73.429688 150.9375 83.125 150.9375 L 179.375 150.9375 C 189.070312 150.9375 196.875 143.132812 196.875 133.4375 L 196.875 63.4375 C 196.875 53.742188 189.070312 45.9375 179.375 45.9375 L 83.125 45.9375 z M 48.726562 150.9375 L 42.109375 157.5 L 38.390625 153.78125 L 43.367188 173.140625 L 62.78125 178.171875 L 59.0625 174.453125 L 65.625 167.835938 L 48.726562 150.9375 z M 213.773438 150.9375 L 196.875 167.835938 L 203.4375 174.453125 L 199.71875 178.171875 L 219.132812 173.140625 L 224.109375 153.78125 L 220.390625 157.5 L 213.773438 150.9375 z .end
+    .outline fulls_outline: M 17.5 0 L 245 0 C 254.695312 0 262.5 7.804688 262.5 17.5 L 262.5 179.375 C 262.5 189.070312 254.695312 196.875 245 196.875 L 17.5 196.875 C 7.804688 196.875 0 189.070312 0 179.375 L 0 17.5 C 0 7.804688 7.804688 0 17.5 0 z .end
+    .filled fscreen outline=fscreen_outline fill=#969696ff color=#969696ff
+    .filled fulls outline=fulls_outline fill=#64646496 color=#64646496
+
+    .button fscr_button
+        .show fscreen as=idle
+        .show fscreen as=area
+        .show fscreen as=hover
+        .show fscreen as=pressed
+    .end
+
+    .button fs_area
+        .show fsarea as=idle
+        .show fsarea as=area
+        .show fsarea as=hover
+        .show fsarea as=pressed
+        .on_release:
+            fullscreen_button._visible = 0;
+            fs_area._visible = 0;
+            Stage["displayState"] = "fullScreen";
+            _root.load_text = "[Click to start]";
+            _root.dlprogress_mvclip._visible = true;
+            the_presentation = "./]] .. document.presentation_filename .. [[";
+            this.loadMovie(the_presentation, this.placeholder);
+        .end
+    .end
+
+    .sprite fullscreen_button
+        .put fscreen
+        .put fulls
+    .end
+
+    .swf first_slide "]] .. document.first_slide_swf .. [["
+    .frame 1
+        .put first_slide
+        .stop first_slide
+        .put fullscreen_button
+        .stop fullscreen_button
+        .put fs_area
+        .stop fs_area
+
+        .action:
+            slide_height=Stage.height;
+            slide_width=Stage.width;
+
+            var contextual = new ContextMenu();
+            function ssurl(){ getURL("https://www.presvoz.tk", "_blank"); }
+
+        switch (System.capabilities.language) {
+            case "en" :
+                ss_message = "Done with PresVoz  🤞🐞";
+                break;
+            case "es" :
+                ss_message = "Hecho con PresVoz  🤞🐞";
+                break;
+            case "gl" :
+                ss_message = "Feito con PresVoz  🤞🐞";
+                break;
+            case "pt" :
+                ss_message = "Feito con PresVoz  🤞🐞";
+                break;
+            case "it" :
+                ss_message = "Fatto con PresVoz  🤞🐞";
+                break;
+            case "fr" :
+                ss_message = "Fait avec PresVoz  🤞🐞";
+                break;
+            case "de" :
+                ss_message = "Erezeugt mit PresVoz  🤞🐞";
+                break;
+            case "nl" :
+                ss_message = "Gedaan med PresVoz  🤞🐞";
+                break;
+            case "el" :
+                ss_message = "Kατασκευασμένος με PresVoz  🤞🐞";
+                break;
+            default:
+                ss_message = "Made with PresVoz  🤞🐞";
+                break;
+            }
+
+            contextual.hideBuiltInItems();
+            ss_url = new ContextMenuItem(ss_message, ssurl);
+            contextual.customItems.push(ss_url);
+            _root.menu = contextual;
+
+            counter_percent=(slide_width/800)*100;
+            newloader._xscale=counter_percent;
+            newloader._yscale=counter_percent;
+            newloader._x = (slide_width-(newloader._width))/2;
+            newloader._y = (slide_height-newloader._height)/2;
+
+            button_percent = (slide_width/600)*100;
+            fullscreen_button._xscale = button_percent;
+            fullscreen_button._yscale = button_percent;
+            fullscreen_button._x = (slide_width-(fullscreen_button._width))/2;
+            fullscreen_button._y = (slide_height-fullscreen_button._height)/2;
+
+            _root.createEmptyMovieClip("dlprogress_mvclip", 0);
+            dlprogress_mvclip.createEmptyMovieClip("bar", 1);
+            dlprogress_mvclip.createEmptyMovieClip("stroke", 2);
+
+            with (dlprogress_mvclip.stroke) {
+               lineStyle(0, 0xFF0000, 30);
+               moveTo(0, 0);
+               lineTo(300, 0);
+               lineTo(300, 40);
+               lineTo(0, 40);
+               lineTo(0, 0);
+            }
+            with (dlprogress_mvclip.bar) {
+               beginFill(0xFF0000, 30);
+               moveTo(0, 0);
+               lineTo(300, 0);
+               lineTo(300, 40);
+               lineTo(0, 40);
+               lineTo(0, 0);
+               endFill();
+               _xscale = 0;
+            }
+            dlprogress_mvclip._x = (slide_width-dlprogress_mvclip._width)/2;
+            dlprogress_mvclip._y = (slide_height-dlprogress_mvclip._height)/2;
+
+            dlprogress_mvclip._visible = false;
+                    fs_listen=new Object();
+
+            fs_listen.onKeyDown = function() {
+                if (Key.isDown(13)) {
+                    if(Stage.displayState == "normal"){
+                        Stage.displayState="fullScreen";
+                    } else {
+                        Stage.displayState="normal";
+                    }
+                }
+            };
+
+            Key.addListener(fs_listen);
+
+
+        .end
+
+        .sprite images
+            .put placeholder alpha=0%
+            .action:
+            the_presentation = "./]] .. document.presentation_filename .. [[";
+            first_loading = new Object();
+            first_loading.onMouseDown = function () {
+                    load_swf = new MovieClipLoader();
+                    load_swf.loadClip(the_presentation, placeholder);
+                    listen_loading = new Object();
+            listen_loading.onLoadStart = function(target) {
+                _root.dlprogress_mvclip.bar._xscale = 0;
+                _starttime = gettimer();
+            };
+            listen_loading.onLoadError = function(){
+                _root.load_text = "Presentation cannot be loaded!";
+            };
+            listen_loading.onLoadProgress = function(target, bytesLoaded, bytesTotal) {
+               downldtime = (gettimer() - _starttime) / 1000;
+               _root.load_text = (String (Math.round ((bytesLoaded * 100) / bytesTotal)) + "% (" + Math.round((bytesLoaded / 1024) / downldtime) + " KB/s)");
+               _root.dlprogress_mvclip.bar._xscale = Math.round(bytesLoaded/bytesTotal*100);
+               keeping_awake = setInterval(function(){}, 1000);
+            };
+            listen_loading.onLoadComplete = function(target) {
+               clearInterval(keeping_awake);
+               _root.load_text = "";
+               _root.dlprogress_mvclip._visible = 0;
+               _root.dlprogress_mvclip.bar._visible = 0;
+               _root.first_slide._visible = 0;
+            };
+                        load_swf.addListener(listen_loading);
+                };
+                Mouse.addListener(first_loading);
+            .end
+        .end
+
+        .put newloader
+        .stop newloader
+    .end]])
+
+    raw_times:close()
+    loader_times:close()
+
+    os.execute('pdf2swf -f -p 1 -T 8 -s filloverlap -s linksopennewwindow "' .. document.main_file .. '" -o "' .. document.first_slide_swf .. '"')
+    os.execute('swfc "' .. document.loader_script .. '"')
+    if io.exists(document.loader_swf) then os.remove(document.loader_script) os.remove(document.first_slide_swf) end
+    \stopluacode
+\stopbuffer
+
+\def\TimeLine#1%
+    {\cldcontext{ document.timeline_filename }}
+
+\def\SoundFile#1%
+    {\cldcontext{ document.compressed_audio }}
+
+\startbuffer[generate-timeline]
+    \startluacode
+    local raw_times = io.open(document.original_times)
+    local js_times = io.open(document.timeline_filename, "w")
+
+    js_times:write("\\startJSpreamble times used now")
+    js_times:write("\n")
+    js_times:write("var times = [];")
+    js_times:write("\n")
+    js_times:write("var maxtimes = times[times.length - 1];")
+    js_times:write("\n")
+    js_times:write("times[0] = 0;")
+    js_times:write("\n")
+    line_number = 0
+    while true do
+        line = raw_times:read()
+        if line == nil then break end
+        if line:match("%D") == nil then
+          line_number = line_number + 1
+          print ("times["..line_number.."] = " .. line .. ";")
+                 js_times:write("times["..line_number.."] = " .. line .. ";")
+                 js_times:write("\n")
+        end
+    end
+
+    js_times:write("\\stopJSpreamble")
+
+    raw_times:close()
+    js_times:close()
+    \stopluacode
+\stopbuffer
+
+\startmode[*first]
+\getbuffer[generate-timeline]
+\doiftext
+  {\ctxlua{if os.which('pdf2swf') and os.which('swfc') then context("a") end}}
+  {\getbuffer[flash-presentation]
+   \getbuffer[flash-loader]}
+\stopmode
+
+\getfiguredimensions[\Presentation]
+
+\setupexternalfigures[interaction=all]
+
+\setupinteraction
+    [state=start,
+     color=,
+     contrastcolor=,
+     style=,
+     focus=standard]
+
+\useJSscripts[presvoz.mkxl]
+\startnotmode[*first]
+  \useJSscripts[\TimeLine{\Presentation}]
+\stopnotmode
+
+\definefontfamily
+    [mainface]
+    [rm]
+    [Latin Modern Sans]
+
+\definefontfamily
+    [mainface]
+    [ss]
+    [Flechitas]
+
+\setupbodyfont
+    [mainface, 25pt]
+
+\setupmakeup
+    [page]
+    [pagestate=start,
+     style=\bfd,
+     color=white,
+     footerstate=start,
+     align=center]
+
+\definecolor[transparent-gray]
+    [r=.45, g=.45, b=.45]
+
+\defineviewerlayer[fullscreen][state=start]
+\defineviewerlayer[unfullscreen][state=stop]
+\defineviewerlayer[play][state=start]
+\defineviewerlayer[pause][state=stop]
+
+\definecolor[transparent][r=1, a=1, t=0]
+
+\startbuffer[fullscreen-button]
+  \startoverlay
+    {\viewerlayer[fullscreen]{C}}
+    {\viewerlayer[unfullscreen]{I}}
+    {\goto{\color[transparent]{C}}[JS(SwitchFS{})]}
+  \stopoverlay
+\stopbuffer
+
+\startbuffer[play-pause-button]
+  \startoverlay
+    {\viewerlayer[play]{R}}
+    {\viewerlayer[pause]{H}}
+    {\goto{\color[transparent]{C}}[JS(PlayPauseSound{})]}
+  \stopoverlay
+\stopbuffer
+
+\def\SlideNavigationButtons{%
+    \goto{F}[JS(GoToFirstSlide{})]\,%
+    \goto{B}[JS(GoToPreviousSlide{})]\,%
+    \inlinebuffer[play-pause-button]\,%
+    \goto{S}[JS(StopSound{})]\,%
+    \goto{N}[JS(GoToNextSlide{})]\,%
+    \goto{L}[JS(GoToLastSlide{})]\quad
+    \null\inlinebuffer[fullscreen-button]%
+    }
+
+\definelayer[player-buttons]
+    [x=.5\dimexpr\figurewidth\relax,
+     y=.9525\dimexpr\figureheight\relax,
+     location=middle,
+     state=repeat]
+
+\definelayer[placesound]
+
+\startbuffer[placesound]
+  \definerenderingwindow[soundplace]
+    [width=0pt, height=0pt, frame=on]
+
+\doiftextelse{\ctxlua{if document.compressed_audio == document.audio_opus then context("opus") end}}
+  {\userendering[mainsound][audio/opus][\SoundFile{\Presentation}][embed=yes, list=no]}
+  {\userendering[mainsound][audio/mp3][\SoundFile{\Presentation}][embed=yes, list=no]}
+
+  \placerenderingwindow[soundplace][mainsound]
+\stopbuffer
+
+\setupbackgrounds
+    [page]
+    [background={foreground, placesound, player-buttons}]
+
+
+\setlayer[player-buttons]
+    {\switchtobodyfont[sans, \cldcontext{tex.dimen.paperwidth/1000000}pt]\color[transparent-gray]{\SlideNavigationButtons}}
+
+\resetpagenumber
+
+\dorecurse{\noffigurepages}{\startTEXpage[pagestate=start]
+\ifnum\recurselevel=1 \setlayer[placesound]{\getbuffer[placesound]}\fi
+\externalfigure[\Presentation][page=\recurselevel]
+\stopTEXpage}
+\stopnotmode
+
+\startluacode
+luatex.wrapup(
+  function()
+    os.remove(presvoz_name)
+    os.rename(tex.jobname .. ".pdf", presvoz_name)
+  end
+)
+\stopluacode
+\stoptext
+\stoplmtxmode
+
+\startmkivmode
+\setupinteractionscreen[option=max]
+\startTEXpage[offset=2em, align=center]
+  \ssbf\color[darkgreen]{\LMTX\ required,\\I’m afraid.}
+\stopTEXpage
+\stopmkivmode
+\stoptext

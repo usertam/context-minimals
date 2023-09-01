@@ -1,0 +1,183 @@
+\startJSpreamble PresVoz used now
+var ocgs = this.getOCGs(0);
+this.pageNum = 0;
+
+var label = "mainsound" ;
+var rendition = this.media.getRendition(label) ;
+var screen = this.media.getAnnot({nPage: 0, cAnnotTitle: label}) ;
+var main_sound_player;
+
+function ToogleFSButton() {
+  if (app.fs.isFullScreen) {
+    ocgs[0].state = false;
+    ocgs[3].state = true;
+  } else {
+    ocgs[0].state = true;
+    ocgs[3].state = false;
+  }
+}
+
+function TooglePlayPauseButton() {
+  if (main_sound_player.isPlaying) {
+    ocgs[1].state = true;
+    ocgs[2].state = false;
+  } else {
+    ocgs[1].state = false;
+    ocgs[2].state = true;
+  }
+}
+
+function timer_resume() {
+    check_time = app.setInterval("advance_slide()", 10);
+}
+
+function timer_pause() {
+    app.clearInterval(check_time);
+}
+
+function jump() {
+  if (!main_sound_player.isOpen) { main_sound_player.open(); }
+
+  if ( typeof main_sound_player != "undefined" || ( typeof main_sound_player != "undefined" && main_sound_player.isOpen )) {
+    if (this.pageNum < times.length) {
+        if (!main_sound_player.isPlaying) {
+            timer_resume();
+        }
+
+        var jump_time = times[this.pageNum] / 1000;
+
+        main_sound_player.pause();
+        main_sound_player.seek({time: jump_time});
+        main_sound_player.play();
+    }
+  }
+}
+
+function advance_slide() {
+  if (!main_sound_player.isOpen) { main_sound_player.open(); }
+  if ( typeof main_sound_player.where() != "undefined") {
+    var current_offset = 1000 * main_sound_player.where().time;
+
+    if (current_offset >= times[this.pageNum + 1]) {
+        this.pageNum += 1;
+    } else if (current_offset <= times[this.pageNum - 1]) {
+        this.pageNum -= 1;
+    }
+  }
+}
+
+function start_player() {
+    main_sound_player = app.media.createPlayer({
+        rendition: rendition,
+        annot: screen,
+        settings: {
+            autoPlay: false,
+        },
+        events: {
+            onDone: function() {
+                timer_pause();
+                app.fs.isFullScreen = false;
+                ToogleFSButton();
+                this.pageNum = this.numPages - 1;
+            },
+            afterDone: function() {
+                main_sound_player.pause();
+                TooglePlayPauseButton();
+                main_sound_player.seek({time: maxtimes});
+                this.pageNum = this.numPages - 1;
+            },
+            onEscape: function() {
+                app.fs.isFullScreen = false;
+                ToogleFSButton();
+            },
+            afterEscape: function() {
+                main_sound_player.pause();
+                TooglePlayPauseButton();
+            },
+            afterPause: function() {
+                timer_pause();
+                TooglePlayPauseButton();
+            },
+            onPlay: function() {
+                app.fs.isFullScreen = true;
+                ToogleFSButton();
+            },
+            afterPlay: function() {
+                timer_resume();
+                TooglePlayPauseButton();
+            },
+            afterReady: function() {
+                main_sound_player.play();
+            },
+        },
+    });
+    main_sound_player.open();
+}
+
+function GoToFirstSlide(label) {
+  this.pageNum = 0;
+  if ( typeof main_sound_player != "undefined" || ( typeof main_sound_player != "undefined" && main_sound_player.isOpen )) {
+    if ( main_sound_player.isPlaying ) { jump(); }
+  }
+}
+
+function PlayPauseSound() {
+  if ( typeof main_sound_player == "undefined" ) {
+    start_player();
+  } else if ( !main_sound_player.isPlaying ) {
+    if (!main_sound_player.isOpen) { main_sound_player.open(); }
+    if ( typeof main_sound_player.where() != "undefined" && main_sound_player.where().time == 0 )
+      { this.pageNum = 0; }
+    timer_resume();
+    main_sound_player.play();
+  } else if ( main_sound_player.isPlaying ) {
+    timer_pause();
+    main_sound_player.pause();
+  }
+}
+
+function StopSound() {
+  if ( typeof main_sound_player != "undefined" || ( typeof main_sound_player != "undefined" && main_sound_player.isOpen )) {
+    main_sound_player.pause();
+    main_sound_player.seek({time: 0});
+  }
+  this.pageNum = 0;
+}
+
+function GoToLastSlide(label) {
+  this.pageNum = this.numPages - 1;
+  if ( typeof main_sound_player != "undefined" || ( typeof main_sound_player != "undefined" && main_sound_player.isOpen )) {
+    if ( main_sound_player.isPlaying ) { jump(); }
+  }
+}
+
+function GoToNextSlide(label) {
+  ++this.pageNum;
+  if ( typeof main_sound_player != "undefined" || ( typeof main_sound_player != "undefined" && main_sound_player.isOpen )) {
+    if ( main_sound_player.isPlaying ) { jump(); }
+  }
+}
+
+function GoToPreviousSlide(label) {
+  --this.pageNum;
+  if ( typeof main_sound_player != "undefined" || ( typeof main_sound_player != "undefined" && main_sound_player.isOpen )) {
+    if ( main_sound_player.isPlaying ) { jump(); }
+  }
+}
+
+function SwitchFS() {
+  if (app.fs.isFullScreen == false) {
+   app.fs.isFullScreen = true;
+   if (app.fs.isFullScreen) {
+     ocgs[0].state = false;
+     ocgs[3].state = true;
+   }
+  } else {
+   app.fs.isFullScreen = false;
+   if (!app.fs.isFullScreen) {
+     ocgs[0].state = true;
+     ocgs[3].state = false;
+   }
+  }
+}
+\stopJSpreamble
