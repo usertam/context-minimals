@@ -26,7 +26,7 @@
           luatex = pkgs.callPackage ./pkgs/luatex {
             src = inputs.luatex;
           };
-          context-minimals = pkgs.callPackage self {
+          context-minimals = pkgs.callPackage ./pkgs/context-minimals {
             inherit (inputs) context context-fonts modules;
             inherit luametatex luatex;
           };
