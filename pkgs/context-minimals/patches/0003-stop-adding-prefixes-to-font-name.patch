@@ -1,4 +1,4 @@
-From 31faaea7dafb77bd8879f3906db3cbfe3225b0d3 Mon Sep 17 00:00:00 2001
+From 4d910a60e459c54b85b0fb72aaab5b7b9c674fb4 Mon Sep 17 00:00:00 2001
 From: usertam <heiyiutam@gmail.com>
 Date: Thu, 22 Dec 2022 01:07:39 +0800
 Subject: [PATCH 3/4] stop adding prefixes to font name
@@ -8,10 +8,10 @@ Subject: [PATCH 3/4] stop adding prefixes to font name
  1 file changed, 1 insertion(+), 15 deletions(-)
 
 diff --git a/tex/context/base/mkxl/lpdf-emb.lmt b/tex/context/base/mkxl/lpdf-emb.lmt
-index 271aadd..4e9147d 100644
+index 2b600e37d..a2fbd17d1 100644
 --- a/tex/context/base/mkxl/lpdf-emb.lmt
 +++ b/tex/context/base/mkxl/lpdf-emb.lmt
-@@ -311,22 +311,8 @@ end
+@@ -312,22 +312,8 @@ end
  
      -- Actually we can use the same as we only embed once.
  
@@ -36,5 +36,5 @@ index 271aadd..4e9147d 100644
  
  end
 -- 
-2.38.1
+2.41.0
 

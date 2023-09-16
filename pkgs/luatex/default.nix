@@ -8,10 +8,11 @@
 , zziplib
 }:
 
-stdenv.mkDerivation {
-  src = "${src}/source";
+stdenv.mkDerivation (attrsFinal: {
   pname = "luatex";
   version = "1.16.0";
+
+  src = src + /source;
 
   nativeBuildInputs = [
     pkg-config
@@ -53,4 +54,10 @@ stdenv.mkDerivation {
   installPhase = ''
     install -Dm555 -t $out/bin texk/web2c/luatex
   '';
-}
+
+  passthru.computedVersion =
+    let
+      source = builtins.readFile (attrsFinal.src + /texk/web2c/luatexdir/luatex.c);
+      versionMatch = builtins.match ''.*[^a-z0-9_]luatex_version_string[ \t]*=[ \t]*"([^"]*)";.*'' source;
+    in builtins.elemAt versionMatch 0;
+})

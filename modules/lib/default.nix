@@ -1,6 +1,7 @@
-{ nixpkgs
-, ctxpkgs
+{ contextPackages
 , forAllSystems
+, nixpkgs
+, nixpkgs-lib
 }:
 
 {
@@ -18,7 +19,7 @@
     forAllSystems (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        ctx = ctxpkgs.${system}.default.override {
+        ctx = contextPackages.${system}.default.override {
           inherit fpath fcache;
           fonts = map (a: pkgs.${a}) fonts;
         };
@@ -26,7 +27,7 @@
         default = pkgs.runCommand doc {
           inherit preUnpack postUnpack;
           src = if suffices != null
-            then nixpkgs.lib.sourceFilesBySuffices src suffices
+            then nixpkgs-lib.sourceFilesBySuffices src suffices
             else src;
           nativeBuildInputs = [ ctx pkgs.qpdf ]
             ++ map (a: pkgs.${a}) nativeBuildInputs;
@@ -48,7 +49,7 @@
     forAllSystems (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        ctx = ctxpkgs.${system}.default.override {
+        ctx = contextPackages.${system}.default.override {
           inherit fpath fcache;
           fonts = map (a: pkgs.${a}) fonts;
         };

@@ -44,34 +44,25 @@ jobs:
         fi
     - name: Checkout current branch
       run: |
-        git switch ${GITHUB_REF##*/}
+        git switch "${GITHUB_REF##*/}"
     - name: Update flake lock file
       id: update
       run: |
         # only update nixpkgs if others dependencies are updated
-        nix flake metadata --update-input context --update-input luatex --update-input modules
+        nix flake metadata --update-input context --update-input luatex --update-input context-modules
         if git status --porcelain | grep flake.lock; then
-          echo "REBUILD=1" >> $GITHUB_OUTPUT
+          echo "REBUILD=1" >> "$GITHUB_OUTPUT"
           nix flake update
         fi
     - name: Refresh derivation versions
       id: versions
       run: |
         # context-minimals
-        source=$(nix eval --raw --apply toString .#context-minimals.src.srcs | cut -d\  -f1)
-        echo -n 'ctx=' >> $GITHUB_OUTPUT
-        grep 'newcontextversion' $source/tex/context/base/mkxl/cont-new.mkxl \
-          | cut -d{ -f2 | cut -d} -f1 >> $GITHUB_OUTPUT
+        nix eval --raw --apply 'v: "ctx=${v}\n"' .#context-minimals.src.computedVersion >> "$GITHUB_OUTPUT"
         # luametatex
-        source=$(nix eval --raw --apply toString .#luametatex.src)
-        echo -n 'lmx=' >> $GITHUB_OUTPUT
-        grep 'luametatex_version_string' $source/source/luametatex.h \
-          | cut -d\" -f2 >> $GITHUB_OUTPUT
+        nix eval --raw --apply 'v: "lmx=${v}\n"' .#luametatex.computedVersion >> "$GITHUB_OUTPUT"
         # luatex
-        source=$(nix eval --raw --apply toString .#luatex.src)
-        echo -n 'ltx=' >> $GITHUB_OUTPUT
-        grep 'luatex_version_string' $source/texk/web2c/luatexdir/luatex.c \
-          | cut -d\" -f2 >> $GITHUB_OUTPUT
+        nix eval --raw --apply 'v: "ltx=${v}\n"' .#luatex.computedVersion >> "$GITHUB_OUTPUT"
     - name: Upload lock file artifact
       if: steps.update.outputs.REBUILD || github.event_name != 'schedule'
       uses: actions/upload-artifact@v3
@@ -146,5 +137,5 @@ jobs:
           echo "Upstream changes present."
           git add flake.lock default.nix pkgs/luametatex/default.nix pkgs/luatex/default.nix
           git commit -m "context-minimals: ${{ needs.update-deps.outputs.ctx }}"
-          git push origin ${GITHUB_REF##*/}
+          git push origin "${GITHUB_REF##*/}"
         fi
