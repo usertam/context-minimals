@@ -1,4 +1,4 @@
-From 21288e890ead65f667cd6e7cfba9dfe1498007d0 Mon Sep 17 00:00:00 2001
+From f189e8573086be0773688b27f049936318ecc5d5 Mon Sep 17 00:00:00 2001
 From: usertam <heiyiutam@gmail.com>
 Date: Fri, 30 Dec 2022 01:59:42 +0800
 Subject: [PATCH 4/4] remove placeholder text for uuid
@@ -9,7 +9,7 @@ Subject: [PATCH 4/4] remove placeholder text for uuid
  2 files changed, 4 insertions(+), 19 deletions(-)
 
 diff --git a/tex/context/base/mkiv/lpdf-xmp.lua b/tex/context/base/mkiv/lpdf-xmp.lua
-index 2ca3ab3..ec77404 100644
+index 2ca3ab3fe..ec77404d6 100644
 --- a/tex/context/base/mkiv/lpdf-xmp.lua
 +++ b/tex/context/base/mkiv/lpdf-xmp.lua
 @@ -262,18 +262,11 @@ local function flushxmpinfo()
@@ -43,11 +43,11 @@ index 2ca3ab3..ec77404 100644
          pdfaddxmpinfo("CreatorTool",creator)
          pdfaddxmpinfo("CreateDate",time)
 diff --git a/tex/context/base/mkxl/lpdf-xmp.lmt b/tex/context/base/mkxl/lpdf-xmp.lmt
-index e147c79..c485012 100644
+index 7d29a275b..1182ca332 100644
 --- a/tex/context/base/mkxl/lpdf-xmp.lmt
 +++ b/tex/context/base/mkxl/lpdf-xmp.lmt
 @@ -119,8 +119,6 @@ local function pdfgetmetadata()
-         local luatexversion       = format("%1.2f",LUATEXVERSION)
+         local luatexversion       = LUATEXVERBOSE
          local luatexfunctionality = tostring(LUATEXFUNCTIONALITY)
          local jobname             = environment.jobname or tex.jobname or "unknown"
 -        local documentid          = trailerid and ("uuid:" .. osuuid()) or "no unique document id here"
@@ -71,7 +71,7 @@ index e147c79..c485012 100644
              jobname             = jobname,
          }
       -- inspect(metadata)
-@@ -364,8 +358,6 @@ local function flushxmpinfo()
+@@ -365,8 +359,6 @@ local function flushxmpinfo()
      local time       = metadata.time
      local producer   = metadata.producer
      local creator    = metadata.creator
@@ -80,7 +80,7 @@ index e147c79..c485012 100644
  
      pdfaddtoinfo("Producer",producer)
      pdfaddtoinfo("Creator",creator)
-@@ -374,8 +366,8 @@ local function flushxmpinfo()
+@@ -375,8 +367,8 @@ local function flushxmpinfo()
  
      if add_xmp_blob then
  
@@ -92,5 +92,5 @@ index e147c79..c485012 100644
          pdfaddxmpinfo("CreatorTool",creator)
          pdfaddxmpinfo("CreateDate",time)
 -- 
-2.38.1
+2.41.0
 

@@ -4,10 +4,11 @@
 , ninja
 }:
 
-stdenv.mkDerivation {
-  inherit src;
+stdenv.mkDerivation (attrsFinal: {
   pname = "luametatex";
-  version = "2.10.10";
+  version = "2.10.11";
+
+  inherit src;
 
   nativeBuildInputs = [
     cmake
@@ -21,4 +22,10 @@ stdenv.mkDerivation {
   installPhase = ''
     install -Dm555 -t $out/bin luametatex
   '';
-}
+
+  passthru.computedVersion =
+    let
+      source = builtins.readFile (attrsFinal.src + /source/luametatex.h);
+      versionMatch = builtins.match ''.*[^a-z0-9_]luametatex_version_string[ \t]+"([^"]*)".*'' source;
+    in builtins.elemAt versionMatch 0;
+})

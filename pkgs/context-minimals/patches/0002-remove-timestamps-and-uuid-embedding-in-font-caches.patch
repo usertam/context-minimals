@@ -1,0 +1,344 @@
+From 3da315912ca828b5473d06955a9edd7aba9d9c56 Mon Sep 17 00:00:00 2001
+From: usertam <heiyiutam@gmail.com>
+Date: Wed, 21 Dec 2022 16:48:39 +0800
+Subject: [PATCH 2/4] remove timestamps and uuid embedding in font caches
+
+Improves font caches reproducibility.
+---
+ scripts/context/lua/mtx-fonts.lua      |  2 --
+ scripts/context/lua/mtxrun.lua         | 12 ------------
+ scripts/context/stubs/mswin/mtxrun.lua | 12 ------------
+ scripts/context/stubs/unix/mtxrun      | 12 ------------
+ scripts/context/stubs/win64/mtxrun.lua | 12 ------------
+ tex/context/base/mkiv/data-res.lua     |  4 ----
+ tex/context/base/mkiv/data-tmp.lua     | 11 -----------
+ tex/context/base/mkiv/font-cft.lua     |  1 -
+ tex/context/base/mkiv/font-syn.lua     | 12 +-----------
+ 9 files changed, 1 insertion(+), 77 deletions(-)
+
+diff --git a/scripts/context/lua/mtx-fonts.lua b/scripts/context/lua/mtx-fonts.lua
+index d28f470b4..592d9922f 100644
+--- a/scripts/context/lua/mtx-fonts.lua
++++ b/scripts/context/lua/mtx-fonts.lua
+@@ -159,9 +159,7 @@ function fonts.names.statistics()
+         return table.sequenced(n)
+     end
+ 
+-    report("cache uuid      : %s", data.cache_uuid)
+     report("cache version   : %s", data.cache_version)
+-    report("number of trees : %s", #data.datastate)
+     report()
+     report("number of fonts : %s", statistics.fonts or 0)
+     report("used files      : %s", statistics.readfiles or 0)
+diff --git a/scripts/context/lua/mtxrun.lua b/scripts/context/lua/mtxrun.lua
+index 54d979e80..f266094dc 100644
+--- a/scripts/context/lua/mtxrun.lua
++++ b/scripts/context/lua/mtxrun.lua
+@@ -22121,7 +22121,6 @@ end
+ local saveoptions={ compact=true,accurate=not JITSUPPORTED }
+ function caches.savedata(filepath,filename,data,fast)
+  local tmaname,tmcname=setluanames(filepath,filename)
+- data.cache_uuid=osuuid()
+  if fast or fast_cache then
+   savedata(tmaname,fastserialize(data,true))
+  elseif direct_cache then
+@@ -22131,10 +22130,6 @@ function caches.savedata(filepath,filename,data,fast)
+  end
+  compilelua(tmaname,tmcname)
+ end
+-local content_state={}
+-function caches.contentstate()
+- return content_state or {}
+-end
+ function caches.loadcontent(cachename,dataname,filename)
+  if not filename then
+   local name=hashed(cachename)
+@@ -22150,7 +22145,6 @@ function caches.loadcontent(cachename,dataname,filename)
+   if data and data.content then
+    if data.type==dataname then
+     if data.version==resolvers.cacheversion then
+-     content_state[#content_state+1]=data.uuid
+      if trace_locating then
+       report_resolvers("loading %a for %a from %a",dataname,cachename,filename)
+      end
+@@ -22190,10 +22184,7 @@ function caches.savecontent(cachename,dataname,content,filename)
+   type=dataname,
+   root=cachename,
+   version=resolvers.cacheversion,
+-  date=osdate("%Y-%m-%d"),
+-  time=osdate("%H:%M:%S"),
+   content=content,
+-  uuid=osuuid(),
+  }
+  local ok=savedata(luaname,serialize(data,true))
+  if ok then
+@@ -22914,9 +22905,6 @@ function resolvers.splitexpansions()
+   end
+  end
+ end
+-function resolvers.datastate()
+- return caches.contentstate()
+-end
+ variable=function(name)
+  local variables=instance.variables
+  local name=name and lpegmatch(dollarstripper,name)
+diff --git a/scripts/context/stubs/mswin/mtxrun.lua b/scripts/context/stubs/mswin/mtxrun.lua
+index 54d979e80..f266094dc 100644
+--- a/scripts/context/stubs/mswin/mtxrun.lua
++++ b/scripts/context/stubs/mswin/mtxrun.lua
+@@ -22121,7 +22121,6 @@ end
+ local saveoptions={ compact=true,accurate=not JITSUPPORTED }
+ function caches.savedata(filepath,filename,data,fast)
+  local tmaname,tmcname=setluanames(filepath,filename)
+- data.cache_uuid=osuuid()
+  if fast or fast_cache then
+   savedata(tmaname,fastserialize(data,true))
+  elseif direct_cache then
+@@ -22131,10 +22130,6 @@ function caches.savedata(filepath,filename,data,fast)
+  end
+  compilelua(tmaname,tmcname)
+ end
+-local content_state={}
+-function caches.contentstate()
+- return content_state or {}
+-end
+ function caches.loadcontent(cachename,dataname,filename)
+  if not filename then
+   local name=hashed(cachename)
+@@ -22150,7 +22145,6 @@ function caches.loadcontent(cachename,dataname,filename)
+   if data and data.content then
+    if data.type==dataname then
+     if data.version==resolvers.cacheversion then
+-     content_state[#content_state+1]=data.uuid
+      if trace_locating then
+       report_resolvers("loading %a for %a from %a",dataname,cachename,filename)
+      end
+@@ -22190,10 +22184,7 @@ function caches.savecontent(cachename,dataname,content,filename)
+   type=dataname,
+   root=cachename,
+   version=resolvers.cacheversion,
+-  date=osdate("%Y-%m-%d"),
+-  time=osdate("%H:%M:%S"),
+   content=content,
+-  uuid=osuuid(),
+  }
+  local ok=savedata(luaname,serialize(data,true))
+  if ok then
+@@ -22914,9 +22905,6 @@ function resolvers.splitexpansions()
+   end
+  end
+ end
+-function resolvers.datastate()
+- return caches.contentstate()
+-end
+ variable=function(name)
+  local variables=instance.variables
+  local name=name and lpegmatch(dollarstripper,name)
+diff --git a/scripts/context/stubs/unix/mtxrun b/scripts/context/stubs/unix/mtxrun
+index 54d979e80..f266094dc 100755
+--- a/scripts/context/stubs/unix/mtxrun
++++ b/scripts/context/stubs/unix/mtxrun
+@@ -22121,7 +22121,6 @@ end
+ local saveoptions={ compact=true,accurate=not JITSUPPORTED }
+ function caches.savedata(filepath,filename,data,fast)
+  local tmaname,tmcname=setluanames(filepath,filename)
+- data.cache_uuid=osuuid()
+  if fast or fast_cache then
+   savedata(tmaname,fastserialize(data,true))
+  elseif direct_cache then
+@@ -22131,10 +22130,6 @@ function caches.savedata(filepath,filename,data,fast)
+  end
+  compilelua(tmaname,tmcname)
+ end
+-local content_state={}
+-function caches.contentstate()
+- return content_state or {}
+-end
+ function caches.loadcontent(cachename,dataname,filename)
+  if not filename then
+   local name=hashed(cachename)
+@@ -22150,7 +22145,6 @@ function caches.loadcontent(cachename,dataname,filename)
+   if data and data.content then
+    if data.type==dataname then
+     if data.version==resolvers.cacheversion then
+-     content_state[#content_state+1]=data.uuid
+      if trace_locating then
+       report_resolvers("loading %a for %a from %a",dataname,cachename,filename)
+      end
+@@ -22190,10 +22184,7 @@ function caches.savecontent(cachename,dataname,content,filename)
+   type=dataname,
+   root=cachename,
+   version=resolvers.cacheversion,
+-  date=osdate("%Y-%m-%d"),
+-  time=osdate("%H:%M:%S"),
+   content=content,
+-  uuid=osuuid(),
+  }
+  local ok=savedata(luaname,serialize(data,true))
+  if ok then
+@@ -22914,9 +22905,6 @@ function resolvers.splitexpansions()
+   end
+  end
+ end
+-function resolvers.datastate()
+- return caches.contentstate()
+-end
+ variable=function(name)
+  local variables=instance.variables
+  local name=name and lpegmatch(dollarstripper,name)
+diff --git a/scripts/context/stubs/win64/mtxrun.lua b/scripts/context/stubs/win64/mtxrun.lua
+index 54d979e80..f266094dc 100644
+--- a/scripts/context/stubs/win64/mtxrun.lua
++++ b/scripts/context/stubs/win64/mtxrun.lua
+@@ -22121,7 +22121,6 @@ end
+ local saveoptions={ compact=true,accurate=not JITSUPPORTED }
+ function caches.savedata(filepath,filename,data,fast)
+  local tmaname,tmcname=setluanames(filepath,filename)
+- data.cache_uuid=osuuid()
+  if fast or fast_cache then
+   savedata(tmaname,fastserialize(data,true))
+  elseif direct_cache then
+@@ -22131,10 +22130,6 @@ function caches.savedata(filepath,filename,data,fast)
+  end
+  compilelua(tmaname,tmcname)
+ end
+-local content_state={}
+-function caches.contentstate()
+- return content_state or {}
+-end
+ function caches.loadcontent(cachename,dataname,filename)
+  if not filename then
+   local name=hashed(cachename)
+@@ -22150,7 +22145,6 @@ function caches.loadcontent(cachename,dataname,filename)
+   if data and data.content then
+    if data.type==dataname then
+     if data.version==resolvers.cacheversion then
+-     content_state[#content_state+1]=data.uuid
+      if trace_locating then
+       report_resolvers("loading %a for %a from %a",dataname,cachename,filename)
+      end
+@@ -22190,10 +22184,7 @@ function caches.savecontent(cachename,dataname,content,filename)
+   type=dataname,
+   root=cachename,
+   version=resolvers.cacheversion,
+-  date=osdate("%Y-%m-%d"),
+-  time=osdate("%H:%M:%S"),
+   content=content,
+-  uuid=osuuid(),
+  }
+  local ok=savedata(luaname,serialize(data,true))
+  if ok then
+@@ -22914,9 +22905,6 @@ function resolvers.splitexpansions()
+   end
+  end
+ end
+-function resolvers.datastate()
+- return caches.contentstate()
+-end
+ variable=function(name)
+  local variables=instance.variables
+  local name=name and lpegmatch(dollarstripper,name)
+diff --git a/tex/context/base/mkiv/data-res.lua b/tex/context/base/mkiv/data-res.lua
+index 11e67f785..e13edfd6b 100644
+--- a/tex/context/base/mkiv/data-res.lua
++++ b/tex/context/base/mkiv/data-res.lua
+@@ -751,10 +751,6 @@ end
+ -- we used to have 'files' and 'configurations' so therefore the following
+ -- shared function
+ 
+-function resolvers.datastate()
+-    return caches.contentstate()
+-end
+-
+ variable = function(name)
+     local variables = instance.variables
+     local name   = name and lpegmatch(dollarstripper,name)
+diff --git a/tex/context/base/mkiv/data-tmp.lua b/tex/context/base/mkiv/data-tmp.lua
+index 21e0d1f4f..7ba8906cf 100644
+--- a/tex/context/base/mkiv/data-tmp.lua
++++ b/tex/context/base/mkiv/data-tmp.lua
+@@ -371,7 +371,6 @@ local saveoptions = { compact = true, accurate = not JITSUPPORTED }
+ 
+ function caches.savedata(filepath,filename,data,fast)
+     local tmaname, tmcname = setluanames(filepath,filename)
+-    data.cache_uuid = osuuid()
+     if fast or fast_cache then
+         savedata(tmaname,fastserialize(data,true))
+     elseif direct_cache then
+@@ -384,12 +383,6 @@ end
+ 
+ -- moved from data-res:
+ 
+-local content_state = { }
+-
+-function caches.contentstate()
+-    return content_state or { }
+-end
+-
+ function caches.loadcontent(cachename,dataname,filename)
+     if not filename then
+         local name = hashed(cachename)
+@@ -405,7 +398,6 @@ function caches.loadcontent(cachename,dataname,filename)
+         if data and data.content then
+             if data.type == dataname then
+                 if data.version == resolvers.cacheversion then
+-                    content_state[#content_state+1] = data.uuid
+                     if trace_locating then
+                         report_resolvers("loading %a for %a from %a",dataname,cachename,filename)
+                     end
+@@ -447,10 +439,7 @@ function caches.savecontent(cachename,dataname,content,filename)
+         type    = dataname,
+         root    = cachename,
+         version = resolvers.cacheversion,
+-        date    = osdate("%Y-%m-%d"),
+-        time    = osdate("%H:%M:%S"),
+         content = content,
+-        uuid    = osuuid(),
+     }
+     local ok = savedata(luaname,serialize(data,true))
+     if ok then
+diff --git a/tex/context/base/mkiv/font-cft.lua b/tex/context/base/mkiv/font-cft.lua
+index d6afc01f7..6d6fa30ed 100644
+--- a/tex/context/base/mkiv/font-cft.lua
++++ b/tex/context/base/mkiv/font-cft.lua
+@@ -168,7 +168,6 @@ do
+     }
+ 
+     data.original = {
+-        cache_uuid     =  t_string,
+         cache_version  =  t_float,
+         compacted      =  t_boolean,
+         creator        =  t_string,
+diff --git a/tex/context/base/mkiv/font-syn.lua b/tex/context/base/mkiv/font-syn.lua
+index d4663c073..ede96967a 100644
+--- a/tex/context/base/mkiv/font-syn.lua
++++ b/tex/context/base/mkiv/font-syn.lua
+@@ -1259,7 +1259,6 @@ local function resetdata()
+         names          = { },
+         indices        = { },
+         rejected       = { },
+-        datastate      = resolvers.datastate(),
+     }
+ end
+ 
+@@ -1365,16 +1364,7 @@ local function is_reloaded()
+     if not reloaded then
+         local data = names.data
+         if autoreload then
+-            local c_status = serialize(resolvers.datastate())
+-            local f_status = serialize(data.datastate)
+-            if c_status == f_status then
+-                if trace_names then
+-                    report_names("font database has matching configuration and file hashes")
+-                end
+-                return
+-            else
+-                report_names("font database has mismatching configuration and file hashes")
+-            end
++            return
+         else
+             report_names("font database is regenerated (controlled by directive 'fonts.autoreload')")
+         end
+-- 
+2.41.0
+
