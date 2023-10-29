@@ -72,7 +72,7 @@ jobs:
         name: flake.lock
     - name: Update default.nix versions
       run: |
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' pkgs/context-minimals/default.nix
         sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.lmx }}"/' pkgs/luametatex/default.nix
         sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ltx }}"/' pkgs/luatex/default.nix
         git clean -xfd
@@ -104,7 +104,7 @@ jobs:
         name: flake.lock
     - name: Update default.nix versions
       run: |
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' pkgs/context-minimals/default.nix
         sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.lmx }}"/' pkgs/luametatex/default.nix
         sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ltx }}"/' pkgs/luatex/default.nix
         git clean -xfd
@@ -114,7 +114,7 @@ jobs:
           echo "No upstream changes present."
         else
           echo "Upstream changes present."
-          git add flake.lock default.nix pkgs/luametatex/default.nix pkgs/luatex/default.nix
+          git add flake.lock pkgs/{context-minimals,luametatex,luatex}/default.nix
           git commit -m "context-minimals: ${{ needs.update-deps.outputs.ctx }}"
           git push origin "${GITHUB_REF##*/}"
         fi
