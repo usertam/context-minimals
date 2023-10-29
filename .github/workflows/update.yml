@@ -24,27 +24,6 @@ jobs:
     - uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz
-    - name: Checkout modules branch
-      run: |
-        git fetch --depth=1 origin mirror/modules:mirror/modules || true
-        git symbolic-ref HEAD refs/heads/mirror/modules
-        git reset --hard
-    - name: Sync with upstream modules
-      run: |
-        rsync -av rsync://contextgarden.net/minimals/current/modules/* .
-    - name: Commit and push if modules changes present
-      run: |
-        if [ -z "$(git status --porcelain)" ]; then
-          echo "No modules changes present."
-        else
-          echo "Modules changes present."
-          git add .
-          git commit --allow-empty-message -m ""
-          git push origin mirror/modules
-        fi
-    - name: Checkout current branch
-      run: |
-        git switch "${GITHUB_REF##*/}"
     - name: Update flake lock file
       id: update
       run: |
