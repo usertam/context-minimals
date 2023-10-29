@@ -99,7 +99,7 @@ in {
 
   passthru.computedVersion =
     let
-      source = builtins.readFile (srcs'.context + /tex/context/base/mkxl/cont-new.mkxl);
+      source = builtins.readFile (srcs'.context + "/tex/context/base/mkxl/cont-new.mkxl");
       versionMatch = builtins.match ''.*\\newcontextversion\{([^{}]*)}.*'' source;
     in builtins.elemAt versionMatch 0;
 });

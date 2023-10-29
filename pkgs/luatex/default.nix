@@ -57,7 +57,7 @@ stdenv.mkDerivation (attrsFinal: {
 
   passthru.computedVersion =
     let
-      source = builtins.readFile (attrsFinal.src + /texk/web2c/luatexdir/luatex.c);
+      source = builtins.readFile (attrsFinal.src + "/texk/web2c/luatexdir/luatex.c");
       versionMatch = builtins.match ''.*[^a-z0-9_]luatex_version_string[ \t]*=[ \t]*"([^"]*)";.*'' source;
     in builtins.elemAt versionMatch 0;
 })
