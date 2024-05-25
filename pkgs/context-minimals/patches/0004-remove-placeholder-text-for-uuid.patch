@@ -52,19 +52,21 @@ index 7d29a275b..1182ca332 100644
          local jobname             = environment.jobname or tex.jobname or "unknown"
 -        local documentid          = trailerid and ("uuid:" .. osuuid()) or "no unique document id here"
 -        local instanceid          = trailerid and ("uuid:" .. osuuid()) or "no unique instance id here"
+         local producer            = "LuaMetaTeX"
+         local creator             = format("LuaMetaTeX %s %s + ConTeXt LMTX %s",luatexversion,luatexfunctionality,contextversion)
          metadata = creationdate and {
-             producer            = format("LuaMetaTeX-%s",luatexversion),
-             creator             = format("LuaMetaTeX %s %s + ConTeXt LMTX %s",luatexversion,luatexfunctionality,contextversion),
-@@ -132,15 +130,11 @@ local function pdfgetmetadata()
-             creationdate        = creationdate,
-             modificationdate    = modificationdate,
+@@ -134,8 +134,6 @@ local function pdfgetmetadata()
+             producer            = producer,
+             creator             = creator,
              id                  = format("%s | %s",jobname,creationdate),
 -            documentid          = documentid,
 -            instanceid          = instanceid,
              jobname             = jobname,
-         } or {
-             producer            = "LuaMetaTeX",
-             creator             = "LuaMetaTeX + ConTeXt LMTX",
+             --
+             luatexversion       = luatexversion,
+@@ -149,8 +147,6 @@ local function pdfgetmetadata()
+             producer            = producer,
+             creator             = creator,
              id                  = jobname,
 -            documentid          = documentid,
 -            instanceid          = instanceid,
@@ -72,11 +74,11 @@ index 7d29a275b..1182ca332 100644
          }
       -- inspect(metadata)
 @@ -365,8 +359,6 @@ local function flushxmpinfo()
-     local time       = metadata.time
-     local producer   = metadata.producer
-     local creator    = metadata.creator
--    local documentid = metadata.documentid
--    local instanceid = metadata.instanceid
+     local modification = metadata.time or metadata.modificationdate or modificationdate or creation
+     local producer     = metadata.producer
+     local creator      = metadata.creator
+-    local documentid   = metadata.documentid
+-    local instanceid   = metadata.instanceid
  
      pdfaddtoinfo("Producer",producer)
      pdfaddtoinfo("Creator",creator)
