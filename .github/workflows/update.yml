@@ -11,40 +11,35 @@ jobs:
     name: Update dependencies
     runs-on: ubuntu-latest
     outputs:
-      rebuild: ${{ steps.update.outputs.REBUILD }}
-      ctx: ${{ steps.versions.outputs.ctx }}
-      lmx: ${{ steps.versions.outputs.lmx }}
-      ltx: ${{ steps.versions.outputs.ltx }}
+      continue: ${{ steps.update.outputs.continue }}
+      context: ${{ steps.versions.outputs.context }}
+      luametatex: ${{ steps.versions.outputs.luametatex }}
+      luatex: ${{ steps.versions.outputs.luatex }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@main
+    - uses: DeterminateSystems/nix-installer-action@main
     - name: Set up github-actions name and email
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-    - uses: cachix/install-nix-action@v22
-      with:
-        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz
     - name: Update flake lock file
       id: update
       run: |
-        # only update nixpkgs if others dependencies are updated
-        nix flake metadata --update-input context --update-input luatex --update-input context-modules
+        nix flake update context luatex context-modules
         if git status --porcelain | grep flake.lock; then
-          echo "REBUILD=1" >> "$GITHUB_OUTPUT"
+          # Only update nixpkgs if others dependencies are updated
           nix flake update
+          echo "continue=1" | tee -a "$GITHUB_OUTPUT"
         fi
     - name: Refresh derivation versions
       id: versions
       run: |
-        # context-minimals
-        nix eval --raw --apply 'v: "ctx=${v}\n"' .#context-minimals.src.computedVersion >> "$GITHUB_OUTPUT"
-        # luametatex
-        nix eval --raw --apply 'v: "lmx=${v}\n"' .#luametatex.computedVersion >> "$GITHUB_OUTPUT"
-        # luatex
-        nix eval --raw --apply 'v: "ltx=${v}\n"' .#luatex.computedVersion >> "$GITHUB_OUTPUT"
+        nix eval --raw --apply 'v: "context=${v}\n"' .#context-minimals.src.computedVersion | tee -a "$GITHUB_OUTPUT"
+        nix eval --raw --apply 'v: "luametatex=${v}\n"' .#luametatex.computedVersion | tee -a "$GITHUB_OUTPUT"
+        nix eval --raw --apply 'v: "luatex=${v}\n"' .#luatex.computedVersion | tee -a "$GITHUB_OUTPUT"
     - name: Upload lock file artifact
-      if: steps.update.outputs.REBUILD || github.event_name != 'schedule'
-      uses: actions/upload-artifact@v3
+      if: steps.update.outputs.continue || github.event_name != 'schedule'
+      uses: actions/upload-artifact@main
       with:
         name: flake.lock
         path: flake.lock
@@ -52,34 +47,32 @@ jobs:
   build:
     name: Build
     needs: update-deps
-    if: needs.update-deps.outputs.rebuild || github.event_name != 'schedule'
+    if: needs.update-deps.outputs.continue || github.event_name != 'schedule'
     strategy:
       matrix:
         os: [ macos-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v22
-      with:
-        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz
-    - uses: cachix/cachix-action@v12
+    - uses: actions/checkout@main
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: cachix/cachix-action@master
       with:
         name: context-minimals
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Download lock file artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@main
       with:
         name: flake.lock
     - name: Update default.nix versions
       run: |
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' pkgs/context-minimals/default.nix
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.lmx }}"/' pkgs/luametatex/default.nix
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ltx }}"/' pkgs/luatex/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.context }}"/' pkgs/context-minimals/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.luametatex }}"/' pkgs/luametatex/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.luatex }}"/' pkgs/luatex/default.nix
         git clean -xfd
     - name: Build and enforce determinism
       run: |
         for ATTR in luametatex luatex context-minimals.src context-minimals; do
-          nix build ".#$ATTR"
+          nix build --print-out-paths --print-build-logs ".#$ATTR"
           nix build --rebuild ".#$ATTR"
         done
     - name: Test basic compilation
@@ -90,23 +83,23 @@ jobs:
   release:
     name: Release
     needs: [ update-deps, build ]
-    if: needs.update-deps.outputs.rebuild || github.event_name != 'schedule'
+    if: needs.update-deps.outputs.continue || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@main
     - name: Set up github-actions name and email
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions[bot]@users.noreply.github.com"
     - name: Download lock file artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@main
       with:
         name: flake.lock
     - name: Update default.nix versions
       run: |
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ctx }}"/' pkgs/context-minimals/default.nix
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.lmx }}"/' pkgs/luametatex/default.nix
-        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.ltx }}"/' pkgs/luatex/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.context }}"/' pkgs/context-minimals/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.luametatex }}"/' pkgs/luametatex/default.nix
+        sed -i.orig 's/version = ".*"/version = "${{ needs.update-deps.outputs.luatex }}"/' pkgs/luatex/default.nix
         git clean -xfd
     - name: Commit and push if upstream changes present
       run: |
@@ -115,6 +108,6 @@ jobs:
         else
           echo "Upstream changes present."
           git add flake.lock pkgs/{context-minimals,luametatex,luatex}/default.nix
-          git commit -m "context-minimals: ${{ needs.update-deps.outputs.ctx }}"
+          git commit -m "context-minimals: ${{ needs.update-deps.outputs.context }}"
           git push origin "${GITHUB_REF##*/}"
         fi
