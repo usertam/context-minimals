@@ -1,5 +1,5 @@
 # context-minimals
-A reproducible ConTeXt LMTX distribution. Sources checked and updated daily.
+A reproducible ConTeXt LMTX distribution. Sources checked and updated weekly.
 
 ## Run me with Nix!
 These are some common ad-hoc usages.

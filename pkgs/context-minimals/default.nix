@@ -6,6 +6,7 @@
 , luametatex
 , luatex
 , makeWrapper
+, poppler_utils
 , fonts ? []
 , fpath ? []
 , fcache ? []
@@ -110,45 +111,94 @@ stdenv.mkDerivation (attrsFinal: {
   inherit (attrsFinal.src) version;
 
   enableParallelBuilding = true;
-  passAsFile = [ "buildCommand" ];
 
   src = ctx-base;
 
   buildInputs = [ attrsFinal.src ] ++ fonts;
   nativeBuildInputs = [ makeWrapper ];
 
-  buildCommand = ''
-    # symlink original sources
+  buildPhase = ''
+    runHook preBuild
+
+    # Symlink built base's /share/tex
     mkdir -p $out/share/tex
     ln -t $out/share/tex -s $src/share/tex/*
 
-    # set TEXMFCACHE to `tex/texmf-cache`
-    export TEXMFCACHE=$out/share/tex/texmf-cache
-    mkdir -p $TEXMFCACHE
-
-    # wrap `tex/texmf-system/bin` -> `bin`
+    # Wrap binaries in texmf-system to /bin
     for BIN in context mtxrun luametatex luatex; do
       makeWrapper $out/share/tex/texmf-context/bin/$BIN $out/bin/$BIN \
         --set TEXMFCACHE $TEXMFCACHE
     done
 
-    # generate file databases
-    $out/bin/mtxrun --verbose --generate
-    $out/bin/luatex --luaonly $out/share/tex/texmf-context/bin/mtxrun.lua --verbose --generate
+    # Set up texmf-cache
+    export TEXMFCACHE=$out/share/tex/texmf-cache
+    mkdir -p $TEXMFCACHE
 
-    # generate font databases
+    # Generate file databases
+    $out/bin/mtxrun --generate
+    $out/bin/luatex --luaonly $out/share/tex/texmf-context/bin/mtxrun.lua --generate
+
+    # Generate font databases
     export OSFONTDIR=${builtins.concatStringsSep ":" ((map (f: f + "/share/fonts") fonts) ++ fpath)}
-    $out/bin/mtxrun --verbose --script font --reload
+    $out/bin/mtxrun --script font --reload
 
   '' + builtins.concatStringsSep "\n" (map (font: ''
-    # build font cache by forcing cache misses
-    cat <<'EOF' > "${font}.tex" && $out/bin/context "${font}.tex"
-    \definedfont[name:${font}*default]
-    Normal {\bf Bold} {\it Italic} {\sl Slanted} {\bi Bold Italic} {\bs Bold Slanted} {\sc Small Capitals}
-    EOF
+    (
+      mkdir -p $TMPDIR/cache
+      cd $TMPDIR/cache
+
+      # Build font cache by forcing cache misses
+      echo "Writing ${font}.tex..."
+      cat <<'EOF' > "${font}.tex"
+      \definedfont[name:${font}*default]
+      Normal {\bf Bold} {\it Italic} {\sl Slanted} {\bi Bold Italic} {\bs Bold Slanted} {\sc Small Capitals}
+      EOF
+      echo "Compiling ${font}.tex..."
+      $out/bin/context "${font}.tex"
+    )
   '') fcache) + ''
 
-    # delete the formats from forcing cache misses, keep cache deterministic
+    runHook postBuild
+
+    # Delete formats from cache, keep it deterministic
+    find $out/share/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
+  '';
+
+  doCheck = true;
+  nativeCheckInputs = [ poppler_utils ];
+
+  checkPhase = ''
+    runHook preCheck
+
+    mkdir -p $TMPDIR/test-1
+    cd $TMPDIR/test-1
+
+    echo "Writing test-1.tex..."
+    cat <<EOF > test-1.tex
+    \starttext
+    \input khatt-en
+    \stoptext
+    EOF
+    echo "Compiling test-1.tex..."
+    $out/bin/context test-1.tex 2>&1 | tail -10
+    echo "Checking if result test-1.pdf exists..."
+    if ! [ -f test-1.pdf ]; then
+      echo "Fail: test-1.pdf not found."
+      exit 1
+    fi
+    echo "Checking text in test-1.pdf..."
+    if ! pdftotext test-1.pdf - | grep -q 'sharpen the edge of your pen'; then
+      echo "Fail: test-1.pdf does not contain expected text."
+      echo "  expected: sharpen the edge of your pen"
+      echo "  got:"
+      pdftotext test-1.pdf - | sed 's/^/    /g'
+      exit 1
+    fi
+    echo "Pass: test-1.pdf."
+
+    runHook postCheck
+
+    # Delete formats from cache, keep it deterministic
     find $out/share/tex/texmf-cache -name 'formats' -type d -exec rm -rf {} +
   '';
 })
