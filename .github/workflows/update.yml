@@ -94,11 +94,11 @@ jobs:
     - name: Build derivations
       run: |
         nix build --print-out-paths --print-build-logs \
-          .#luametatex .#luatex .#context-minimals.src .#context-minimals
+          .#packages.${{matrix.system}}.{luametatex,luatex,context-minimals.src,context-minimals}
     - name: Enforce determinism
       run: |
         nix build --rebuild --print-out-paths --print-build-logs \
-          .#luametatex .#luatex .#context-minimals.src .#context-minimals
+          .#packages.${{matrix.system}}.{luametatex,luatex,context-minimals.src,context-minimals}
 
   release:
     name: Release
