@@ -2,21 +2,19 @@
 A reproducible ConTeXt LMTX distribution. Sources checked and updated weekly.
 
 ## Run me with Nix!
-These are some common ad-hoc usages.
+Common ad-hoc usages below.
 ```sh
-# run context by default; or luametatex, luatex, mtxrun by specifying them
+# Run context by default, specify luametatex, luatex, mtxrun to run them.
 nix run github:usertam/context-minimals
 nix run github:usertam/context-minimals#mtxrun
 
-# get a shell with all the goodies
+# Get a shell with all the goodies.
 nix shell github:usertam/context-minimals
 ```
 
-## Setup with binary cache
-Now comes with binary cache at [context-minimals.cachix.org][6]! However, only `x86_64-linux` and `x86_64-darwin` are cached as of now, because GitHub Actions.
+## Dedicated cache
+Builds of common platforms are cached at [context-minimals.cachix.org][6].
 ```sh
-# add to $HOME/nix/nix.conf (user) or /etc/nix/nix.conf (system)
-extra-experimental-features = nix-command flakes
 extra-substituters = https://context-minimals.cachix.org
 extra-trusted-public-keys = context-minimals.cachix.org-1:pYxyH24J/A04fznRlYbTTjWrn9EsfUQvccGMjfXMdj0=
 ```
@@ -26,17 +24,17 @@ In `flake.nix`, use [`mkCompilation`][7] in `modules/lib/default.nix` to compile
 ```nix
 {
   inputs.context-minimals.url = "github:usertam/context-minimals";
-  inputs.photo.url = "https://unsplash.com/photos/.../download";  # include extra files, but only in `nix build`
+  inputs.photo.url = "https://unsplash.com/photos/.../download";  # Include extra files, only available in `nix build`.
   inputs.photo.flake = false;
 
   outputs = { self, context-minimals, ... }@inputs: let
-    fonts = [ "source-han-serif" ]; # include nixpkgs-provided fonts
-    fcache = [ "sourcehanserif" ];  # force build font caches, useful for slow CJK fonts
+    fonts = [ "source-han-serif" ]; # Include a font defined in nixpkgs.
+    fcache = [ "sourcehanserif" ];  # Force build caches of the font, useful for slow CJK fonts. This name should be recognized by ConTeXt.
   in {
     packages = context-minimals.lib.mkCompilation {
       inherit fonts fcache;
       src = self;
-      nativeBuildInputs = [ "imagemagick" ];  # include tools to use in `postUnpack`
+      nativeBuildInputs = [ "imagemagick" ];  # Include deps for `postUnpack`.
       postUnpack = "convert -quality 100% -despeckle ${inputs.photo} $sourceRoot/photo.jpeg";
     };
     apps = context-minimals.lib.mkCompilationApps {
@@ -47,12 +45,12 @@ In `flake.nix`, use [`mkCompilation`][7] in `modules/lib/default.nix` to compile
 ```
 
 ## Remarks
-By default, installing ConTeXt LMTX requires downloading a prebuilt [`mtxrun`][1] to bootstrap the installation. The installation script `mtx-install.lua` is then run, downloading and extracting archives in the process; after which the modules would need to be installed [separately][2]. While the defaults focus on the ease of maintaince (running `mtx-update`), the internals are harder to dissect.
+By default, installing ConTeXt LMTX requires downloading a prebuilt [`mtxrun`][1] to bootstrap the installation. The installation script `mtx-install.lua` is then run, downloading and extracting archives in the process; after which the modules would need to be installed [separately][2]. While the defaults focus on the ease of maintenance (running `mtx-update`), the internals are harder to dissect.
 
-The installation script is a lengthy [lua script][1], making the fetching and extracting steps unclear from first glance. The [two-part installation][2], platform-dependent [setups][3] and [install steps][4] also didn't make it easy to follow. Along with the use of unpinned prebuilt [binaries][5], it was challenging to reproduce an installation that could be used out-of-the-box.
+The installation script is a lengthy [lua script][1], making the fetching and extracting steps unclear at first glance. The [two-part installation][2], platform-dependent [setups][3] and [install steps][4] also didn't make it easy to follow. Along with unpinned prebuilt [binaries][5], it was challenging to reproduce an installation that could be used out-of-the-box.
 
 #### Solution
-The project didn't follow the installation script, but rather reconstructs the tex structure based on the sources and by looking at the artifact. The reworked steps are then trimmed down and implemented in `default.nix`, building binaries `luametatex` and `luatex` from source. Fonts and font caches are another can of worms, and needed a number of patches to stay deterministic but functional.
+The project does not follow the installation script, but rather reconstructs the tex structure based on the sources and by looking at the artifact. The reworked steps are then trimmed down and implemented in `default.nix`, building binaries `luametatex` and `luatex` from source. Fonts and font caches are another can of worms, and need several patches to stay deterministic but functional.
 
 Apart from the reproducibility of the ConTeXt installation, the deterministic compilation of PDFs is another goal of the project. ConTeXt does offer flags like `randomseed`, `nodates` and `trailerid` to disable non-deterministic PDF subtleties, but not well-documented. Therefore, functions like `lib.mkCompilation` are provided to offer "standard" ways to compile PDFs.
 
