@@ -17,7 +17,7 @@ ctx-base = stdenvNoCC.mkDerivation (attrsFinal: let
   inherit (attrsFinal.passthru) srcs';
 in {
   pname = "context-minimals-base";
-  version = "2024.09.25 11:47";
+  version = "2024.11.01 19:09";
 
   passthru.srcs' = { inherit context context-fonts context-modules; };
   srcs = builtins.attrValues srcs';
