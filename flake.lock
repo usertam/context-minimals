@@ -3,11 +3,11 @@
     "context": {
       "flake": false,
       "locked": {
-        "lastModified": 1730485243,
-        "narHash": "sha256-T+v0mX1aY+G8hoAgM4OvYvvPUq+uW/p2I0SUzN9J1aQ=",
+        "lastModified": 1735572798,
+        "narHash": "sha256-O2Iw0WjN91Nqasxqg2d4ZwADo+HAw56aFEZCTEcQ0Ig=",
         "owner": "contextgarden",
         "repo": "context",
-        "rev": "0d2ec448a05c3cf7e83d79ad62eb485f48464872",
+        "rev": "7b4ed98f4cd17476631d13e439b6915b1de603b5",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1730272153,
-        "narHash": "sha256-B5WRZYsRlJgwVHIV6DvidFN7VX7Fg9uuwkRW9Ha8z+w=",
+        "lastModified": 1735915915,
+        "narHash": "sha256-Q4HuFAvoKAIiTRZTUxJ0ZXeTC7lLfC9/dggGHNXNlCw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "2d2a9ddbe3f2c00747398f3dc9b05f7f2ebb0f53",
+        "rev": "a27871180d30ebee8aa6b11bf7fef8a52f024733",
         "type": "github"
       },
       "original": {
