@@ -6,7 +6,7 @@
 
 stdenv.mkDerivation (attrsFinal: {
   pname = "luametatex";
-  version = "2.11.06";
+  version = "2.11.07";
 
   inherit src;
 
