@@ -10,9 +10,9 @@
 
 stdenv.mkDerivation (attrsFinal: {
   pname = "luatex";
-  version = "1.16.0";
+  version = "1.23.3";
 
-  src = src + /source;
+  inherit src;
 
   nativeBuildInputs = [
     pkg-config
