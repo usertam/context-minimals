@@ -3,11 +3,11 @@
     "context": {
       "flake": false,
       "locked": {
-        "lastModified": 1740763243,
-        "narHash": "sha256-LNZMSZvntwOj7XqJszACTO3hwCOXY0Qj1w8RdA83TvM=",
+        "lastModified": 1751657509,
+        "narHash": "sha256-/2J8XX+aCDYqcOb+ICKp8GAgPNEV1uwwArx7KgJ6WPw=",
         "owner": "contextgarden",
         "repo": "context",
-        "rev": "d73ed1ca81bf1a525b4c3d439dfd1cf11564b761",
+        "rev": "674f447d3efb5c70a8b7926d585484502dc0d726",
         "type": "github"
       },
       "original": {
@@ -19,11 +19,11 @@
     "context-fonts": {
       "flake": false,
       "locked": {
-        "lastModified": 1730458872,
-        "narHash": "sha256-hJ+2/GrGq64oQdEEu5mjeaLk9qh9OYlpw4tlxeYHqHs=",
+        "lastModified": 1748290920,
+        "narHash": "sha256-bMGeKnGrYVRbWRIp+9tV0zw5hqsfKC1NXpMjtnszDA8=",
         "owner": "contextgarden",
         "repo": "context-distribution-fonts",
-        "rev": "5131d698b6818332e0de75202789b0b13ee7286b",
+        "rev": "6b9c14c2bb57fc769d5eaa5fc65af538c24e24c4",
         "type": "github"
       },
       "original": {
@@ -52,32 +52,35 @@
     "luatex": {
       "flake": false,
       "locked": {
-        "lastModified": 1677857213,
-        "narHash": "sha256-70KPEGv2oVkhGlCWThtmRdasKA1E4ZZe/vTt4wHoukk=",
-        "owner": "TeX-Live",
+        "host": "gitlab.lisn.upsaclay.fr",
+        "lastModified": 1751711777,
+        "narHash": "sha256-GySGycCTZt+SzgK8nBgk2qTOyS6P0zMT2vzVCQLXZB8=",
+        "owner": "texlive",
         "repo": "luatex",
-        "rev": "f52b099f3e01d53dc03b315e1909245c3d5418d3",
-        "type": "github"
+        "rev": "7c54758685c7c1ff176306c606a075be77e3535f",
+        "type": "gitlab"
       },
       "original": {
-        "owner": "TeX-Live",
+        "host": "gitlab.lisn.upsaclay.fr",
+        "owner": "texlive",
         "repo": "luatex",
-        "type": "github"
+        "type": "gitlab"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1740791350,
-        "narHash": "sha256-igS2Z4tVw5W/x3lCZeeadt0vcU9fxtetZ/RyrqsCRQ0=",
-        "owner": "NixOS",
+        "lastModified": 1751625545,
+        "narHash": "sha256-4E7wWftF1ExK5ZEDzj41+9mVgxtuRV3wWCId7QAYMAU=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "199169a2135e6b864a888e89a2ace345703c025d",
+        "rev": "c860cf0b3a0829f0f6cf344ca8de83a2bbfab428",
         "type": "github"
       },
       "original": {
-        "id": "nixpkgs",
+        "owner": "nixos",
         "ref": "nixpkgs-unstable",
-        "type": "indirect"
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "root": {
@@ -91,7 +94,6 @@
       }
     },
     "systems": {
-      "flake": false,
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
@@ -101,8 +103,9 @@
         "type": "github"
       },
       "original": {
-        "id": "systems",
-        "type": "indirect"
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
       }
     }
   },
