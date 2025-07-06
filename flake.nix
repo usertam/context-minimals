@@ -1,16 +1,11 @@
 {
   inputs = {
-    context.flake = false;
-    context.url = "github:contextgarden/context";
-    context-fonts.flake = false;
-    context-fonts.url = "github:contextgarden/context-distribution-fonts";
-    context-modules.flake = false;
-    context-modules.url = "github:usertam/context-minimals/mirror/modules";
-    luatex.flake = false;
-    luatex.url = "github:TeX-Live/luatex";
-    nixpkgs.url = "flake:nixpkgs/nixpkgs-unstable";
-    systems.flake = false;
-    systems.url = "flake:systems";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    systems.url = "github:nix-systems/default";
+    context = { url = "github:contextgarden/context"; flake = false; };
+    context-fonts = { url = "github:contextgarden/context-distribution-fonts"; flake = false; };
+    context-modules = { url = "github:usertam/context-minimals/mirror/modules"; flake = false; };
+    luatex = { url = "gitlab:texlive/luatex?host=gitlab.lisn.upsaclay.fr"; flake = false; };
   };
 
   nixConfig.extra-substituters = "https://context-minimals.cachix.org";
@@ -28,10 +23,10 @@
           pkgs = inputs.nixpkgs.legacyPackages.${system};
         in {
           luametatex = pkgs.callPackage ./pkgs/luametatex {
-            src = inputs.context + /source/luametatex;
+            src = inputs.context + "/source/luametatex";
           };
           luatex = pkgs.callPackage ./pkgs/luatex {
-            src = inputs.luatex;
+            src = inputs.luatex + "/source";
           };
           context-minimals = pkgs.callPackage ./pkgs/context-minimals {
             inherit (inputs) context context-fonts context-modules;
