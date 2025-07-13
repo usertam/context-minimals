@@ -65,6 +65,7 @@ jobs:
           runs-on: macos-13
         - system: x86_64-linux
           runs-on: ubuntu-latest
+      fail-fast: false
     runs-on: ${{matrix.runs-on}}
     steps:
     - uses: actions/checkout@main
